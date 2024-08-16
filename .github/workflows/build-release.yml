@@ -1,0 +1,35 @@
+name: 🚀 Build release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      
+jobs:
+
+  build:
+    runs-on: macos-14 # Apple Silicon Runner
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: n1hility/cancel-previous-runs@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Select latest Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.1'
+        
+    - name: 🛠️ Build with release configuration
+      run: |
+        swift build --configuration release | xcpretty --utf --color && exit ${PIPESTATUS[0]}
+        
+    - uses: actions/upload-artifact@v4
+      with:
+        name: 'public-api-diff'
+        path: '.build/release/public-api-diff'
+        if-no-files-found: 'error'
+        retention-days: 0
+
