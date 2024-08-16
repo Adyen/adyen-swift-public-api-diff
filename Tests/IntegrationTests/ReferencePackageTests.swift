@@ -9,7 +9,7 @@ import XCTest
 
 class ReferencePackageTests: XCTestCase {
     
-    func test_basicPipeline() async throws {
+    func test_defaultPipeline() async throws {
         
         // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
         guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
@@ -25,11 +25,7 @@ class ReferencePackageTests: XCTestCase {
         let expectedOutput: String = try {
             let expectedOutputFilePath = try XCTUnwrap(Bundle.module.path(forResource: "expected-reference-changes", ofType: "md"))
             let expectedOutputData = try XCTUnwrap(FileManager.default.contents(atPath: expectedOutputFilePath))
-            var expectedOutput = try XCTUnwrap(String(data: expectedOutputData, encoding: .utf8))
-            if expectedOutput.hasSuffix("\n") {
-                expectedOutput.removeLast(1) // \n only counts as one character
-            }
-            return expectedOutput
+            return try XCTUnwrap(String(data: expectedOutputData, encoding: .utf8))
         }()
         
         let fileHandler: FileHandling = FileManager.default
@@ -47,6 +43,19 @@ class ReferencePackageTests: XCTestCase {
             logger: logger
         )
         
-        XCTAssertEqual(expectedOutput, pipelineOutput)
+        XCTAssertEqual(sanitizeOutput(expectedOutput), sanitizeOutput(pipelineOutput))
+    }
+}
+
+private extension ReferencePackageTests {
+    
+    /// Removes the 2nd line that contains local file paths + empty newline at the end of the content if it exists
+    func sanitizeOutput(_ output: String) -> String {
+        var lines = output.components(separatedBy: "\n")
+        lines.remove(at: 1) // 2nd line contains context specific paths
+        if lines.last?.isEmpty == true {
+            lines.removeLast() // Last line is empty because of empty newline
+        }
+        return lines.joined(separator: "\n")
     }
 }

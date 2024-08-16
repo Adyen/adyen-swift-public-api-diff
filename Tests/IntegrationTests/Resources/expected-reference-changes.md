@@ -1,5 +1,5 @@
 # 👀 11 public changes detected
-_Comparing `/Users/alexandergu/Code/adyen-swift-public-api-diff/ReferencePackages/UpdatedPackage` to `/Users/alexandergu/Code/adyen-swift-public-api-diff/ReferencePackages/ReferencePackage`_
+_Comparing `/.../.../UpdatedPackage` to `/.../.../ReferencePackage`_
 
 ---
 ## `ReferencePackage`
