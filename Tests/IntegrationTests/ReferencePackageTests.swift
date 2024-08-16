@@ -43,6 +43,14 @@ class ReferencePackageTests: XCTestCase {
             logger: logger
         )
         
+        print("Expected Output")
+        print(sanitizeOutput(expectedOutput))
+        print("----------------------------------------------------")
+        
+        print("Pipeline Output")
+        print(sanitizeOutput(pipelineOutput))
+        print("----------------------------------------------------")
+        
         XCTAssertEqual(sanitizeOutput(expectedOutput), sanitizeOutput(pipelineOutput))
     }
 }
