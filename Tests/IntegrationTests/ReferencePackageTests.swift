@@ -43,23 +43,15 @@ class ReferencePackageTests: XCTestCase {
             logger: logger
         )
         
-        print(pipelineOutput)
-        
-        /*
-        print("Expected Output")
-        print(sanitizeOutput(expectedOutput))
-        print("----------------------------------------------------")
-        
-        print("Pipeline Output")
-        print(sanitizeOutput(pipelineOutput))
-        print("----------------------------------------------------")
-        
         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
         let pipelineOutputLines = sanitizeOutput(pipelineOutput).components(separatedBy: "\n")
         
         for i in 0..<expectedLines.count  {
-            XCTAssertEqual(expectedLines[i], pipelineOutputLines[i])
-        }*/
+            if expectedLines[i] != pipelineOutputLines[i] {
+                XCTAssertEqual(expectedLines[i], pipelineOutputLines[i])
+                return
+            }
+        }
     }
 }
 
