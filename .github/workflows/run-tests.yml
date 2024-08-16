@@ -1,4 +1,4 @@
-name: Detect public API changes
+name: 🧪 Run Tests
 
 on:
   pull_request:
