@@ -10,7 +10,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.0")
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.3")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
