@@ -23,7 +23,7 @@ let package = Package(
             path: "Sources"
         ),
         .testTarget(
-            name: "PublicApiDiffTests",
+            name: "UnitTests",
             dependencies: ["public-api-diff"],
             resources: [
                 // Copy Tests/ExampleTests/Resources directories as-is.
@@ -31,6 +31,16 @@ let package = Package(
                 // Will be at top level in bundle.
                 .copy("Resources/dummy.abi.json"),
                 .copy("Resources/dummi-abi-flat-definition.md")
+            ]
+        ),
+        .testTarget(
+            name: "IntegrationTests",
+            dependencies: ["public-api-diff"],
+            resources: [
+                // Copy Tests/ExampleTests/Resources directories as-is.
+                // Use to retain directory structure.
+                // Will be at top level in bundle.
+                .copy("Resources/expected-reference-changes.md")
             ]
         )
     ]

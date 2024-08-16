@@ -20,6 +20,10 @@ jobs:
       with:
         xcode-version: '15.1'
         
-    - name: 🛠️ Run Tests
+    - name: 🛠️ Run Unit Tests
       run: |
-        xcodebuild test -scheme public-api-diff -destination "platform=iOS,name=Any iOS Device" | xcpretty --utf --color && exit
+        xcodebuild test -scheme public-api-diff -testPlan UnitTests -destination "platform=iOS,name=Any iOS Device" | xcpretty --utf --color && exit
+        
+    - name: 🤝 Run Integration Tests
+      run: |
+        xcodebuild test -scheme public-api-diff -testPlan IntegrationTests -destination "platform=iOS,name=Any iOS Device" | xcpretty --utf --color && exit

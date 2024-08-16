@@ -36,12 +36,41 @@ struct PublicApiDiff: AsyncParsableCommand {
         let currentDirectory = fileHandler.currentDirectoryPath
         let workingDirectoryPath = currentDirectory.appending("/tmp-public-api-diff")
         
+        let pipelineOutput = try await Pipeline.run(
+            newSource: newSource,
+            oldSource: oldSource,
+            scheme: scheme,
+            workingDirectoryPath: workingDirectoryPath,
+            fileHandler: fileHandler,
+            logger: logger
+        )
+        
+        if let output {
+            try fileHandler.write(pipelineOutput, to: output)
+        } else {
+            // We're not using a logger here as we always want to have it printed if no output was specified
+            print(pipelineOutput)
+        }
+    }
+}
+
+internal extension Pipeline {
+    
+    static func run(
+        newSource: ProjectSource,
+        oldSource: ProjectSource,
+        scheme: String?,
+        workingDirectoryPath: String,
+        fileHandler: FileHandling,
+        logger: Logging?
+    ) async throws -> String {
+        
         defer {
-            logger.debug("Cleaning up", from: "Main")
+            logger?.debug("Cleaning up", from: "Main")
             try? fileHandler.removeItem(atPath: workingDirectoryPath)
         }
         
-        let pipelineOutput = try await Pipeline(
+        return try await Pipeline(
             newProjectSource: newSource,
             oldProjectSource: oldSource,
             scheme: scheme,
@@ -53,12 +82,5 @@ struct PublicApiDiff: AsyncParsableCommand {
             outputGenerator: MarkdownOutputGenerator(),
             logger: logger
         ).run()
-        
-        if let output {
-            try fileHandler.write(pipelineOutput, to: output)
-        } else {
-            // We're not using a logger here as we always want to have it printed if no output was specified
-            print(pipelineOutput)
-        }
     }
 }
