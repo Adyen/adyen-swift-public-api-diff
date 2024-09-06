@@ -24,21 +24,22 @@ struct ProjectABIProvider: ABIGenerating {
             return []
         }
         
-        logger?.log("📋 Locating ABI file for `\(description)`", from: String(describing: Self.self))
+        logger?.log("📋 Locating ABI file for `\(scheme)` in `\(description)`", from: String(describing: Self.self))
         
-        let swiftModulePaths = shell.execute("cd '\(projectDirectory)'; find . -type d -name '\(scheme).swiftmodule'")
+        let swiftModulePaths = shell.execute("cd '\(projectDirectory.path())'; find . -type d -name '\(scheme).swiftmodule'")
             .components(separatedBy: .newlines)
             .map { URL(filePath: $0) }
 
-        guard let swiftModuleDirectory = swiftModulePaths.first else {
+        guard let swiftModulePath = swiftModulePaths.first?.path() else {
             throw FileHandlerError.pathDoesNotExist(path: "find . -type d -name '\(scheme).swiftmodule'")
         }
 
+        let swiftModuleDirectory = projectDirectory.appending(path: swiftModulePath)
         let swiftModuleDirectoryContent = try fileHandler.contentsOfDirectory(atPath: swiftModuleDirectory.path())
         guard let abiJsonFilePath = swiftModuleDirectoryContent.first(where: {
-            $0.hasSuffix("abi.json")
+            $0.hasSuffix(".abi.json")
         }) else {
-            throw FileHandlerError.pathDoesNotExist(path: swiftModuleDirectory.appending(path: ".abi.json").path())
+            throw FileHandlerError.pathDoesNotExist(path: swiftModuleDirectory.appending(path: "[MODULE_NAME].abi.json").path())
         }
         
         logger?.debug("- `\(abiJsonFilePath)`", from: String(describing: Self.self))
