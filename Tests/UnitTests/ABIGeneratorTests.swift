@@ -52,7 +52,7 @@ class ABIGeneratorTests: XCTestCase {
         
         let scheme = "Scheme"
         let pathToSwiftModule = "path/to/\(scheme).swiftmodule"
-        let expectedAbiJsonUrl = URL(filePath: "\(pathToSwiftModule)/abi.json")
+        let expectedAbiJsonUrl = URL(filePath: "projectDir/\(pathToSwiftModule)/.abi.json")
         
         var shell = MockShell()
         shell.handleExecute = { _ in
@@ -61,16 +61,16 @@ class ABIGeneratorTests: XCTestCase {
         
         var fileHandler = MockFileHandler()
         fileHandler.handleContentsOfDirectory = { _ in
-            ["abi.json"]
+            [".abi.json"]
         }
         
         var logger = MockLogger()
         logger.handleLog = { message, subsystem in
-            XCTAssertEqual(message, "📋 Locating ABI file for `description`")
+            XCTAssertEqual(message, "📋 Locating ABI file for `Scheme` in `description`")
             XCTAssertEqual(subsystem, "ProjectABIProvider")
         }
         logger.handleDebug = { message, subsystem in
-            XCTAssertEqual(message, "- `abi.json`")
+            XCTAssertEqual(message, "- `.abi.json`")
             XCTAssertEqual(subsystem, "ProjectABIProvider")
         }
         
@@ -80,7 +80,12 @@ class ABIGeneratorTests: XCTestCase {
             logger: logger
         )
         
-        let output = try abiGenerator.generate(for: URL(filePath: "projectDir"), scheme: scheme, description: "description")
+        let output = try abiGenerator.generate(
+            for: URL(filePath: "projectDir"),
+            scheme: scheme,
+            description: "description"
+        )
+        
         let expectedOutput: [ABIGeneratorOutput] = [.init(
             targetName: scheme,
             abiJsonFileUrl: expectedAbiJsonUrl

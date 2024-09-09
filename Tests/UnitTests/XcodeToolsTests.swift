@@ -39,7 +39,33 @@ class XcodeToolsTests: XCTestCase {
             return ""
         }
         
-        let xcodeTools = XcodeTools(shell: mockShell)
+        let fileHandler = MockFileHandler(handleFileExists: { filePath in
+            XCTAssertEqual(filePath, "\(projectDirectoryPath)/.build")
+            return true
+        })
+        
+        let xcodeTools = XcodeTools(shell: mockShell, fileHandler: fileHandler)
         try xcodeTools.build(projectDirectoryPath: projectDirectoryPath, scheme: allTargetsLibraryName, isPackage: true)
+    }
+    
+    func test_build_failing() throws {
+        let projectDirectoryPath = UUID().uuidString
+        let allTargetsLibraryName = UUID().uuidString
+        
+        let mockShell = MockShell { _ in return "" }
+        
+        let fileHandler = MockFileHandler(handleFileExists: { filePath in
+            XCTAssertEqual(filePath, "\(projectDirectoryPath)/.build")
+            return false
+        })
+        
+        let xcodeTools = XcodeTools(shell: mockShell, fileHandler: fileHandler)
+        do {
+            try xcodeTools.build(projectDirectoryPath: projectDirectoryPath, scheme: allTargetsLibraryName, isPackage: true)
+            XCTFail("Build should have failed")
+        } catch {
+            let xcodeToolsError = try XCTUnwrap(error as? XcodeToolsError)
+            XCTAssertEqual(xcodeToolsError.errorDescription, "💥 Building project failed")
+        }
     }
 }
