@@ -19,8 +19,10 @@ struct ProjectABIProvider: ABIGenerating {
         description: String
     ) throws -> [ABIGeneratorOutput] {
         
-        // TODO: Instead of using the abi.json - use the .swiftinterface file instead (Parsable with SwiftSyntax)
-        // The .swiftinterface file also does exist for SwiftPackages with binary targets (not for non-binary Swift Packages tho unfortunately)
+        // TODO: For binary frameworks:
+        // Instead of using the abi.json - use the .swiftinterface file instead (Parsable with SwiftSyntax)
+        // The .swiftinterface file also does exist for SwiftPackages with binary targets
+        // (for non-binary Swift Packages we would still parse the abi.json)
         
         guard let scheme else {
             assertionFailure("ProjectABIProvider needs a scheme to be passed to \(#function)")
