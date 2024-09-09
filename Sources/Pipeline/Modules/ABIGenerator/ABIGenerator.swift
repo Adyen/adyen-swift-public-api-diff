@@ -20,7 +20,7 @@ struct ABIGenerator: ABIGenerating {
         logger: Logging?
     ) {
         self.shell = shell
-        self.xcodeTools = XcodeTools(shell: shell)
+        self.xcodeTools = XcodeTools(shell: shell, fileHandler: fileHandler)
         self.packageFileHelper = .init(fileHandler: fileHandler, xcodeTools: xcodeTools)
         self.fileHandler = fileHandler
         self.logger = logger

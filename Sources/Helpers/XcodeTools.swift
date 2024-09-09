@@ -22,9 +22,14 @@ struct XcodeTools {
     }
     
     private let shell: ShellHandling
+    private let fileHandler: FileHandling
     
-    init(shell: ShellHandling = Shell()) {
+    init(
+        shell: ShellHandling = Shell(),
+        fileHandler: FileHandling = FileManager.default
+    ) {
         self.shell = shell
+        self.fileHandler = fileHandler
     }
     
     func loadPackageDescription(
@@ -60,7 +65,11 @@ struct XcodeTools {
         // print("👾 \(command.joined(separator: " "))")
         let result = shell.execute(command.joined(separator: " "))
         
-        if result.range(of: "xcodebuild: error:") != nil || result.range(of: "BUILD FAILED") != nil {
+        if 
+            !fileHandler.fileExists(atPath: "\(projectDirectoryPath)/\(Constants.derivedDataPath)") ||
+            result.range(of: "xcodebuild: error:") != nil ||
+            result.range(of: "BUILD FAILED") != nil
+        {
             print(result)
             throw XcodeToolsError(
                 errorDescription: "💥 Building project failed",

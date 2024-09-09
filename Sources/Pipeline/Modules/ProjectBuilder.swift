@@ -76,7 +76,10 @@ private extension ProjectBuilder {
             logger: logger
         )
         
-        let xcodeTools = XcodeTools(shell: shell)
+        let xcodeTools = XcodeTools(
+            shell: shell,
+            fileHandler: fileHandler
+        )
         
         try Self.buildProject(
             projectDirectoryPath: sourceWorkingDirectoryPath,

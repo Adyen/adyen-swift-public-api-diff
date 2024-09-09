@@ -21,7 +21,7 @@ struct PublicApiDiff: AsyncParsableCommand {
     @Option(help: "Where to output the result (File path)")
     public var output: String?
     
-    @Option(help: "Which scheme to build")
+    @Option(help: "Which scheme to build (Needed when comparing 2 swift frameworks)")
     public var scheme: String?
     
     public func run() async throws {

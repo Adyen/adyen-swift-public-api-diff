@@ -41,6 +41,10 @@ class ProjectBuilderTests: XCTestCase {
             XCTAssertEqual(path, "\(baseWorkingDirectoryPath)/\(randomString)/Package.swift")
             return true
         }
+        fileHandler.handleFileExists = { path in
+            XCTAssertEqual(path, "\(baseWorkingDirectoryPath)/\(randomString)/.build")
+            return true
+        }
         var shell = MockShell()
         shell.handleExecute = { command in
             if command == "cd \(baseWorkingDirectoryPath)/\(randomString); swift package describe --type json" {
