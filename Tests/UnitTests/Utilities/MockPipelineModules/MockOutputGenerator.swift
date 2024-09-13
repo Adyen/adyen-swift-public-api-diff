@@ -9,9 +9,9 @@ import XCTest
 
 struct MockOutputGenerator: OutputGenerating {
     
-    var onGenerate: ([String: [Change]], [String], ProjectSource, ProjectSource) throws -> String
+    var onGenerate: ([String: [Change]], [String], ProjectSource, ProjectSource, [String]) throws -> String
     
-    func generate(from changesPerTarget: [String: [Change]], allTargets: [String], oldSource: ProjectSource, newSource: ProjectSource) throws -> String {
-        try onGenerate(changesPerTarget, allTargets, oldSource, newSource)
+    func generate(from changesPerTarget: [String: [Change]], allTargets: [String], oldSource: ProjectSource, newSource: ProjectSource, warnings: [String]) throws -> String {
+        try onGenerate(changesPerTarget, allTargets, oldSource, newSource, warnings)
     }
 }

@@ -24,7 +24,8 @@ class OutputGeneratorTests: XCTestCase {
             from: [:],
             allTargets: ["Target_1"],
             oldSource: .local(path: "old_source"),
-            newSource: .local(path: "new_source")
+            newSource: .local(path: "new_source"),
+            warnings: []
         )
         XCTAssertEqual(output, expectedOutput)
     }
@@ -52,7 +53,8 @@ class OutputGeneratorTests: XCTestCase {
             from: ["Target_1": [.init(changeType: .addition(description: "Some Addition"), parentName: "")]],
             allTargets: ["Target_1"],
             oldSource: .local(path: "old_source"),
-            newSource: .local(path: "new_source")
+            newSource: .local(path: "new_source"),
+            warnings: []
         )
         XCTAssertEqual(output, expectedOutput)
     }
@@ -102,7 +104,8 @@ class OutputGeneratorTests: XCTestCase {
             ],
             allTargets: ["Target_1", "Target_2"],
             oldSource: .remote(branch: "old_branch", repository: "old_repository"),
-            newSource: .local(path: "new_source")
+            newSource: .local(path: "new_source"),
+            warnings: []
         )
         XCTAssertEqual(output, expectedOutput)
     }

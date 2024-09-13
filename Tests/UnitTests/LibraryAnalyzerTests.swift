@@ -33,7 +33,7 @@ class LibraryAnalyzerTests: XCTestCase {
         
         let xcodeTools = XcodeTools(shell: shell)
         
-        let libraryAnalyzer = LibraryAnalyzer(
+        let libraryAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
             xcodeTools: xcodeTools
         )
@@ -44,7 +44,7 @@ class LibraryAnalyzerTests: XCTestCase {
         )
         
         let expectedChanges: [Change] = []
-        XCTAssertEqual(changes, expectedChanges)
+        XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)
     }
@@ -86,7 +86,7 @@ class LibraryAnalyzerTests: XCTestCase {
         
         let xcodeTools = XcodeTools(shell: shell)
         
-        let libraryAnalyzer = LibraryAnalyzer(fileHandler: fileHandler, xcodeTools: xcodeTools)
+        let libraryAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler, xcodeTools: xcodeTools)
         
         let changes = try libraryAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldPackage"),
@@ -97,7 +97,7 @@ class LibraryAnalyzerTests: XCTestCase {
             .init(changeType: .removal(description: ".library(name: \"OldLibrary\", ...)"), parentName: ""),
             .init(changeType: .addition(description: ".library(name: \"NewLibrary\", ...)"), parentName: "")
         ]
-        XCTAssertEqual(changes, expectedChanges)
+        XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)
     }
@@ -111,7 +111,7 @@ class LibraryAnalyzerTests: XCTestCase {
             handleFileExpectation.fulfill()
             return false // Package.swift file does not exist
         }
-        let libraryAnalyzer = LibraryAnalyzer(fileHandler: fileHandler)
+        let libraryAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler)
         
         let changes = try libraryAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldProject"),
@@ -119,7 +119,7 @@ class LibraryAnalyzerTests: XCTestCase {
         )
         
         let expectedChanges: [Change] = []
-        XCTAssertEqual(changes, expectedChanges)
+        XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)
     }

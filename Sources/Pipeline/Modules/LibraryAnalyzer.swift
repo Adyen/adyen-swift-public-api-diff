@@ -6,7 +6,7 @@
 
 import Foundation
 
-struct LibraryAnalyzer: LibraryAnalyzing {
+struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
     
     let fileHandler: FileHandling
     let xcodeTools: XcodeTools
@@ -19,7 +19,7 @@ struct LibraryAnalyzer: LibraryAnalyzing {
         self.xcodeTools = xcodeTools
     }
     
-    func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> [Change] {
+    func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> ProjectAnalyzerResult {
         
         let oldProjectPath = oldProjectUrl.path()
         let newProjectPath = newProjectUrl.path()
@@ -34,18 +34,24 @@ struct LibraryAnalyzer: LibraryAnalyzing {
             )
             
             return try analyze(
-                old: packageHelper.availableProducts(at: oldProjectPath),
-                new: packageHelper.availableProducts(at: newProjectPath)
+                old: packageHelper.packageDescription(at: oldProjectPath),
+                new: packageHelper.packageDescription(at: newProjectPath)
             )
         } else {
-            return []
+            return .init(
+                changes: [],
+                warnings: []
+            )
         }
     }
     
     private func analyze(
-        old oldLibraries: Set<String>,
-        new newLibraries: Set<String>
-    ) throws -> [Change] {
+        old oldPackageDescription: SwiftPackageDescription,
+        new newPackageDescription: SwiftPackageDescription
+    ) throws -> ProjectAnalyzerResult {
+        
+        let oldLibraries = Set(oldPackageDescription.products.map(\.name))
+        let newLibraries = Set(newPackageDescription.products.map(\.name))
         
         let removedLibaries = oldLibraries.subtracting(newLibraries)
         var packageChanges = [Change]()
@@ -65,6 +71,9 @@ struct LibraryAnalyzer: LibraryAnalyzing {
             )
         }
         
-        return packageChanges
+        return .init(
+            changes: packageChanges,
+            warnings: newPackageDescription.warnings
+        )
     }
 }
