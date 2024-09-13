@@ -7,7 +7,7 @@
 @testable import public_api_diff
 import XCTest
 
-class LibraryAnalyzerTests: XCTestCase {
+class SwiftPackageFileAnalyzerTests: XCTestCase {
     
     func test_noPackageLibraryDifferences_causeNoChanges() throws {
         
@@ -33,12 +33,12 @@ class LibraryAnalyzerTests: XCTestCase {
         
         let xcodeTools = XcodeTools(shell: shell)
         
-        let libraryAnalyzer = SwiftPackageFileAnalyzer(
+        let projectAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
             xcodeTools: xcodeTools
         )
         
-        let changes = try libraryAnalyzer.analyze(
+        let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "NewPackage"),
             newProjectUrl: URL(filePath: "NewPackage")
         )
@@ -86,9 +86,9 @@ class LibraryAnalyzerTests: XCTestCase {
         
         let xcodeTools = XcodeTools(shell: shell)
         
-        let libraryAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler, xcodeTools: xcodeTools)
+        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler, xcodeTools: xcodeTools)
         
-        let changes = try libraryAnalyzer.analyze(
+        let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldPackage"),
             newProjectUrl: URL(filePath: "NewPackage")
         )
@@ -111,9 +111,9 @@ class LibraryAnalyzerTests: XCTestCase {
             handleFileExpectation.fulfill()
             return false // Package.swift file does not exist
         }
-        let libraryAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler)
+        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler)
         
-        let changes = try libraryAnalyzer.analyze(
+        let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldProject"),
             newProjectUrl: URL(filePath: "NewProject")
         )

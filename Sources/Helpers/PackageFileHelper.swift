@@ -116,7 +116,7 @@ private extension PackageFileHelper {
                 let directoryTag = "'\(URL(filePath: projectDirectoryPath).lastPathComponent)': "
                 let warning = firstLine
                     .replacingOccurrences(of: warningTag, with: "")
-                    .replacingOccurrences(of: directoryTag, with: "")
+                    .replacingOccurrences(of: directoryTag, with: "", options: .caseInsensitive)
                 warnings += [warning]
             }
             

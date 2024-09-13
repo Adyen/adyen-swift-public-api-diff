@@ -17,7 +17,7 @@ class PipelineTests: XCTestCase {
         let abiGeneratorExpectation = expectation(description: "ABIGenerator is called twice")
         abiGeneratorExpectation.expectedFulfillmentCount = 2
         
-        let libraryAnalyzerExpectation = expectation(description: "LibraryAnalyzer is called once")
+        let projectAnalyzerExpectation = expectation(description: "ProjectAnalyzer is called once")
         
         let dumpGeneratorExpectation = expectation(description: "SDKDumpGenerator is called twice")
         dumpGeneratorExpectation.expectedFulfillmentCount = 2
@@ -82,7 +82,7 @@ class PipelineTests: XCTestCase {
                 expectedSteps.removeFirst()
                 XCTAssertEqual(new, expectedSteps.first as? URL)
                 expectedSteps.removeFirst()
-                libraryAnalyzerExpectation.fulfill()
+                projectAnalyzerExpectation.fulfill()
                 
                 return .init(
                     changes: [.init(changeType: .addition(description: "A Library was added"), parentName: "Parent")],
@@ -126,7 +126,7 @@ class PipelineTests: XCTestCase {
         await fulfillment(of: [
             projectBuilderExpectation,
             abiGeneratorExpectation,
-            libraryAnalyzerExpectation,
+            projectAnalyzerExpectation,
             dumpGeneratorExpectation,
             dumpAnalyzerExpectation
         ])
