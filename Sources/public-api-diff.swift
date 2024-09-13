@@ -76,7 +76,7 @@ internal extension Pipeline {
             scheme: scheme,
             projectBuilder: ProjectBuilder(baseWorkingDirectoryPath: workingDirectoryPath, logger: logger),
             abiGenerator: ABIGenerator(logger: logger),
-            projectAnalyzer: SwiftPackageAnalyzer(),
+            projectAnalyzer: SwiftPackageFileAnalyzer(),
             sdkDumpGenerator: SDKDumpGenerator(),
             sdkDumpAnalyzer: SDKDumpAnalyzer(),
             outputGenerator: MarkdownOutputGenerator(),

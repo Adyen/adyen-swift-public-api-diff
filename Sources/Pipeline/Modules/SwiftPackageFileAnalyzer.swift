@@ -7,7 +7,7 @@
 import Foundation
 import PackageDescription
 
-struct SwiftPackageAnalyzer: ProjectAnalyzing {
+struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
     
     let fileHandler: FileHandling
     let xcodeTools: XcodeTools
@@ -32,11 +32,11 @@ struct SwiftPackageAnalyzer: ProjectAnalyzing {
         let oldProjectPath = oldProjectUrl.path()
         let newProjectPath = newProjectUrl.path()
         
-        let oldPackagePath = PackageFileHelper.packagePath(for: oldProjectPath)
-        let newPackagePath = PackageFileHelper.packagePath(for: newProjectPath)
+        let oldPackagePath = SwiftPackageFileHelper.packagePath(for: oldProjectPath)
+        let newPackagePath = SwiftPackageFileHelper.packagePath(for: newProjectPath)
         
         if fileHandler.fileExists(atPath: oldPackagePath), fileHandler.fileExists(atPath: newPackagePath) {
-            let packageHelper = PackageFileHelper(
+            let packageHelper = SwiftPackageFileHelper(
                 fileHandler: fileHandler,
                 xcodeTools: xcodeTools
             )
@@ -51,7 +51,7 @@ struct SwiftPackageAnalyzer: ProjectAnalyzing {
     }
 }
 
-private extension SwiftPackageAnalyzer {
+private extension SwiftPackageFileAnalyzer {
     
     private func analyze(
         old: SwiftPackageDescription,

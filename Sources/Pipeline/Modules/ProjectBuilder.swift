@@ -182,7 +182,7 @@ private extension ProjectBuilder {
             // Creating an `.library(name: "_allTargets", targets: [ALL_TARGETS])`
             // so we only have to build once and then can generate ABI files for every module from a single build
             schemeToBuild = "_AllTargets"
-            let packageFileHelper = PackageFileHelper(fileHandler: fileHandler, xcodeTools: xcodeTools)
+            let packageFileHelper = SwiftPackageFileHelper(fileHandler: fileHandler, xcodeTools: xcodeTools)
             try packageFileHelper.preparePackageWithConsolidatedLibrary(named: schemeToBuild, at: projectDirectoryPath)
         }
         
