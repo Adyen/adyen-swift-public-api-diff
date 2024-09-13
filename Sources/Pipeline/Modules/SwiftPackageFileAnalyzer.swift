@@ -5,7 +5,6 @@
 //
 
 import Foundation
-import PackageDescription
 
 struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
     
@@ -18,7 +17,7 @@ struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
             "\(packageFileName) / \(child)"
         }
     }
-    
+
     init(
         fileHandler: FileHandling = FileManager.default,
         xcodeTools: XcodeTools = XcodeTools()

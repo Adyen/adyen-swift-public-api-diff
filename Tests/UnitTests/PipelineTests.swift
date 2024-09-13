@@ -92,7 +92,7 @@ class PipelineTests: XCTestCase {
                         parentName: "Parent"
                     )],
                     warnings: []
-                ) 
+                )
             }),
             sdkDumpGenerator: MockSDKDumpGenerator(onGenerate: { url in
                 XCTAssertEqual(url, expectedSteps.first as? URL)

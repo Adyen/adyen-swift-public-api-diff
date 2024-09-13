@@ -113,7 +113,11 @@ private extension SwiftPackageFileHelper {
             }
             
             if firstLine.starts(with: warningTag) {
-                warnings += [firstLine]
+                let directoryTag = "'\(URL(filePath: projectDirectoryPath).lastPathComponent)': "
+                let warning = firstLine
+                    .replacingOccurrences(of: warningTag, with: "")
+                    .replacingOccurrences(of: directoryTag, with: "", options: .caseInsensitive)
+                warnings += [warning]
             }
             
             if 
