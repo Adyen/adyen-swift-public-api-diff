@@ -220,16 +220,6 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
         
         XCTAssertEqual(changes.changes, expectedChanges)
         
-        let outputGenerator = MarkdownOutputGenerator()
-        let output = outputGenerator.generate(
-            from: ["": changes.changes],
-            allTargets: [],
-            oldSource: .local(path: "old"),
-            newSource: .local(path: "new"),
-            warnings: changes.warnings
-        )
-        print(output)
-        
         waitForExpectations(timeout: 1)
     }
     
