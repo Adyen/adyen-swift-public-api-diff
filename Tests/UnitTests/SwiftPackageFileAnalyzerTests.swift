@@ -23,8 +23,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
         shell.handleExecute = { _ in
             let packageDescription = SwiftPackageDescription(
                 defaultLocalization: "en-en",
-                products: [],
-                targets: [],
+                name: "Name",
                 toolsVersion: "1.0"
             )
             let encodedPackageDescription = try! JSONEncoder().encode(packageDescription)
@@ -66,17 +65,47 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             
             if command.range(of: "NewPackage") != nil {
                 packageDescription = SwiftPackageDescription(
-                    defaultLocalization: "en-en",
-                    products: [.init(name: "NewLibrary", targets: [])],
-                    targets: [],
+                    defaultLocalization: "en-us",
+                    name: "New Name",
+                    platforms: [.init(name: "iOS", version: "15.0"), .init(name: "visionOS", version: "1.0")],
+                    products: [
+                        .init(name: "New Library", targets: ["New Target"]),
+                        .init(name: "Some Library", targets: ["Some Target", "New Target"])
+                    ],
+                    targets: [
+                        .init(name: "New Target", type: .binary, path: "new/path", moduleType: .swiftTarget),
+                        .init(
+                            name: "Some Target",
+                            type: .library,
+                            path: "some/new/path",
+                            moduleType: .swiftTarget,
+                            productDependencies: ["Some Product Dependency", "New Product Dependency"],
+                            targetDependencies: ["Some Target Dependency", "New Target Dependency"]
+                        ),
+                    ],
                     toolsVersion: "1.0"
                 )
             } else {
                 packageDescription = SwiftPackageDescription(
-                    defaultLocalization: "en-en",
-                    products: [.init(name: "OldLibrary", targets: [])],
-                    targets: [],
-                    toolsVersion: "1.0"
+                    defaultLocalization: "nl-nl",
+                    name: "Old Name",
+                    platforms: [.init(name: "iOS", version: "12.0"), .init(name: "macOS", version: "10.0")],
+                    products: [
+                        .init(name: "Old Library", targets: ["Old Target"]),
+                        .init(name: "Some Library", targets: ["Some Target", "Old Target"])
+                    ],
+                    targets: [
+                        .init(name: "Old Target", type: .test, path: "old/path", moduleType: .swiftTarget),
+                        .init(
+                            name: "Some Target",
+                            type: .binary,
+                            path: "some/old/path",
+                            moduleType: .swiftTarget,
+                            productDependencies: ["Some Product Dependency", "Old Product Dependency"],
+                            targetDependencies: ["Some Target Dependency", "Old Target Dependency"]
+                        ),
+                    ],
+                    toolsVersion: "2.0"
                 )
             }
             
@@ -86,7 +115,10 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
         
         let xcodeTools = XcodeTools(shell: shell)
         
-        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler, xcodeTools: xcodeTools)
+        let projectAnalyzer = SwiftPackageFileAnalyzer(
+            fileHandler: fileHandler,
+            xcodeTools: xcodeTools
+        )
         
         let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldPackage"),
@@ -94,10 +126,109 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
         )
         
         let expectedChanges: [Change] = [
-            .init(changeType: .removal(description: ".library(name: \"OldLibrary\", ...)"), parentName: ""),
-            .init(changeType: .addition(description: ".library(name: \"NewLibrary\", ...)"), parentName: "")
+            .init(
+                changeType: .change(
+                    oldDescription: "// swift-tools-version: 2.0",
+                    newDescription: "// swift-tools-version: 1.0"
+                ),
+                parentName: "Package.swift",
+                listOfChanges: []
+            ),
+            .init(
+                changeType: .change(
+                    oldDescription: "defaultLocalization: \"nl-nl\"",
+                    newDescription: "defaultLocalization: \"en-us\""
+                ),
+                parentName: "Package.swift",
+                listOfChanges: []
+            ),
+            .init(
+                changeType: .change(
+                    oldDescription: "name: \"Old Name\"",
+                    newDescription: "name: \"New Name\""
+                ),
+                parentName: "Package.swift",
+                listOfChanges: []
+            ),
+            .init(
+                changeType: .change(
+                    oldDescription: "platforms: [iOS(12.0), macOS(10.0)]",
+                    newDescription: "platforms: [iOS(15.0), visionOS(1.0)]"
+                ),
+                parentName: "Package.swift",
+                listOfChanges: [
+                    "Added visionOS(1.0)",
+                    "Changed from iOS(12.0) to iOS(15.0)",
+                    "Removed macOS(10.0)"
+                ]
+            ),
+            .init(
+                changeType: .addition(
+                    description: ".library(name: \"New Library\", targets: [\"New Target\"])"
+                ),
+                parentName: "Package.swift / products",
+                listOfChanges: []
+            ),
+            .init(
+                changeType: .change(
+                    oldDescription: ".library(name: \"Some Library\", targets: [\"Some Target\", \"Old Target\"])",
+                    newDescription: ".library(name: \"Some Library\", targets: [\"Some Target\", \"New Target\"])"
+                ),
+                parentName: "Package.swift / products",
+                listOfChanges: [
+                    "Added target \"New Target\"",
+                    "Removed target \"Old Target\""
+                ]
+            ),
+            .init(
+                changeType: .removal(
+                    description: ".library(name: \"Old Library\", targets: [\"Old Target\"])"
+                ),
+                parentName: "Package.swift / products",
+                listOfChanges: []
+            ),
+            .init(
+                changeType: .addition(
+                    description: ".binaryTarget(name: \"New Target\", path: \"new/path\")"
+                ),
+                parentName: "Package.swift / targets",
+                listOfChanges: []
+            ),
+            .init(
+                changeType: .change(
+                    oldDescription: ".binaryTarget(name: \"Some Target\", dependencies: [.target(name: \"Some Target Dependency\"), .target(name: \"Old Target Dependency\"), .product(name: \"Some Product Dependency\", ...), .product(name: \"Old Product Dependency\", ...)], path: \"some/old/path\")",
+                    newDescription: ".target(name: \"Some Target\", dependencies: [.target(name: \"Some Target Dependency\"), .target(name: \"New Target Dependency\"), .product(name: \"Some Product Dependency\", ...), .product(name: \"New Product Dependency\", ...)], path: \"some/new/path\")"
+                ),
+                parentName: "Package.swift / targets",
+                listOfChanges: [
+                    "Added dependency .target(name: \"New Target Dependency\")",
+                    "Added dependency .product(name: \"New Product Dependency\", ...)",
+                    "Changed path from \"some/old/path\" to \"some/new/path\"",
+                    "Changed type from `.binaryTarget` to `.target`",
+                    "Removed dependency .target(name: \"Old Target Dependency\")",
+                    "Removed dependency .product(name: \"Old Product Dependency\", ...)"
+                ]
+            ),
+            .init(
+                changeType: .removal(
+                    description: ".testTarget(name: \"Old Target\", path: \"old/path\")"
+                ),
+                parentName: "Package.swift / targets",
+                listOfChanges: []
+            )
         ]
+        
         XCTAssertEqual(changes.changes, expectedChanges)
+        
+        let outputGenerator = MarkdownOutputGenerator()
+        let output = outputGenerator.generate(
+            from: ["": changes.changes],
+            allTargets: [],
+            oldSource: .local(path: "old"),
+            newSource: .local(path: "new"),
+            warnings: changes.warnings
+        )
+        print(output)
         
         waitForExpectations(timeout: 1)
     }
