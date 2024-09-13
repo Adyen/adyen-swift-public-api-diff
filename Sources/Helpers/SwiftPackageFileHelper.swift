@@ -59,13 +59,6 @@ struct SwiftPackageFileHelper {
         return Set(targets.map(\.name))
     }
     
-    /*
-    func availableProducts(at projectDirectoryPath: String) throws -> Set<String> {
-        let packageDescription = try packageDescription(at: projectDirectoryPath)
-        return Set(packageDescription.products.map(\.name))
-    }
-     */
-    
     func packageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
         try generatePackageDescription(at: projectDirectoryPath)
     }
