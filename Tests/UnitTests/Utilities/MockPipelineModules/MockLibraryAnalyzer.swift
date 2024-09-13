@@ -7,11 +7,11 @@
 @testable import public_api_diff
 import XCTest
 
-struct MockLibraryAnalyzer: LibraryAnalyzing {
+struct MockProjectAnalyzer: ProjectAnalyzing {
     
-    var onAnalyze: (URL, URL) throws -> [Change]
+    var onAnalyze: (URL, URL) throws -> ProjectAnalyzerResult
     
-    func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> [Change] {
+    func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> ProjectAnalyzerResult {
         try onAnalyze(oldProjectUrl, newProjectUrl)
     }
 }

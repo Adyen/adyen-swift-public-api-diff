@@ -7,7 +7,7 @@
 @testable import public_api_diff
 import XCTest
 
-class LibraryAnalyzerTests: XCTestCase {
+class SwiftPackageFileAnalyzerTests: XCTestCase {
     
     func test_noPackageLibraryDifferences_causeNoChanges() throws {
         
@@ -33,18 +33,18 @@ class LibraryAnalyzerTests: XCTestCase {
         
         let xcodeTools = XcodeTools(shell: shell)
         
-        let libraryAnalyzer = LibraryAnalyzer(
+        let projectAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
             xcodeTools: xcodeTools
         )
         
-        let changes = try libraryAnalyzer.analyze(
+        let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "NewPackage"),
             newProjectUrl: URL(filePath: "NewPackage")
         )
         
         let expectedChanges: [Change] = []
-        XCTAssertEqual(changes, expectedChanges)
+        XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)
     }
@@ -86,9 +86,9 @@ class LibraryAnalyzerTests: XCTestCase {
         
         let xcodeTools = XcodeTools(shell: shell)
         
-        let libraryAnalyzer = LibraryAnalyzer(fileHandler: fileHandler, xcodeTools: xcodeTools)
+        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler, xcodeTools: xcodeTools)
         
-        let changes = try libraryAnalyzer.analyze(
+        let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldPackage"),
             newProjectUrl: URL(filePath: "NewPackage")
         )
@@ -97,7 +97,7 @@ class LibraryAnalyzerTests: XCTestCase {
             .init(changeType: .removal(description: ".library(name: \"OldLibrary\", ...)"), parentName: ""),
             .init(changeType: .addition(description: ".library(name: \"NewLibrary\", ...)"), parentName: "")
         ]
-        XCTAssertEqual(changes, expectedChanges)
+        XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)
     }
@@ -111,15 +111,15 @@ class LibraryAnalyzerTests: XCTestCase {
             handleFileExpectation.fulfill()
             return false // Package.swift file does not exist
         }
-        let libraryAnalyzer = LibraryAnalyzer(fileHandler: fileHandler)
+        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler)
         
-        let changes = try libraryAnalyzer.analyze(
+        let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldProject"),
             newProjectUrl: URL(filePath: "NewProject")
         )
         
         let expectedChanges: [Change] = []
-        XCTAssertEqual(changes, expectedChanges)
+        XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)
     }

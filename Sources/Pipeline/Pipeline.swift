@@ -14,7 +14,7 @@ struct Pipeline {
     
     let projectBuilder: any ProjectBuilding
     let abiGenerator: any ABIGenerating
-    let libraryAnalyzer: any LibraryAnalyzing
+    let projectAnalyzer: any ProjectAnalyzing
     let sdkDumpGenerator: any SDKDumpGenerating
     let sdkDumpAnalyzer: any SDKDumpAnalyzing
     let outputGenerator: any OutputGenerating
@@ -26,7 +26,7 @@ struct Pipeline {
         scheme: String?,
         projectBuilder: any ProjectBuilding,
         abiGenerator: any ABIGenerating,
-        libraryAnalyzer: any LibraryAnalyzing,
+        projectAnalyzer: any ProjectAnalyzing,
         sdkDumpGenerator: any SDKDumpGenerating,
         sdkDumpAnalyzer: any SDKDumpAnalyzing,
         outputGenerator: any OutputGenerating,
@@ -37,7 +37,7 @@ struct Pipeline {
         self.scheme = scheme
         self.projectBuilder = projectBuilder
         self.abiGenerator = abiGenerator
-        self.libraryAnalyzer = libraryAnalyzer
+        self.projectAnalyzer = projectAnalyzer
         self.sdkDumpGenerator = sdkDumpGenerator
         self.sdkDumpAnalyzer = sdkDumpAnalyzer
         self.outputGenerator = outputGenerator
@@ -53,11 +53,13 @@ struct Pipeline {
         )
         
         var changes = [String: [Change]]()
+        var warnings = [String]()
         
         try analyzeLibraryChanges(
             oldProjectUrl: oldProjectUrl,
             newProjectUrl: newProjectUrl,
-            changes: &changes
+            changes: &changes,
+            warnings: &warnings
         )
         
         let allTargets = try analyzeApiChanges(
@@ -70,7 +72,8 @@ struct Pipeline {
             from: changes,
             allTargets: allTargets.sorted(),
             oldSource: oldProjectSource,
-            newSource: newProjectSource
+            newSource: newProjectSource,
+            warnings: warnings
         )
     }
 }
@@ -124,16 +127,18 @@ private extension Pipeline {
         return allTargets.sorted()
     }
     
-    func analyzeLibraryChanges(oldProjectUrl: URL, newProjectUrl: URL, changes: inout [String: [Change]]) throws {
+    func analyzeLibraryChanges(oldProjectUrl: URL, newProjectUrl: URL, changes: inout [String: [Change]], warnings: inout [String]) throws {
         // Analyzing if there are any changes in available libraries between the project versions
-        let libraryChanges = try libraryAnalyzer.analyze(
+        let projectChanges = try projectAnalyzer.analyze(
             oldProjectUrl: oldProjectUrl,
             newProjectUrl: newProjectUrl
         )
         
-        if !libraryChanges.isEmpty {
-            changes[""] = libraryChanges
+        if !projectChanges.changes.isEmpty {
+            changes[""] = projectChanges.changes
         }
+        
+        warnings = projectChanges.warnings
     }
     
     func analyzeApiChanges(oldProjectUrl: URL, newProjectUrl: URL, changes: inout [String: [Change]]) throws -> [String] {

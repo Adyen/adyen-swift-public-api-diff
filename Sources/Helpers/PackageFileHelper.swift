@@ -59,9 +59,8 @@ struct PackageFileHelper {
         return Set(targets.map(\.name))
     }
     
-    func availableProducts(at projectDirectoryPath: String) throws -> Set<String> {
-        let packageDescription = try packageDescription(at: projectDirectoryPath)
-        return Set(packageDescription.products.map(\.name))
+    func packageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
+        try generatePackageDescription(at: projectDirectoryPath)
     }
     
     /// Inserts a new library into the targets section containing all targets from the target section
@@ -92,7 +91,7 @@ struct PackageFileHelper {
 
 private extension PackageFileHelper {
     
-    func packageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
+    func generatePackageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
         
         let result = try xcodeTools.loadPackageDescription(projectDirectoryPath: projectDirectoryPath)
         
@@ -114,7 +113,11 @@ private extension PackageFileHelper {
             }
             
             if firstLine.starts(with: warningTag) {
-                warnings += [firstLine]
+                let directoryTag = "'\(URL(filePath: projectDirectoryPath).lastPathComponent)': "
+                let warning = firstLine
+                    .replacingOccurrences(of: warningTag, with: "")
+                    .replacingOccurrences(of: directoryTag, with: "", options: .caseInsensitive)
+                warnings += [warning]
             }
             
             if firstLine.starts(with: "{"),
