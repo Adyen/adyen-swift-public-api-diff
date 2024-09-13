@@ -59,9 +59,15 @@ struct PackageFileHelper {
         return Set(targets.map(\.name))
     }
     
+    /*
     func availableProducts(at projectDirectoryPath: String) throws -> Set<String> {
         let packageDescription = try packageDescription(at: projectDirectoryPath)
         return Set(packageDescription.products.map(\.name))
+    }
+     */
+    
+    func packageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
+        try generatePackageDescription(at: projectDirectoryPath)
     }
     
     /// Inserts a new library into the targets section containing all targets from the target section
@@ -92,7 +98,7 @@ struct PackageFileHelper {
 
 private extension PackageFileHelper {
     
-    func packageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
+    func generatePackageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
         
         let result = try xcodeTools.loadPackageDescription(projectDirectoryPath: projectDirectoryPath)
         
@@ -117,17 +123,23 @@ private extension PackageFileHelper {
                 warnings += [firstLine]
             }
             
-            if firstLine.starts(with: "{"),
-               let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8) {
-                var packageDescription = try JSONDecoder().decode(SwiftPackageDescription.self, from: packageDescriptionData)
-                packageDescription.warnings = warnings
-                return packageDescription
+            if 
+                firstLine.starts(with: "{"),
+                let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8)
+            {
+                return try decodePackageDescription(from: packageDescriptionData, warnings: warnings)
             }
             
             packageDescriptionLines.removeFirst()
         }
         
         throw PackageFileHelperError.couldNotGeneratePackageDescription
+    }
+    
+    func decodePackageDescription(from packageDescriptionData: Data, warnings: [String]) throws -> SwiftPackageDescription {
+        var packageDescription = try JSONDecoder().decode(SwiftPackageDescription.self, from: packageDescriptionData)
+        packageDescription.warnings = warnings
+        return packageDescription
     }
 }
 

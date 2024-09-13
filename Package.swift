@@ -9,8 +9,10 @@ let package = Package(
         .macOS(.v13)
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.4")
+        // swift-package-manager depends on an old swift-argument-parser so we have to use the same
+        .package(url: "https://github.com/apple/swift-argument-parser", exact: "1.2.3"),
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.4"),
+        .package(url: "https://github.com/swiftlang/swift-package-manager", revision: "swift-5.10.1-RELEASE"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -18,7 +20,8 @@ let package = Package(
         .executableTarget(
             name: "public-api-diff",
             dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "PackageDescription", package: "swift-package-manager")
             ],
             path: "Sources"
         ),

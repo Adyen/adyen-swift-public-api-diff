@@ -14,7 +14,8 @@ struct MarkdownOutputGenerator: OutputGenerating {
         from changesPerTarget: [String: [Change]],
         allTargets: [String],
         oldSource: ProjectSource,
-        newSource: ProjectSource
+        newSource: ProjectSource,
+        warnings: [String]
     ) -> String {
         
         let separator = "\n---"
@@ -25,6 +26,10 @@ struct MarkdownOutputGenerator: OutputGenerating {
             Self.repoInfo(oldSource: oldSource, newSource: newSource),
             separator
         ]
+        
+        if !warnings.isEmpty {
+            lines += Self.warningInfo(for: warnings) + [separator]
+        }
         
         if !changes.isEmpty {
             lines += changes + [separator]
@@ -58,6 +63,10 @@ private extension MarkdownOutputGenerator {
     
     static func analyzedModulesInfo(allTargets: [String]) -> String {
         "**Analyzed targets:** \(allTargets.joined(separator: ", "))"
+    }
+    
+    static func warningInfo(for warnings: [String]) -> [String] {
+        warnings.map { "> [!WARNING]\n> \($0)" }
     }
     
     static func changeLines(changesPerModule: [String: [Change]]) -> [String] {

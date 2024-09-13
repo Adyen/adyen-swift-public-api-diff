@@ -32,16 +32,22 @@ protocol OutputGenerating {
         from changesPerTarget: [String: [Change]],
         allTargets: [String],
         oldSource: ProjectSource,
-        newSource: ProjectSource
+        newSource: ProjectSource,
+        warnings: [String]
     ) throws -> String
 }
 
-protocol LibraryAnalyzing {
+struct ProjectAnalyzerResult {
+    let changes: [Change]
+    let warnings: [String]
+}
+
+protocol ProjectAnalyzing {
     /// Analyzes whether or not the available libraries changed between the old and new version
     func analyze(
         oldProjectUrl: URL,
         newProjectUrl: URL
-    ) throws -> [Change]
+    ) throws -> ProjectAnalyzerResult
 }
 
 enum LogLevel {

@@ -17,7 +17,7 @@ class PipelineTests: XCTestCase {
         let abiGeneratorExpectation = expectation(description: "ABIGenerator is called twice")
         abiGeneratorExpectation.expectedFulfillmentCount = 2
         
-        let libraryAnalyzerExpectation = expectation(description: "LibraryAnalyzer is called once")
+        let projectAnalyzerExpectation = expectation(description: "ProjectAnalyzer is called once")
         
         let dumpGeneratorExpectation = expectation(description: "SDKDumpGenerator is called twice")
         dumpGeneratorExpectation.expectedFulfillmentCount = 2
@@ -77,14 +77,22 @@ class PipelineTests: XCTestCase {
                 
                 return [.init(targetName: "Target", abiJsonFileUrl: url)]
             }),
-            libraryAnalyzer: MockLibraryAnalyzer(onAnalyze: { old, new in
+            projectAnalyzer: MockProjectAnalyzer(onAnalyze: { old, new in
                 XCTAssertEqual(old, expectedSteps.first as? URL)
                 expectedSteps.removeFirst()
                 XCTAssertEqual(new, expectedSteps.first as? URL)
                 expectedSteps.removeFirst()
-                libraryAnalyzerExpectation.fulfill()
+                projectAnalyzerExpectation.fulfill()
                 
-                return [.init(changeType: .addition(description: "A Library was added"), parentName: "Parent")]
+                return .init(
+                    changes: [.init(
+                        changeType: .addition(
+                            description: "A Library was added"
+                        ),
+                        parentName: "Parent"
+                    )],
+                    warnings: []
+                ) 
             }),
             sdkDumpGenerator: MockSDKDumpGenerator(onGenerate: { url in
                 XCTAssertEqual(url, expectedSteps.first as? URL)
@@ -102,7 +110,7 @@ class PipelineTests: XCTestCase {
                 
                 return [.init(changeType: .addition(description: "Something was added"), parentName: "Parent")]
             }),
-            outputGenerator: MockOutputGenerator(onGenerate: { changes, allTargets, old, new in
+            outputGenerator: MockOutputGenerator(onGenerate: { changes, allTargets, old, new, warnings in
                 XCTAssertEqual(changes, expectedSteps.first as? [String: [Change]])
                 expectedSteps.removeFirst()
                 XCTAssertEqual(allTargets, expectedSteps.first as? [String])
@@ -111,6 +119,7 @@ class PipelineTests: XCTestCase {
                 expectedSteps.removeFirst()
                 XCTAssertEqual(new, expectedSteps.first as? ProjectSource)
                 expectedSteps.removeFirst()
+                XCTAssertTrue(warnings.isEmpty)
                 
                 return "Output"
             }),
@@ -122,7 +131,7 @@ class PipelineTests: XCTestCase {
         await fulfillment(of: [
             projectBuilderExpectation,
             abiGeneratorExpectation,
-            libraryAnalyzerExpectation,
+            projectAnalyzerExpectation,
             dumpGeneratorExpectation,
             dumpAnalyzerExpectation
         ])
