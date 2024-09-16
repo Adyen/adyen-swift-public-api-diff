@@ -10,7 +10,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.5")
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.5"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -24,13 +25,18 @@ let package = Package(
         ),
         .testTarget(
             name: "UnitTests",
-            dependencies: ["public-api-diff"],
+            dependencies: [
+                "public-api-diff",
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+            ],
             resources: [
                 // Copy Tests/ExampleTests/Resources directories as-is.
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
                 .copy("Resources/dummy.abi.json"),
-                .copy("Resources/dummi-abi-flat-definition.md")
+                .copy("Resources/dummi-abi-flat-definition.md"),
+                .copy("Resources/expected-reference-changes.md")
             ]
         ),
         .testTarget(
