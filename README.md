@@ -8,7 +8,8 @@ Alternatively you could use `xcrun swift-api-digester -diagnose-sdk` and pass th
 
 ## How it works
 
-![image](https://github.com/user-attachments/assets/6f8b8927-d08b-487d-9d80-e5ee1b8d8302)
+![image](https://github.com/user-attachments/assets/cc04d21a-06f6-42bc-8e73-4aef7af21d7a)
+
 
 ### Project Builder
 
