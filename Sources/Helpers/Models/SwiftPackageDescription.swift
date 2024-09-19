@@ -225,6 +225,7 @@ extension SwiftPackageDescription.Target: CustomStringConvertible {
         }
         
         if !dependencyDescriptions.isEmpty {
+             // `, dependencies: [.target(name: ...), .target(name: ...), .product(name: ...), ...]`
             description += ", dependencies: [\(dependencyDescriptions.joined(separator: ", "))]"
         }
         
