@@ -56,7 +56,7 @@ private extension SDKDump.Element {
         if isObjcAccessible { components += ["@objc"] }
         if isInlinable { components += ["@inlinable"] }
         if isOverride { components += ["override"] }
-        if declKind != .import {
+        if declKind != .import && declKind != .case {
             if isOpen {
                 components += ["open"]
             } else if isInternal {

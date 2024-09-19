@@ -55,7 +55,7 @@ struct Pipeline {
         var changes = [String: [Change]]()
         var warnings = [String]()
         
-        try analyzeLibraryChanges(
+        try analyzeProjectChanges(
             oldProjectUrl: oldProjectUrl,
             newProjectUrl: newProjectUrl,
             changes: &changes,
@@ -127,8 +127,8 @@ private extension Pipeline {
         return allTargets.sorted()
     }
     
-    func analyzeLibraryChanges(oldProjectUrl: URL, newProjectUrl: URL, changes: inout [String: [Change]], warnings: inout [String]) throws {
-        // Analyzing if there are any changes in available libraries between the project versions
+    func analyzeProjectChanges(oldProjectUrl: URL, newProjectUrl: URL, changes: inout [String: [Change]], warnings: inout [String]) throws {
+        
         let projectChanges = try projectAnalyzer.analyze(
             oldProjectUrl: oldProjectUrl,
             newProjectUrl: newProjectUrl
@@ -156,13 +156,8 @@ private extension Pipeline {
         
         // Goes through all the available abi files and compares them
         try allTargets.forEach { target in
-            guard let oldAbiJson = oldAbiFiles.abiJsonFileUrl(for: target) else {
-                return changes[target] = [.removedTarget]
-            }
-            
-            guard let newAbiJson = newAbiFiles.abiJsonFileUrl(for: target) else {
-                return changes[target] = [.addedTarget]
-            }
+            guard let oldAbiJson = oldAbiFiles.abiJsonFileUrl(for: target) else { return }
+            guard let newAbiJson = newAbiFiles.abiJsonFileUrl(for: target) else { return }
             
             /*
              // Using `xcrun --sdk iphoneos swift-api-digester -diagnose-sdk` instead of the custom parser
@@ -195,17 +190,6 @@ private extension Pipeline {
 }
 
 // MARK: - Convenience
-
-private extension Change {
-    
-    static var removedTarget: Self {
-        .init(changeType: .removal(description: "Target was removed"), parentName: "")
-    }
-
-    static var addedTarget: Self {
-        .init(changeType: .addition(description: "Target was added"), parentName: "")
-    }
-}
 
 private extension [String: [Change]] {
     

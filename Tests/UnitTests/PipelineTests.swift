@@ -85,7 +85,12 @@ class PipelineTests: XCTestCase {
                 projectAnalyzerExpectation.fulfill()
                 
                 return .init(
-                    changes: [.init(changeType: .addition(description: "A Library was added"), parentName: "Parent")],
+                    changes: [.init(
+                        changeType: .addition(
+                            description: "A Library was added"
+                        ),
+                        parentName: "Parent"
+                    )],
                     warnings: []
                 )
             }),

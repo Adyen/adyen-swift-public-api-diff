@@ -6,7 +6,7 @@
 
 import Foundation
 
-enum PackageFileHelperError: LocalizedError {
+enum SwiftPackageFileHelperError: LocalizedError {
     case packageDescriptionError(_ description: String)
     case couldNotGeneratePackageDescription
     case couldNotConsolidateTargetsInPackageFile
@@ -23,7 +23,7 @@ enum PackageFileHelperError: LocalizedError {
     }
 }
 
-struct PackageFileHelper {
+struct SwiftPackageFileHelper {
     
     private let fileHandler: FileHandling
     private let xcodeTools: XcodeTools
@@ -89,7 +89,7 @@ struct PackageFileHelper {
 
 // MARK: Generate Package Description
 
-private extension PackageFileHelper {
+private extension SwiftPackageFileHelper {
     
     func generatePackageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
         
@@ -109,7 +109,7 @@ private extension PackageFileHelper {
             // That we have to get rid of first to generate the description object
             
             if firstLine.starts(with: errorTag) {
-                throw PackageFileHelperError.packageDescriptionError(result)
+                throw SwiftPackageFileHelperError.packageDescriptionError(result)
             }
             
             if firstLine.starts(with: warningTag) {
@@ -120,23 +120,29 @@ private extension PackageFileHelper {
                 warnings += [warning]
             }
             
-            if firstLine.starts(with: "{"),
-               let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8) {
-                var packageDescription = try JSONDecoder().decode(SwiftPackageDescription.self, from: packageDescriptionData)
-                packageDescription.warnings = warnings
-                return packageDescription
+            if 
+                firstLine.starts(with: "{"),
+                let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8)
+            {
+                return try decodePackageDescription(from: packageDescriptionData, warnings: warnings)
             }
             
             packageDescriptionLines.removeFirst()
         }
         
-        throw PackageFileHelperError.couldNotGeneratePackageDescription
+        throw SwiftPackageFileHelperError.couldNotGeneratePackageDescription
+    }
+    
+    func decodePackageDescription(from packageDescriptionData: Data, warnings: [String]) throws -> SwiftPackageDescription {
+        var packageDescription = try JSONDecoder().decode(SwiftPackageDescription.self, from: packageDescriptionData)
+        packageDescription.warnings = warnings
+        return packageDescription
     }
 }
 
 // MARK: Update Package Content
 
-private extension PackageFileHelper {
+private extension SwiftPackageFileHelper {
     
     /// Generates a library entry from the name and available target names to be inserted into the `Package.swift` file
     func consolidatedLibraryEntry(
@@ -162,7 +168,7 @@ private extension PackageFileHelper {
         if let productsRange = packageContent.range(of: "products: [", options: .caseInsensitive) {
             updatedContent.insert(contentsOf: consolidatedEntry, at: productsRange.upperBound)
         } else {
-            throw PackageFileHelperError.couldNotConsolidateTargetsInPackageFile
+            throw SwiftPackageFileHelperError.couldNotConsolidateTargetsInPackageFile
         }
         return updatedContent
     }
