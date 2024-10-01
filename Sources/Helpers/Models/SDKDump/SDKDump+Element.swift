@@ -211,51 +211,51 @@ extension SDKDump.Element {
     
     var isFinal: Bool {
         guard declKind == .class else { return false }
-        return (declAttributes ?? []).contains("Final")
+        return (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Final") == .orderedSame }
     }
     
     var hasDiscardableResult: Bool {
-        (declAttributes ?? []).contains("DiscardableResult")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("DiscardableResult") == .orderedSame }
     }
     
     var isObjcAccessible: Bool {
-        (declAttributes ?? []).contains("ObjC")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("ObjC") == .orderedSame }
     }
     
     var isOverride: Bool {
-        (declAttributes ?? []).contains("Override")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Override") == .orderedSame }
     }
     
     var isDynamic: Bool {
-        (declAttributes ?? []).contains("Dynamic")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Dynamic") == .orderedSame }
     }
     
     var isLazy: Bool {
-        (declAttributes ?? []).contains("Lazy")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Lazy") == .orderedSame }
     }
     
     var isRequired: Bool {
-        (declAttributes ?? []).contains("Required")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Required") == .orderedSame }
     }
     
     var isPrefix: Bool {
-        (declAttributes ?? []).contains("Prefix")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Prefix") == .orderedSame }
     }
     
     var isPostfix: Bool {
-        (declAttributes ?? []).contains("Postfix")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Postfix") == .orderedSame }
     }
     
     var isInfix: Bool {
-        (declAttributes ?? []).contains("Infix")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Infix") == .orderedSame }
     }
     
     var isInlinable: Bool {
-        (declAttributes ?? []).contains("Inlinable")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Inlinable") == .orderedSame }
     }
     
     var isIndirect: Bool {
-        (declAttributes ?? []).contains("Indirect")
+        (declAttributes ?? []).contains { $0.caseInsensitiveCompare("Indirect") == .orderedSame }
     }
     
     var isTypeInformation: Bool {

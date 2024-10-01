@@ -22,18 +22,34 @@ import Foundation
 
 // MARK: - Protocol with associatedtype
 
-public protocol CustomProtocol {
+public protocol ParentProtocol<ParentType> {
+    associatedtype ParentType: Equatable
+    associatedtype Iterator: Collection where Iterator.Element == ParentType
+}
+
+public protocol CustomProtocol<CustomAssociatedType, AnotherAssociatedType>: ParentProtocol<Double> {
     associatedtype CustomAssociatedType: Equatable
+    associatedtype AnotherAssociatedType: Strideable
     
-    var getSetVar: CustomAssociatedType { get set }
+    var getSetVar: AnotherAssociatedType { get set }
     var getVar: CustomAssociatedType { get }
     func function() -> CustomAssociatedType
 }
 
 public struct CustomStruct<T: Strideable>: CustomProtocol {
     public typealias CustomAssociatedType = Int
+    public typealias AnotherAssociatedType = Double
+    public typealias Iterator = Array<AnotherAssociatedType>
     
-    public var getSetVar: Int
+    @available(macOS, unavailable, message: "Unavailable on macOS")
+    public struct NestedStruct {
+        @available(*, deprecated, renamed: "nestedVar")
+        public let nestedLet: String = "let"
+        @available(swift, introduced: 5.9)
+        public let nestedVar: String = "var"
+    }
+    
+    public var getSetVar: Double
     public var getVar: Int
     @discardableResult
     public func function() -> Int { 0 }
@@ -51,8 +67,10 @@ public class CustomClass<T: Equatable> {
     package let constantLet: String = "I'm a let"
     public var optionalVar: T?
     
+    public let a = 0, b = 0, c = 0, d: Double = 5.0
+    
     @MainActor
-    public func asyncThrowingFunc() async throws {}
+    public func asyncThrowingFunc<Element>(_ element: Element) async throws -> Void where Element: Strideable {}
     public func rethrowingFunc(throwingArg: @escaping () throws -> String) rethrows {}
     
     public init(weakObject: CustomClass? = nil, optionalVar: T? = nil) {
@@ -70,13 +88,15 @@ public class CustomClass<T: Equatable> {
 // MARK: - Generic open class with Protocol conformance and @_spi constraint
 
 @_spi(SystemProgrammingInterface)
-open class OpenSpiConformingClass<T: Equatable>: CustomProtocol {
+open class OpenSpiConformingClass<T: Equatable & Strideable>: CustomProtocol {
     public typealias CustomAssociatedType = T
+    public typealias AnotherAssociatedType = T
+    public typealias Iterator = Array<Double>
     
     public var getSetVar: T
     public var getVar: T
     @inlinable
-    public func function() -> T { getVar }
+    public func function() -> T where T: Equatable { getVar }
     
     public init(getSetVar: T, getVar: T) {
         self.getSetVar = getSetVar
@@ -136,9 +156,15 @@ precedencegroup CustomPrecedence {
 
 public enum CustomEnum {
     case normalCase
-    case caseWithString(String)
-    case caseWithTuple(String, Int)
+    case caseWithNamedString(title: String)
+    case caseWithTuple(_ foo: String, bar: Int)
     case caseWithBlock((Int) throws -> Void)
+    case a, b, c, d, e(Int)
     
     indirect case recursive(CustomEnum)
+}
+
+public enum RawValueEnum: String {
+    case one
+    case two = "three"
 }
