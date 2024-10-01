@@ -46,6 +46,8 @@ class ReferencePackageTests: XCTestCase {
         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
         let pipelineOutputLines = sanitizeOutput(pipelineOutput).components(separatedBy: "\n")
         
+        print(pipelineOutput)
+        
         for i in 0..<expectedLines.count  {
             if expectedLines[i] != pipelineOutputLines[i] {
                 XCTAssertEqual(expectedLines[i], pipelineOutputLines[i])

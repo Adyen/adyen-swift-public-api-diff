@@ -82,7 +82,7 @@ private extension MarkdownOutputGenerator {
             var groupedChanges = [String: [Change]]()
             
             changesForTarget.forEach {
-                groupedChanges[$0.parentName] = (groupedChanges[$0.parentName] ?? []) + [$0]
+                groupedChanges[$0.parentPath ?? ""] = (groupedChanges[$0.parentPath ?? ""] ?? []) + [$0]
             }
             
             groupedChanges.keys.sorted().forEach { parent in

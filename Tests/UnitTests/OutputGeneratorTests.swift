@@ -50,7 +50,7 @@ class OutputGeneratorTests: XCTestCase {
         let outputGenerator = MarkdownOutputGenerator()
         
         let output = outputGenerator.generate(
-            from: ["Target_1": [.init(changeType: .addition(description: "Some Addition"), parentName: "")]],
+            from: ["Target_1": [.init(changeType: .addition(description: "Some Addition"), parentPath: "")]],
             allTargets: ["Target_1"],
             oldSource: .local(path: "old_source"),
             newSource: .local(path: "new_source"),
@@ -94,12 +94,12 @@ class OutputGeneratorTests: XCTestCase {
         let output = outputGenerator.generate(
             from: [
                 "Target_1": [
-                    .init(changeType: .addition(description: "Some Addition"), parentName: ""),
-                    .init(changeType: .removal(description: "Some Removal"), parentName: "")
+                    .init(changeType: .addition(description: "Some Addition"), parentPath: ""),
+                    .init(changeType: .removal(description: "Some Removal"), parentPath: "")
                 ],
                 "Target_2": [
-                    .init(changeType: .addition(description: "Another Addition"), parentName: ""),
-                    .init(changeType: .removal(description: "Another Removal"), parentName: "")
+                    .init(changeType: .addition(description: "Another Addition"), parentPath: ""),
+                    .init(changeType: .removal(description: "Another Removal"), parentPath: "")
                 ]
             ],
             allTargets: ["Target_1", "Target_2"],

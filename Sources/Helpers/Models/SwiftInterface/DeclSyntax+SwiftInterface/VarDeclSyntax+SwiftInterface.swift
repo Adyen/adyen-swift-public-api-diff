@@ -6,8 +6,8 @@ extension VariableDeclSyntax {
     
     func toInterfaceElement() -> [SwiftInterfaceVar] {
        
-        let declarationAttributes = self.attributes.map { $0.trimmedDescription }
-        let modifiers = self.modifiers.map { $0.trimmedDescription }
+        let declarationAttributes = self.attributes.sanitizedList
+        let modifiers = self.modifiers.sanitizedList
         let bindingSpecifier = self.bindingSpecifier.trimmedDescription
         
         // Transforming:
@@ -18,13 +18,13 @@ extension VariableDeclSyntax {
         // - final public let c: Double = 5.0
         return bindings.map {
             return SwiftInterfaceVar(
-                declarationAttributes: declarationAttributes,
+                attributes: declarationAttributes,
                 modifiers: modifiers,
                 bindingSpecifier: bindingSpecifier,
                 name: $0.pattern.trimmedDescription,
                 typeAnnotation: $0.typeAnnotation?.type.trimmedDescription,
                 initializerValue: $0.initializer?.value.trimmedDescription,
-                accessors: $0.accessorBlock?.accessors.trimmedDescription
+                accessors: $0.accessorBlock?.sanitizedDescription
             )
         }
     }

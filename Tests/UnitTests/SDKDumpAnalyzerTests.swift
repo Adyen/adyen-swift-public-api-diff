@@ -27,8 +27,8 @@ class SDKDumpAnalyzerTests: XCTestCase {
         let oldDump = SDKDump(root: .init(kind: .func, name: "old_name", printedName: "old_printedName"))
         
         let expectedChanges: [Change] = [
-            .init(changeType: .removal(description: "public old_printedName"), parentName: ""),
-            .init(changeType: .addition(description: "public printedName"), parentName: "")
+            .init(changeType: .removal(description: "public old_printedName"), parentPath: ""),
+            .init(changeType: .addition(description: "public printedName"), parentPath: "")
         ]
         
         let analyzer = SDKDumpAnalyzer()
@@ -66,7 +66,7 @@ class SDKDumpAnalyzerTests: XCTestCase {
         // Adding Child
         
         let expectedChangesAdded: [Change] = [
-            .init(changeType: .addition(description: "public childPrintedName"), parentName: "parent")
+            .init(changeType: .addition(description: "public childPrintedName"), parentPath: "parent")
         ]
         
         let analyzer = SDKDumpAnalyzer()
@@ -80,7 +80,7 @@ class SDKDumpAnalyzerTests: XCTestCase {
         // Removing Child
         
         let expectedChangesRemoved: [Change] = [
-            .init(changeType: .removal(description: "public childPrintedName"), parentName: "parent")
+            .init(changeType: .removal(description: "public childPrintedName"), parentPath: "parent")
         ]
         
         let changesRemoved = analyzer.analyze(
@@ -134,12 +134,12 @@ class SDKDumpAnalyzerTests: XCTestCase {
         )
         
         let expectedChanges: [Change] = [
-            .init(changeType: .removal(description: "public struct childPrintedName"), parentName: "parent"),
-            .init(changeType: .removal(description: "public class spiChildPrintedName"), parentName: "parent"),
-            .init(changeType: .change(oldDescription: "public static var staticLetPrintedName: UNKNOWN_TYPE", newDescription: "public static let staticLetPrintedName: UNKNOWN_TYPE"), parentName: "parent.enumChild"),
-            .init(changeType: .removal(description: "public case oldCasePrintedName"), parentName: "parent.enumChild"),
-            .init(changeType: .addition(description: "public class childPrintedName"), parentName: "parent"),
-            .init(changeType: .addition(description: "public case newCasePrintedName"), parentName: "parent.enumChild")
+            .init(changeType: .removal(description: "public struct childPrintedName"), parentPath: "parent"),
+            .init(changeType: .removal(description: "public class spiChildPrintedName"), parentPath: "parent"),
+            .init(changeType: .change(oldDescription: "public static var staticLetPrintedName: UNKNOWN_TYPE", newDescription: "public static let staticLetPrintedName: UNKNOWN_TYPE"), parentPath: "parent.enumChild"),
+            .init(changeType: .removal(description: "public case oldCasePrintedName"), parentPath: "parent.enumChild"),
+            .init(changeType: .addition(description: "public class childPrintedName"), parentPath: "parent"),
+            .init(changeType: .addition(description: "public case newCasePrintedName"), parentPath: "parent.enumChild")
         ]
         
         let analyzer = SDKDumpAnalyzer()
@@ -169,7 +169,7 @@ class SDKDumpAnalyzerTests: XCTestCase {
          // Adding Target
         
          let expectedChangesAdded: [Change] = [
-             .init(changeType: .addition, parentName: "", changeDescription: "Target was added")
+             .init(changeType: .addition, parentPath: "", changeDescription: "Target was added")
          ]
         
          let analyzer = SDKDumpAnalyzer()
@@ -183,7 +183,7 @@ class SDKDumpAnalyzerTests: XCTestCase {
          // Removing Target
         
          let expectedChangesRemoved: [Change] = [
-             .init(changeType: .removal, parentName: "", changeDescription: "Target was removed")
+             .init(changeType: .removal, parentPath: "", changeDescription: "Target was removed")
          ]
         
          let changesRemoved = analyzer.analyze(

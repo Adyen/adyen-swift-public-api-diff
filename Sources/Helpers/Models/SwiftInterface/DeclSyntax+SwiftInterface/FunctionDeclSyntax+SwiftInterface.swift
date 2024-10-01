@@ -22,13 +22,13 @@ extension FunctionDeclSyntax {
                 firstName: $0.firstName.trimmedDescription,
                 secondName: $0.secondName?.trimmedDescription,
                 type: $0.type.trimmedDescription,
-                defaultValue: $0.defaultValue?.trimmedDescription
+                defaultValue: $0.defaultValue?.value.description
             )
         }
         
         return SwiftInterfaceFunction(
-            declarationAttributes: self.attributes.map { $0.trimmedDescription },
-            modifiers: self.modifiers.map { $0.trimmedDescription },
+            attributes: self.attributes.sanitizedList,
+            modifiers: self.modifiers.sanitizedList,
             name: self.name.trimmedDescription,
             genericParameterDescription: self.genericParameterClause?.trimmedDescription,
             parameters: parameters,

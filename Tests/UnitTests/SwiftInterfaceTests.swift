@@ -41,13 +41,21 @@ class SwiftInterfaceTests: XCTestCase {
             return try XCTUnwrap(String(data: interfaceFileContent, encoding: .utf8))
         }()
 
-        print("----- OLD -----")
-        SwiftInterfaceParser.parse(source: oldSource).forEach { element in
-            print(element.recursiveDescription())
-        }
-        print("----- NEW -----")
-        SwiftInterfaceParser.parse(source: newSource).forEach { element in
-            print(element.recursiveDescription())
+        let oldInterface = SwiftInterfaceParser.parse(source: oldSource)
+        let newInterface = SwiftInterfaceParser.parse(source: newSource)
+        
+        let analyzer = SwiftInterfaceAnalyzer()
+        
+        if oldInterface != newInterface {
+            let changes = analyzer.analyze(old: oldInterface, new: newInterface)
+            let output = MarkdownOutputGenerator().generate(
+                from: ["": changes],
+                allTargets: ["Target"],
+                oldSource: .local(path: "old"),
+                newSource: .local(path: "new"),
+                warnings: []
+            )
+            print(output)
         }
         
         /*

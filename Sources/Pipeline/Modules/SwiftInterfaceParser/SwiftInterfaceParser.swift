@@ -1,4 +1,3 @@
-@testable import public_api_diff
 import Foundation
 import SwiftSyntax
 import SwiftParser
@@ -10,12 +9,46 @@ import SwiftParser
  */
 class SwiftInterfaceParser: SyntaxVisitor {
     
-    private var scope: Scope = .root(symbols: [])
+    class Root: SwiftInterfaceElement, Equatable {
+        
+        var parent: (any SwiftInterfaceElement)? = nil
+        
+        var diffableSignature: String { "" }
+        
+        var consolidatableName: String { "" }
+        
+        var description: String {
+            var description = ""
+            children.forEach { child in
+                description.append(child.recursiveDescription())
+                description.append("\n")
+            }
+            return description
+        }
+        
+        var childGroupName: String { "Root" }
+        
+        let children: [any SwiftInterfaceElement]
+        
+        init(elements: [any SwiftInterfaceElement]) {
+            elements.forEach { $0.setupParentRelationships() }
+            self.children = elements
+        }
+    }
     
-    static public func parse(source: String) -> [any SwiftInterfaceElement] {
+    // TODO: Handle (Nice to have)
+    // - DeinitializerDeclSyntax
+    // - PrecedenceGroupDeclSyntax
+    // - OperatorDeclSyntax
+    // - IfConfigClauseListSyntax
+    // - ... (There are more but not important right now)
+    
+    private var scope: Scope = .root(elements: [])
+    
+    static public func parse(source: String) -> Root {
         let visitor = Self()
         visitor.walk(Parser.parse(source: source))
-        return visitor.scope.symbols
+        return Root(elements: visitor.scope.elements)
     }
     
     /// Designated initializer
@@ -33,23 +66,9 @@ class SwiftInterfaceParser: SyntaxVisitor {
     /// - Parameter makeSymbolWithChildrenInScope: Closure that return a new ``Symbol``
     ///
     /// Call in `visitPost(_ node:)` methods
-    public func endScopeAndAddSymbol(makeSymbolsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
-        scope.end(makeSymbolsWithChildrenInScope: makeSymbolsWithChildrenInScope)
+    public func endScopeAndAddSymbol(makeElementsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
+        scope.end(makeElementsWithChildrenInScope: makeElementsWithChildrenInScope)
     }
-    
-    // TODO:
-    // - InitializerDeclSyntax
-    // - DeinitializerDeclSyntax
-    // - ActorDeclSyntax
-    // - AccessorDeclSyntax
-    // - ExtensionDeclSyntax
-    //
-    // Nice to have:
-    // - PrecedenceGroupDeclSyntax
-    // - OperatorDeclSyntax
-    // - SubscriptDeclSyntax
-    // - IfConfigClauseListSyntax
-    // - ... (There are more but not important right now)
     
     // MARK: - Class
     
@@ -140,45 +159,85 @@ class SwiftInterfaceParser: SyntaxVisitor {
     open override func visitPost(_ node: EnumCaseDeclSyntax) {
         endScopeAndAddSymbol { node.toInterfaceElement(children: $0) }
     }
+    
+    // MARK: - Extension
+    
+    open override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
+        startScope()
+    }
+    
+    open override func visitPost(_ node: ExtensionDeclSyntax) {
+        endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
+    }
+    
+    // MARK: - Initializer
+    
+    open override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
+        startScope()
+    }
+    
+    open override func visitPost(_ node: InitializerDeclSyntax) {
+        endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
+    }
+    
+    // MARK: - Actor
+    
+    open override func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
+        startScope()
+    }
+    
+    open override func visitPost(_ node: ActorDeclSyntax) {
+        endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
+    }
+    
+    // MARK: - Subscript
+    
+    open override func visit(_ node: SubscriptDeclSyntax) -> SyntaxVisitorContinueKind {
+        startScope()
+    }
+    
+    open override func visitPost(_ node: SubscriptDeclSyntax) {
+        endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
+    }
 }
 
 // MARK: - Models
 
 /// Inspired by: https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
-indirect enum Scope {
+fileprivate indirect enum Scope {
 
     /// The root scope of a file
-    case root(symbols: [any SwiftInterfaceElement])
+    case root(elements: [any SwiftInterfaceElement])
+    
     /// A nested scope, within a parent scope
-    case nested(parent: Scope, symbols: [any SwiftInterfaceElement])
+    case nested(parent: Scope, elements: [any SwiftInterfaceElement])
 
     /// Starts a new nested scope
     mutating func start() {
-        self = .nested(parent: self, symbols: [])
+        self = .nested(parent: self, elements: [])
     }
 
-    /// Ends the current scope by adding a new symbol to the scope tree.
+    /// Ends the current scope by adding new elements to the scope tree.
     /// The children provided in the closure are the symbols in the scope to be ended
-    mutating func end(makeSymbolsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
-        let newSymbols = makeSymbolsWithChildrenInScope(symbols)
+    mutating func end(makeElementsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
+        let newElements = makeElementsWithChildrenInScope(elements)
 
         switch self {
         case .root:
             fatalError("Unbalanced calls to start() and end(_:)")
 
-        case .nested(.root(let rootSymbols), _):
-            self = .root(symbols: rootSymbols + newSymbols)
+        case .nested(.root(let rootElements), _):
+            self = .root(elements: rootElements + newElements)
 
-        case .nested(.nested(let parent, let parentSymbols), _):
-            self = .nested(parent: parent, symbols: parentSymbols + newSymbols)
+        case .nested(.nested(let parent, let parentElements), _):
+            self = .nested(parent: parent, elements: parentElements + newElements)
         }
     }
 
-    /// Symbols at current scope
-    var symbols: [any SwiftInterfaceElement] {
+    var elements: [any SwiftInterfaceElement] {
         switch self {
-        case .root(let symbols): return symbols
-        case .nested(_, let symbols): return symbols
+        case .root(let elements): return elements // All child elements recursive from the root
+        case .nested(_, let elements): return elements // All child elements recursive from a nested element
         }
     }
 }

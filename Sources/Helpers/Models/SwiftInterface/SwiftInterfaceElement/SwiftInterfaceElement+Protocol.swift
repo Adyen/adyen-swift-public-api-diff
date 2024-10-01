@@ -1,45 +1,53 @@
-@testable import public_api_diff
 import Foundation
 
-struct SwiftInterfaceEnum: SwiftInterfaceElement {
-    
-    var type: SDKDump.DeclarationKind { .enum }
+class SwiftInterfaceProtocol: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let declarationAttributes: [String]
+    let attributes: [String]
+    
+    let name: String
+    
+    let primaryAssociatedTypes: [String]?
+    
+    let inheritance: [String]?
     
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
     
-    let name: String
-    
-    /// e.g. <T>
-    let genericParameterDescription: String?
-    
-    let inheritance: [String]?
-    
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
+    var childGroupName: String { name } // Not relevant as only used to group children
+    
     /// The members, declarations, ... inside of the body of the struct
     let children: [any SwiftInterfaceElement]
+   
+    var parent: (any SwiftInterfaceElement)? = nil
+    
+    var diffableSignature: String {
+        name
+    }
+    
+    var consolidatableName: String {
+        name
+    }
     
     var description: String {
         compileDescription()
     }
     
     init(
-        declarationAttributes: [String],
+        attributes: [String],
         modifiers: [String],
         name: String,
-        genericParameterDescription: String?,
+        primaryAssociatedTypes: [String]?,
         inheritance: [String]?,
         genericWhereClauseDescription: String?,
         children: [any SwiftInterfaceElement]
     ) {
-        self.declarationAttributes = declarationAttributes
+        self.attributes = attributes
         self.name = name
-        self.genericParameterDescription = genericParameterDescription
+        self.primaryAssociatedTypes = primaryAssociatedTypes
         self.inheritance = inheritance
         self.modifiers = modifiers
         self.genericWhereClauseDescription = genericWhereClauseDescription
@@ -47,26 +55,28 @@ struct SwiftInterfaceEnum: SwiftInterfaceElement {
     }
 }
 
-private extension SwiftInterfaceEnum {
+private extension SwiftInterfaceProtocol {
     
     func compileDescription() -> String {
         
         var components = [String]()
         
-        components += declarationAttributes
+        components += attributes
         components += modifiers
-        components += ["enum"]
+        components += ["protocol"]
         
-        components += [
-            [
+        components += [{
+            var components = [
                 name,
-                genericParameterDescription
+                primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>"}
             ].compactMap { $0 }.joined()
-        ]
-        
-        if let inheritance, !inheritance.isEmpty {
-            components += [": \(inheritance.joined(separator: ", "))"]
-        }
+            
+            if let inheritance, !inheritance.isEmpty {
+                components += ": \(inheritance.joined(separator: ", "))"
+            }
+            
+            return components
+        }()]
         
         genericWhereClauseDescription.map { components += [$0] }
         

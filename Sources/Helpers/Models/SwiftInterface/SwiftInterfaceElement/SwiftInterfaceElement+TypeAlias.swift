@@ -1,12 +1,9 @@
-@testable import public_api_diff
 import Foundation
 
-struct SwiftInterfaceTypeAlias: SwiftInterfaceElement {
-    
-    var type: SDKDump.DeclarationKind { .struct }
+class SwiftInterfaceTypeAlias: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let declarationAttributes: [String]
+    let attributes: [String]
     
     let name: String
     
@@ -22,22 +19,34 @@ struct SwiftInterfaceTypeAlias: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
+    var childGroupName: String { "" } // Not relevant as only used to group children
+    
     /// A typealias does not have children
     let children: [any SwiftInterfaceElement] = []
+    
+    var parent: (any SwiftInterfaceElement)? = nil
+    
+    var diffableSignature: String {
+        name
+    }
+    
+    var consolidatableName: String {
+        name
+    }
     
     var description: String {
         compileDescription()
     }
     
     init(
-        declarationAttributes: [String],
+        attributes: [String],
         modifiers: [String],
         name: String,
         genericParameterDescription: String?,
         initializerValue: String,
         genericWhereClauseDescription: String?
     ) {
-        self.declarationAttributes = declarationAttributes
+        self.attributes = attributes
         self.name = name
         self.genericParameterDescription = genericParameterDescription
         self.initializerValue = initializerValue
@@ -52,7 +61,7 @@ private extension SwiftInterfaceTypeAlias {
 
         var components = [String]()
         
-        components += declarationAttributes
+        components += attributes
         components += modifiers
         components += ["typealias"]
         

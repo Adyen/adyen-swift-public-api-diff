@@ -1,16 +1,14 @@
-@testable import public_api_diff
 import Foundation
 
-struct SwiftInterfaceProtocol: SwiftInterfaceElement {
-    
-    var type: SDKDump.DeclarationKind { .protocol }
+class SwiftInterfaceClass: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let declarationAttributes: [String]
+    let attributes: [String]
     
     let name: String
     
-    let primaryAssociatedTypes: [String]?
+    /// e.g. <T>
+    let genericParameterDescription: String?
     
     let inheritance: [String]?
     
@@ -20,25 +18,37 @@ struct SwiftInterfaceProtocol: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
+    var childGroupName: String { name } // Not relevant as only used to group children
+    
     /// The members, declarations, ... inside of the body of the struct
     let children: [any SwiftInterfaceElement]
+    
+    var parent: (any SwiftInterfaceElement)? = nil
+    
+    var diffableSignature: String {
+        return name
+    }
+    
+    var consolidatableName: String {
+        name
+    }
     
     var description: String {
         compileDescription()
     }
     
     init(
-        declarationAttributes: [String],
+        attributes: [String],
         modifiers: [String],
         name: String,
-        primaryAssociatedTypes: [String]?,
+        genericParameterDescription: String?,
         inheritance: [String]?,
         genericWhereClauseDescription: String?,
         children: [any SwiftInterfaceElement]
     ) {
-        self.declarationAttributes = declarationAttributes
+        self.attributes = attributes
         self.name = name
-        self.primaryAssociatedTypes = primaryAssociatedTypes
+        self.genericParameterDescription = genericParameterDescription
         self.inheritance = inheritance
         self.modifiers = modifiers
         self.genericWhereClauseDescription = genericWhereClauseDescription
@@ -46,26 +56,28 @@ struct SwiftInterfaceProtocol: SwiftInterfaceElement {
     }
 }
 
-private extension SwiftInterfaceProtocol {
+private extension SwiftInterfaceClass {
     
     func compileDescription() -> String {
         
         var components = [String]()
         
-        components += declarationAttributes
+        components += attributes
         components += modifiers
-        components += ["protocol"]
+        components += ["class"]
         
-        components += [
-            [
+        components += [{
+            var components = [
                 name,
-                primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>"}
+                genericParameterDescription
             ].compactMap { $0 }.joined()
-        ]
-        
-        if let inheritance, !inheritance.isEmpty {
-            components += [": \(inheritance.joined(separator: ", "))"]
-        }
+            
+            if let inheritance, !inheritance.isEmpty {
+                components += ": \(inheritance.joined(separator: ", "))"
+            }
+            
+            return components
+        }()]
         
         genericWhereClauseDescription.map { components += [$0] }
         

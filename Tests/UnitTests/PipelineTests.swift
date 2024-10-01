@@ -44,8 +44,8 @@ class PipelineTests: XCTestCase {
             SDKDump(root: .init(kind: .var, name: "Name", printedName: URL(filePath: newProjectSource.description).absoluteString)),
             
             [
-                "": [Change(changeType: .addition(description: "A Library was added"), parentName: "Parent")],
-                "Target": [Change(changeType: .addition(description: "Something was added"), parentName: "Parent")]
+                "": [Change(changeType: .addition(description: "A Library was added"), parentPath: "Parent")],
+                "Target": [Change(changeType: .addition(description: "Something was added"), parentPath: "Parent")]
             ],
             ["Target"],
             oldProjectSource,
@@ -85,7 +85,7 @@ class PipelineTests: XCTestCase {
                 projectAnalyzerExpectation.fulfill()
                 
                 return .init(
-                    changes: [.init(changeType: .addition(description: "A Library was added"), parentName: "Parent")],
+                    changes: [.init(changeType: .addition(description: "A Library was added"), parentPath: "Parent")],
                     warnings: []
                 )
             }),
@@ -103,7 +103,7 @@ class PipelineTests: XCTestCase {
                 expectedSteps.removeFirst()
                 dumpAnalyzerExpectation.fulfill()
                 
-                return [.init(changeType: .addition(description: "Something was added"), parentName: "Parent")]
+                return [.init(changeType: .addition(description: "Something was added"), parentPath: "Parent")]
             }),
             outputGenerator: MockOutputGenerator(onGenerate: { changes, allTargets, old, new, warnings in
                 XCTAssertEqual(changes, expectedSteps.first as? [String: [Change]])

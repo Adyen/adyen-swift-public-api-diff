@@ -15,7 +15,7 @@ struct Change: Equatable {
     }
     
     var changeType: ChangeType
-    var parentName: String
+    var parentPath: String?
 
     var listOfChanges: [String] = []
 }

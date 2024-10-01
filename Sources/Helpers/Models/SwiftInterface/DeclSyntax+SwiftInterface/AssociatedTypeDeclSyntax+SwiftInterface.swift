@@ -6,10 +6,10 @@ extension AssociatedTypeDeclSyntax {
     
     func toInterfaceElement() -> SwiftInterfaceAssociatedType {
         SwiftInterfaceAssociatedType(
-            declarationAttributes: self.attributes.map { $0.trimmedDescription },
-            modifiers: self.modifiers.map { $0.trimmedDescription },
+            attributes: self.attributes.sanitizedList,
+            modifiers: self.modifiers.sanitizedList,
             name: self.name.trimmedDescription,
-            inheritance: self.inheritanceClause?.inheritedTypes.map { $0.trimmedDescription },
+            inheritance: self.inheritanceClause?.inheritedTypes.sanitizedList,
             initializerValue: self.initializer?.value.trimmedDescription,
             genericWhereClauseDescription: self.genericWhereClause?.trimmedDescription
         )

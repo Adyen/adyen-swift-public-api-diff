@@ -1,12 +1,9 @@
-@testable import public_api_diff
 import Foundation
 
-struct SwiftInterfaceStruct: SwiftInterfaceElement {
-    
-    var type: SDKDump.DeclarationKind { .struct }
+class SwiftInterfaceStruct: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let declarationAttributes: [String]
+    let attributes: [String]
     
     let name: String
     
@@ -21,15 +18,27 @@ struct SwiftInterfaceStruct: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
+    var childGroupName: String { name }
+    
     /// The members, declarations, ... inside of the body of the struct
     let children: [any SwiftInterfaceElement]
+    
+    var parent: (any SwiftInterfaceElement)? = nil
+    
+    var diffableSignature: String {
+        name
+    }
+    
+    var consolidatableName: String {
+        name
+    }
     
     var description: String {
         compileDescription()
     }
     
     init(
-        declarationAttributes: [String],
+        attributes: [String],
         modifiers: [String],
         name: String,
         genericParameterDescription: String?,
@@ -37,7 +46,7 @@ struct SwiftInterfaceStruct: SwiftInterfaceElement {
         genericWhereClauseDescription: String?,
         children: [any SwiftInterfaceElement]
     ) {
-        self.declarationAttributes = declarationAttributes
+        self.attributes = attributes
         self.name = name
         self.genericParameterDescription = genericParameterDescription
         self.inheritance = inheritance
@@ -53,20 +62,22 @@ private extension SwiftInterfaceStruct {
         
         var components = [String]()
         
-        components += declarationAttributes
+        components += attributes
         components += modifiers
         components += ["struct"]
         
-        components += [
-            [
+        components += [{
+            var components = [
                 name,
                 genericParameterDescription
             ].compactMap { $0 }.joined()
-        ]
-        
-        if let inheritance, !inheritance.isEmpty {
-            components += [": \(inheritance.joined(separator: ", "))"]
-        }
+            
+            if let inheritance, !inheritance.isEmpty {
+                components += ": \(inheritance.joined(separator: ", "))"
+            }
+            
+            return components
+        }()]
         
         genericWhereClauseDescription.map { components += [$0] }
         

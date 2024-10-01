@@ -1,4 +1,3 @@
-@testable import public_api_diff
 import Foundation
 
 extension SwiftInterfaceEnumCase {
@@ -34,12 +33,10 @@ extension SwiftInterfaceEnumCase {
     }
 }
 
-struct SwiftInterfaceEnumCase: SwiftInterfaceElement {
-    
-    var type: SDKDump.DeclarationKind { .case }
+class SwiftInterfaceEnumCase: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let declarationAttributes: [String]
+    let attributes: [String]
     
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
@@ -50,21 +47,33 @@ struct SwiftInterfaceEnumCase: SwiftInterfaceElement {
     
     let rawValue: String?
     
+    var childGroupName: String { "" }
+    
     /// A typealias does not have children
     let children: [any SwiftInterfaceElement] = []
+    
+    var parent: (any SwiftInterfaceElement)? = nil
+    
+    var diffableSignature: String {
+        name
+    }
+    
+    var consolidatableName: String {
+        name
+    }
     
     var description: String {
         compileDescription()
     }
     
     init(
-        declarationAttributes: [String],
+        attributes: [String],
         modifiers: [String],
         name: String,
         parameters: [Parameter]?,
         rawValue: String?
     ) {
-        self.declarationAttributes = declarationAttributes
+        self.attributes = attributes
         self.modifiers = modifiers
         self.name = name
         self.parameters = parameters
@@ -78,7 +87,7 @@ private extension SwiftInterfaceEnumCase {
 
         var components = [String]()
         
-        components += declarationAttributes
+        components += attributes
         components += modifiers
         components += ["case"]
         

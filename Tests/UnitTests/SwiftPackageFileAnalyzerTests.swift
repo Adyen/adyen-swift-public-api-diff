@@ -94,8 +94,8 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
         )
         
         let expectedChanges: [Change] = [
-            .init(changeType: .removal(description: ".library(name: \"OldLibrary\", ...)"), parentName: ""),
-            .init(changeType: .addition(description: ".library(name: \"NewLibrary\", ...)"), parentName: "")
+            .init(changeType: .removal(description: ".library(name: \"OldLibrary\", ...)"), parentPath: ""),
+            .init(changeType: .addition(description: ".library(name: \"NewLibrary\", ...)"), parentPath: "")
         ]
         XCTAssertEqual(changes.changes, expectedChanges)
         

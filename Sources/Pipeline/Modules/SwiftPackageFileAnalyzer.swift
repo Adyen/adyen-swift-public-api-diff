@@ -59,7 +59,7 @@ struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
         packageChanges += removedLibaries.map {
             .init(
                 changeType: .removal(description: ".library(name: \"\($0)\", ...)"),
-                parentName: ""
+                parentPath: ""
             )
         }
         
@@ -67,7 +67,7 @@ struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
         packageChanges += addedLibraries.map {
             .init(
                 changeType: .addition(description: ".library(name: \"\($0)\", ...)"),
-                parentName: ""
+                parentPath: ""
             )
         }
         

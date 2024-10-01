@@ -6,11 +6,11 @@ extension StructDeclSyntax {
     
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> SwiftInterfaceStruct {
         SwiftInterfaceStruct(
-            declarationAttributes: self.attributes.map { $0.trimmedDescription },
-            modifiers: self.modifiers.map { $0.trimmedDescription },
+            attributes: self.attributes.sanitizedList,
+            modifiers: self.modifiers.sanitizedList,
             name: self.name.trimmedDescription,
             genericParameterDescription: self.genericParameterClause?.trimmedDescription,
-            inheritance: self.inheritanceClause?.inheritedTypes.map { $0.trimmedDescription },
+            inheritance: self.inheritanceClause?.inheritedTypes.sanitizedList,
             genericWhereClauseDescription: self.genericWhereClause?.trimmedDescription,
             children: children
         )

@@ -1,12 +1,9 @@
-@testable import public_api_diff
 import Foundation
 
-struct SwiftInterfaceAssociatedType: SwiftInterfaceElement {
-    
-    var type: SDKDump.DeclarationKind { .struct }
+class SwiftInterfaceAssociatedType: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let declarationAttributes: [String]
+    let attributes: [String]
     
     let name: String
     
@@ -21,22 +18,34 @@ struct SwiftInterfaceAssociatedType: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
+    var childGroupName: String { "" } // Not relevant as only used to group children
+    
     /// A associatedtype does not have children
     let children: [any SwiftInterfaceElement] = []
+    
+    var parent: (any SwiftInterfaceElement)? = nil
+    
+    var diffableSignature: String {
+        name
+    }
+    
+    var consolidatableName: String {
+        name
+    }
     
     var description: String {
         compileDescription()
     }
     
     init(
-        declarationAttributes: [String],
+        attributes: [String],
         modifiers: [String],
         name: String,
         inheritance: [String]?,
         initializerValue: String?,
         genericWhereClauseDescription: String?
     ) {
-        self.declarationAttributes = declarationAttributes
+        self.attributes = attributes
         self.modifiers = modifiers
         self.name = name
         self.inheritance = inheritance
@@ -51,18 +60,15 @@ private extension SwiftInterfaceAssociatedType {
         
         var components = [String]()
         
-        components += declarationAttributes
+        components += attributes
         components += modifiers
         components += ["associatedtype"]
         
-        components += {
-            // Joining name + inheritance without a space
-            var components = [name]
-            if let inheritance, !inheritance.isEmpty {
-                components += [": \(inheritance.joined(separator: ", "))"]
-            }
-            return [components.joined()]
-        }()
+        if let inheritance, !inheritance.isEmpty {
+            components += ["\(name): \(inheritance.joined(separator: ", "))"]
+        } else {
+            components += [name]
+        }
         
         initializerValue.map { components += ["= \($0)"] }
         

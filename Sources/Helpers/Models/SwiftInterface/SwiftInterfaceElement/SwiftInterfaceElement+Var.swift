@@ -1,12 +1,9 @@
-@testable import public_api_diff
 import Foundation
 
-struct SwiftInterfaceVar: SwiftInterfaceElement {
-    
-    var type: SDKDump.DeclarationKind { .struct }
+class SwiftInterfaceVar: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let declarationAttributes: [String]
+    let attributes: [String]
     
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
@@ -22,15 +19,27 @@ struct SwiftInterfaceVar: SwiftInterfaceElement {
     
     let accessors: String?
     
+    var childGroupName: String { "" } // Not relevant as only used to group children
+    
     /// A var does not have children
     let children: [any SwiftInterfaceElement] = []
+    
+    var parent: (any SwiftInterfaceElement)? = nil
+    
+    var diffableSignature: String {
+        name
+    }
+    
+    var consolidatableName: String {
+        name
+    }
     
     var description: String {
         compileDescription()
     }
     
     init(
-        declarationAttributes: [String],
+        attributes: [String],
         modifiers: [String],
         bindingSpecifier: String,
         name: String,
@@ -38,7 +47,7 @@ struct SwiftInterfaceVar: SwiftInterfaceElement {
         initializerValue: String?,
         accessors: String?
     ) {
-        self.declarationAttributes = declarationAttributes
+        self.attributes = attributes
         self.modifiers = modifiers
         self.bindingSpecifier = bindingSpecifier
         self.name = name
@@ -54,7 +63,7 @@ private extension SwiftInterfaceVar {
         
         var components = [String]()
         
-        components += declarationAttributes
+        components += attributes
         components += modifiers
         components += [bindingSpecifier]
         components += ["\(name): \(typeAnnotation)"]

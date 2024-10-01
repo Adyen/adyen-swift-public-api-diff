@@ -8,10 +8,10 @@ import Foundation
 
 struct SDKDumpAnalyzer: SDKDumpAnalyzing {
     
-    let changeConsolidator: ChangeConsolidating
+    let changeConsolidator: SDKDumpChangeConsolidating
     
     init(
-        changeConsolidator: ChangeConsolidating = ChangeConsolidator()
+        changeConsolidator: SDKDumpChangeConsolidating = SDKDumpChangeConsolidator()
     ) {
         self.changeConsolidator = changeConsolidator
     }
@@ -39,7 +39,7 @@ struct SDKDumpAnalyzer: SDKDumpAnalyzing {
         element lhs: SDKDump.Element,
         to rhs: SDKDump.Element,
         oldFirst: Bool
-    ) -> [IndependentChange] {
+    ) -> [IndependentSDKDumpChange] {
         
         if lhs == rhs { return [] }
         
@@ -49,7 +49,7 @@ struct SDKDumpAnalyzer: SDKDumpAnalyzing {
         // If both elements are internal we can ignore them as they are not in the public interface
         if lhs.isInternal, rhs.isInternal { return [] }
         
-        var changes = [IndependentChange]()
+        var changes = [IndependentSDKDumpChange]()
         
         if oldFirst, lhs.description != rhs.description {
             changes += independentChanges(from: lhs, and: rhs, oldFirst: oldFirst)
@@ -80,7 +80,7 @@ struct SDKDumpAnalyzer: SDKDumpAnalyzing {
             // An (spi-)internal element was added/removed which we do not count as a public change
             if lhsElement.isSpiInternal || lhsElement.isInternal { return [] }
             
-            let changeType: IndependentChange.ChangeType = oldFirst ?
+            let changeType: IndependentSDKDumpChange.ChangeType = oldFirst ?
                 .removal(lhsElement.description) :
                 .addition(lhsElement.description)
 
@@ -100,9 +100,9 @@ struct SDKDumpAnalyzer: SDKDumpAnalyzing {
         from lhs: SDKDump.Element,
         and rhs: SDKDump.Element,
         oldFirst: Bool
-    ) -> [IndependentChange] {
+    ) -> [IndependentSDKDumpChange] {
         
-        var changes: [IndependentChange] = [
+        var changes: [IndependentSDKDumpChange] = [
             .from(
                 changeType: .removal(lhs.description),
                 element: lhs,
@@ -137,7 +137,14 @@ private extension SDKDump.Element {
     /// If we used the `name` it could cause a false positive with other functions named `init` (e.g. convenience inits) when trying to find matching elements during this finding phase.
     /// In a later consolidation phase removals/additions are compared again based on their `name` to combine them to a `change`
     func isComparable(to otherElement: SDKDump.Element) -> Bool {
-        printedName == otherElement.printedName &&
+        
+        if declKind == .func && otherElement.declKind == .func {
+            print(printedName)
+            print(otherElement.printedName)
+            print("-----------------------------")
+        }
+        
+        return printedName == otherElement.printedName &&
             declKind == otherElement.declKind &&
             parentPath == otherElement.parentPath
     }

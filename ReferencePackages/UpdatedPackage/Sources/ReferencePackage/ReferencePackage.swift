@@ -22,6 +22,8 @@ import Foundation
 
 // MARK: - Protocol with associatedtype
 
+public protocol SimpleProtocol {}
+
 public protocol ParentProtocol<ParentType> {
     associatedtype ParentType: Equatable
     associatedtype Iterator: Collection where Iterator.Element == ParentType
@@ -60,7 +62,7 @@ public struct CustomStruct<T: Strideable>: CustomProtocol {
 public class CustomClass<T: Equatable> {
     
     public weak var weakObject: CustomClass?
-    lazy var lazyVar: String = { "I am a lazy" }()
+    public lazy var lazyVar: String = { "I am a lazy" }()
     @_spi(SomeSpi)
     @_spi(AnotherSpi)
     open var computedVar: String { "I am computed" }
@@ -76,12 +78,26 @@ public class CustomClass<T: Equatable> {
     public init(weakObject: CustomClass? = nil, optionalVar: T? = nil) {
         self.weakObject = weakObject
         self.optionalVar = optionalVar
+        
+        lazyVar = "Great!"
     }
     
-    public init() {}
+    public init?() {}
     
-    public convenience init(value: T) {
+    public convenience init!(value: T) {
         self.init(optionalVar: value)
+    }
+    
+    public subscript(index: Int) -> T? {
+        get { optionalVar }
+        set { optionalVar = newValue }
+    }
+}
+
+extension Array {
+    public subscript(safe index: Int) -> Element? {
+        guard index >= 0, index < self.count else { return nil }
+        return self[index]
     }
 }
 
@@ -122,7 +138,7 @@ public class ObjcClass: NSObject {
 
 // MARK: - Actor
 
-public actor CustomActor {}
+public actor CustomActor: SimpleProtocol {}
 
 // MARK: - Operators
 
@@ -154,12 +170,12 @@ precedencegroup CustomPrecedence {
 
 // MARK: - Enums
 
-public enum CustomEnum {
+public enum CustomEnum<T> {
     case normalCase
-    case caseWithNamedString(title: String)
+    case caseWithNamedString(title: T)
     case caseWithTuple(_ foo: String, bar: Int)
     case caseWithBlock((Int) throws -> Void)
-    case a, b, c, d, e(Int)
+    case a, b, c, d, e(NestedStructInExtension)
     
     indirect case recursive(CustomEnum)
 }
@@ -167,4 +183,24 @@ public enum CustomEnum {
 public enum RawValueEnum: String {
     case one
     case two = "three"
+}
+
+extension CustomEnum: SimpleProtocol {
+    
+    public struct NestedStructInExtension {
+        public let string: String
+        public init(string: String = "Hello") {
+            self.string = string
+        }
+    }
+}
+
+public extension CustomEnum where T == String {
+    
+    var titleOfCaseWithNamedString: String? {
+        if case let .caseWithNamedString(title) = self {
+            return title
+        }
+        return nil
+    }
 }

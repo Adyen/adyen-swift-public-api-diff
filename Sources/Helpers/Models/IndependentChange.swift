@@ -10,7 +10,7 @@ import Foundation
 ///
 /// This intermediate structure helps gathering a list of additions and removals
 /// that are later consolidated to a ``Change``
-struct IndependentChange: Equatable {
+struct IndependentSDKDumpChange: Equatable {
     enum ChangeType: Equatable {
         case addition(_ description: String)
         case removal(_ description: String)
@@ -27,5 +27,33 @@ struct IndependentChange: Equatable {
     let element: SDKDump.Element
 
     let oldFirst: Bool
-    var parentName: String { element.parentPath }
+    var parentPath: String { element.parentPath }
+}
+
+struct IndependentSwiftInterfaceChange: Equatable {
+    
+    enum ChangeType: Equatable {
+        case addition(_ description: String)
+        case removal(_ description: String)
+
+        var description: String {
+            switch self {
+            case let .addition(description): description
+            case let .removal(description): description
+            }
+        }
+    }
+
+    let changeType: ChangeType
+    let element: any SwiftInterfaceElement
+
+    let oldFirst: Bool
+    var parentPath: String? { element.parentPath }
+    
+    static func == (lhs: IndependentSwiftInterfaceChange, rhs: IndependentSwiftInterfaceChange) -> Bool {
+        lhs.changeType == rhs.changeType &&
+        lhs.element.description == rhs.element.description &&
+        lhs.oldFirst == rhs.oldFirst &&
+        lhs.parentPath == rhs.parentPath
+    }
 }

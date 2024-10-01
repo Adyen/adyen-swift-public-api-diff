@@ -1,4 +1,3 @@
-@testable import public_api_diff
 import Foundation
 
 extension SwiftInterfaceFunction {
@@ -35,11 +34,10 @@ extension SwiftInterfaceFunction {
     }
 }
 
-struct SwiftInterfaceFunction: SwiftInterfaceElement {
-    var type: SDKDump.DeclarationKind { .func }
+class SwiftInterfaceFunction: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let declarationAttributes: [String]
+    let attributes: [String]
     
     let name: String
     
@@ -59,15 +57,27 @@ struct SwiftInterfaceFunction: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
+    var childGroupName: String { "" } // Not relevant as only used to group children
+    
     /// A function does not have children
     let children: [any SwiftInterfaceElement] = []
+    
+    var parent: (any SwiftInterfaceElement)? = nil
+    
+    var diffableSignature: String {
+        "\(name)(\(parameters.map { "\($0.firstName):" }.joined()))"
+    }
+    
+    var consolidatableName: String {
+        name
+    }
     
     var description: String {
         compileDescription()
     }
     
     init(
-        declarationAttributes: [String],
+        attributes: [String],
         modifiers: [String],
         name: String,
         genericParameterDescription: String?,
@@ -76,7 +86,7 @@ struct SwiftInterfaceFunction: SwiftInterfaceElement {
         returnType: String?,
         genericWhereClauseDescription: String?
     ) {
-        self.declarationAttributes = declarationAttributes
+        self.attributes = attributes
         self.modifiers = modifiers
         self.name = name
         self.genericParameterDescription = genericParameterDescription
@@ -92,7 +102,7 @@ private extension SwiftInterfaceFunction {
     func compileDescription() -> String {
         var components = [String]()
         
-        components += declarationAttributes
+        components += attributes
         components += modifiers
         components += ["func"]
         

@@ -7,16 +7,16 @@
 import Foundation
 
 /// A helper to consolidate a `removal` and `addition` to `change`
-protocol ChangeConsolidating {
+protocol SDKDumpChangeConsolidating {
     
     /// Tries to match a `removal` and `addition` to a `change`
     ///
     /// - Parameters:
     ///   - changes: The independent changes (`addition`/`removal`) to try to match
-    func consolidate(_ changes: [IndependentChange]) -> [Change]
+    func consolidate(_ changes: [IndependentSDKDumpChange]) -> [Change]
 }
 
-struct ChangeConsolidator: ChangeConsolidating {
+struct SDKDumpChangeConsolidator: SDKDumpChangeConsolidating {
 
     /// Tries to match a `removal` and `addition` to a `change`
     ///
@@ -31,7 +31,7 @@ struct ChangeConsolidator: ChangeConsolidating {
     /// e.g. a second `addition` `init(unrelated: String)` might be matched as a change of `init(foo: Int, bar: Int)`
     /// as they share the same comparison features but might not be an actual change but a genuine addition.
     /// This is acceptable for now but might be improved in the future (e.g. calculating a matching-percentage)
-    func consolidate(_ changes: [IndependentChange]) -> [Change] {
+    func consolidate(_ changes: [IndependentSDKDumpChange]) -> [Change] {
 
         var independentChanges = changes
         var consolidatedChanges = [Change]()
@@ -56,7 +56,7 @@ struct ChangeConsolidator: ChangeConsolidating {
                         oldDescription: oldDescription,
                         newDescription: newDescription
                     ),
-                    parentName: match.parentName,
+                    parentPath: match.parentPath,
                     listOfChanges: listOfChanges
                 )
             )
@@ -66,7 +66,7 @@ struct ChangeConsolidator: ChangeConsolidating {
     }
 
     /// Compiles a list of changes between 2 independent changes
-    func listOfChanges(between lhs: IndependentChange, and rhs: IndependentChange) -> [String] {
+    func listOfChanges(between lhs: IndependentSDKDumpChange, and rhs: IndependentSDKDumpChange) -> [String] {
         if lhs.oldFirst {
             lhs.element.differences(to: rhs.element)
         } else {
@@ -75,7 +75,7 @@ struct ChangeConsolidator: ChangeConsolidating {
     }
 }
 
-extension IndependentChange {
+extension IndependentSDKDumpChange {
 
     var toConsolidatedChange: Change {
         let changeType: Change.ChangeType = {
@@ -89,14 +89,17 @@ extension IndependentChange {
 
         return .init(
             changeType: changeType,
-            parentName: parentName,
+            parentPath: parentPath,
             listOfChanges: []
         )
     }
 
     /// Helper method to construct an IndependentChange from the changeType & element
     static func from(changeType: ChangeType, element: SDKDump.Element, oldFirst: Bool) -> Self {
-        .init(
+        if element.printedName.range(of: "asyncThrowingFunc") != nil {
+            print("Hello")
+        }
+        return .init(
             changeType: changeType,
             element: element,
             oldFirst: oldFirst
@@ -114,7 +117,7 @@ extension IndependentChange {
     /// It could cause a false positive with other functions named `init` (e.g. convenience inits) when trying to find matching elements during the finding phase.
     /// Here we already found the matching elements and thus are looking for combining a removal/addition to a change and thus we can loosen the filter to use the `name`.
     /// It could potentially still lead to false positives when having multiple functions with changes and the same name and parent but this is acceptable in this phase.
-    func isConsolidatable(with otherChange: IndependentChange) -> Bool {
+    func isConsolidatable(with otherChange: IndependentSDKDumpChange) -> Bool {
         element.name == otherChange.element.name &&
             element.declKind == otherChange.element.declKind &&
             element.parentPath == otherChange.element.parentPath &&
@@ -122,7 +125,7 @@ extension IndependentChange {
     }
 }
 
-private extension IndependentChange.ChangeType {
+private extension IndependentSDKDumpChange.ChangeType {
 
     /// The name of the type (without associated value) as String
     var name: String {
