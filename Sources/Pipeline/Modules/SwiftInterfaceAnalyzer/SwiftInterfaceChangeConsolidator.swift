@@ -67,15 +67,11 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
 
     /// Compiles a list of changes between 2 independent changes
     func listOfChanges(between lhs: IndependentSwiftInterfaceChange, and rhs: IndependentSwiftInterfaceChange) -> [String] {
-        return [String]()
-        // TODO: Enable again
-        /*
         if lhs.oldFirst {
-            lhs.element.differences(to: rhs.element)
+            rhs.differences(to: lhs)
         } else {
-            rhs.element.differences(to: lhs.element)
+            lhs.differences(to: rhs)
         }
-         */
     }
 }
 

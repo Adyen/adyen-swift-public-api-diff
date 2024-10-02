@@ -1,8 +1,6 @@
 import Foundation
 
-class SwiftInterfaceActor: SwiftInterfaceElement {
-    
-    var childGroupName: String { name }
+class SwiftInterfaceStruct: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
@@ -19,6 +17,8 @@ class SwiftInterfaceActor: SwiftInterfaceElement {
     
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
+    
+    var childGroupName: String { name }
     
     /// The members, declarations, ... inside of the body of the struct
     let children: [any SwiftInterfaceElement]
@@ -56,7 +56,21 @@ class SwiftInterfaceActor: SwiftInterfaceElement {
     }
 }
 
-private extension SwiftInterfaceActor {
+extension SwiftInterfaceStruct {
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+        var changes = [String?]()
+        guard let other = otherElement as? Self else { return [] }
+        changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
+        changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
+        changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
+        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance)
+        changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
+        return changes.compactMap { $0 }
+    }
+}
+
+private extension SwiftInterfaceStruct {
     
     func compileDescription() -> String {
         
@@ -64,7 +78,7 @@ private extension SwiftInterfaceActor {
         
         components += attributes
         components += modifiers
-        components += ["actor"]
+        components += ["struct"]
         
         components += [{
             var components = [

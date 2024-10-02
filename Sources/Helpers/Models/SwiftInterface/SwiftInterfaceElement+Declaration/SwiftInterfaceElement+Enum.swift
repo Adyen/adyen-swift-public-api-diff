@@ -1,9 +1,12 @@
 import Foundation
 
-class SwiftInterfaceClass: SwiftInterfaceElement {
+class SwiftInterfaceEnum: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
+    
+    /// e.g. public, private, package, open, internal
+    let modifiers: [String]
     
     let name: String
     
@@ -12,13 +15,10 @@ class SwiftInterfaceClass: SwiftInterfaceElement {
     
     let inheritance: [String]?
     
-    /// e.g. public, private, package, open, internal
-    let modifiers: [String]
-    
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    var childGroupName: String { name } // Not relevant as only used to group children
+    var childGroupName: String { name }
     
     /// The members, declarations, ... inside of the body of the struct
     let children: [any SwiftInterfaceElement]
@@ -26,7 +26,7 @@ class SwiftInterfaceClass: SwiftInterfaceElement {
     var parent: (any SwiftInterfaceElement)? = nil
     
     var diffableSignature: String {
-        return name
+        name
     }
     
     var consolidatableName: String {
@@ -56,7 +56,21 @@ class SwiftInterfaceClass: SwiftInterfaceElement {
     }
 }
 
-private extension SwiftInterfaceClass {
+extension SwiftInterfaceEnum {
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+        var changes = [String?]()
+        guard let other = otherElement as? Self else { return [] }
+        changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
+        changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
+        changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
+        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance)
+        changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
+        return changes.compactMap { $0 }
+    }
+}
+
+private extension SwiftInterfaceEnum {
     
     func compileDescription() -> String {
         
@@ -64,7 +78,7 @@ private extension SwiftInterfaceClass {
         
         components += attributes
         components += modifiers
-        components += ["class"]
+        components += ["enum"]
         
         components += [{
             var components = [

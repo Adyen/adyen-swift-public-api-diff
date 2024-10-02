@@ -19,16 +19,16 @@ let package = Package(
         .executableTarget(
             name: "public-api-diff",
             dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
             ],
             path: "Sources"
         ),
         .testTarget(
             name: "UnitTests",
             dependencies: [
-                "public-api-diff",
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
+                "public-api-diff"
             ],
             resources: [
                 // Copy Tests/ExampleTests/Resources directories as-is.
@@ -46,7 +46,9 @@ let package = Package(
                 // Copy Tests/ExampleTests/Resources directories as-is.
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
-                .copy("Resources/expected-reference-changes.md")
+                .copy("Resources/expected-reference-changes-sdk-dump.md"),
+                .copy("Resources/expected-reference-changes-swift-interface-private.md"),
+                .copy("Resources/expected-reference-changes-swift-interface-public.md")
             ]
         )
     ]

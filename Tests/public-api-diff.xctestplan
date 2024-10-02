@@ -45,7 +45,6 @@
   },
   "testTargets" : [
     {
-      "enabled" : false,
       "target" : {
         "containerPath" : "container:",
         "identifier" : "IntegrationTests",
@@ -53,6 +52,7 @@
       }
     },
     {
+      "enabled" : false,
       "skippedTests" : [
         "ABIGeneratorTests",
         "FileHandlingTests",

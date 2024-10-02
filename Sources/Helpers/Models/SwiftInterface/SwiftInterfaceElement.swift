@@ -1,8 +1,8 @@
 import Foundation
 
-protocol SwiftInterfaceElement: CustomStringConvertible, Equatable, AnyObject {
+protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
     
-    /// Used to group output together
+    /// Used to group children together
     var childGroupName: String { get }
     
     var description: String { get }
@@ -20,7 +20,10 @@ protocol SwiftInterfaceElement: CustomStringConvertible, Equatable, AnyObject {
     /// e.g. `func foo(bar: Int = 0, baz: String)` would have a consolidatable name of `foo`
     var consolidatableName: String { get }
     
+    /// The parent of the element (setup by using ``setupParentRelationships(parent:)``
     var parent: (any SwiftInterfaceElement)? { get set }
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String]
 }
 
 extension SwiftInterfaceElement {
@@ -33,6 +36,12 @@ extension SwiftInterfaceElement {
     }
     
     var parentPath: String {
+        if let extensionElement = self as? SwiftInterfaceExtension {
+            // We want to group all extensions under the type that they are extending
+            // so we return the extended type as the parent
+            return extensionElement.extendedType
+        }
+        
         var parent = self.parent
         var path = [parent?.childGroupName]
         
@@ -41,20 +50,8 @@ extension SwiftInterfaceElement {
             path += [parent?.childGroupName]
         }
         
-        var sanitizedPath = path.compactMap { $0 }
-        
-        if sanitizedPath.last == "TopLevel" {
-            sanitizedPath.removeLast()
-        }
-        
+        let sanitizedPath = path.compactMap { $0 }
         return sanitizedPath.reversed().joined(separator: ".")
-    }
-}
-
-extension SwiftInterfaceElement {
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        // The description is the unique representation of an element and thus used for the equality check
-        lhs.description == rhs.description
     }
 }
 
@@ -85,11 +82,5 @@ extension SwiftInterfaceElement {
             recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))}")
         }
         return recursiveDescription
-    }
-}
-
-extension SwiftInterfaceElement {
-    var isSpiInternal: Bool {
-        description.range(of: "@_spi(") != nil
     }
 }

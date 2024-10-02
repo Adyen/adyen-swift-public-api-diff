@@ -81,6 +81,19 @@ class SwiftInterfaceEnumCase: SwiftInterfaceElement {
     }
 }
 
+extension SwiftInterfaceEnumCase {
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+        var changes = [String?]()
+        guard let other = otherElement as? Self else { return [] }
+        changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
+        changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
+        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters?.map { $0.description }, newValues: parameters?.map { $0.description }) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(propertyType: "raw value", oldValue: other.rawValue, newValue: rawValue)
+        return changes.compactMap { $0 }
+    }
+}
+
 private extension SwiftInterfaceEnumCase {
     
     func compileDescription() -> String {

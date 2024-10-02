@@ -19,8 +19,8 @@ struct SwiftInterfaceAnalyzer {
     }
     
     func analyze(
-        old: SwiftInterfaceParser.Root,
-        new: SwiftInterfaceParser.Root
+        old: some SwiftInterfaceElement,
+        new: some SwiftInterfaceElement
     ) -> [Change] {
         
         let individualChanges = Self.recursiveCompare(
@@ -48,9 +48,6 @@ struct SwiftInterfaceAnalyzer {
         
         if lhs.recursiveDescription() == rhs.recursiveDescription() { return [] }
         
-        // If both elements are spi internal we can ignore them as they are not in the public interface
-        if !isRoot, lhs.isSpiInternal, rhs.isSpiInternal { return [] }
-        
         var changes = [IndependentSwiftInterfaceChange]()
         
         if !isRoot, oldFirst, lhs.description != rhs.description {
@@ -75,10 +72,6 @@ struct SwiftInterfaceAnalyzer {
             }
     
             // No matching element was found so either it was removed or added
-            
-            // An (spi-)internal element was added/removed which we do not count as a public change
-            if lhsElement.isSpiInternal { return [IndependentSwiftInterfaceChange]() }
-            
             let changeType: IndependentSwiftInterfaceChange.ChangeType = oldFirst ?
                 .removal(lhsElement.description) :
                 .addition(lhsElement.recursiveDescription())
@@ -100,26 +93,17 @@ struct SwiftInterfaceAnalyzer {
         and rhs: any SwiftInterfaceElement,
         oldFirst: Bool
     ) -> [IndependentSwiftInterfaceChange] {
-        
-        var changes: [IndependentSwiftInterfaceChange] = [
+        [
             .from(
                 changeType: .removal(lhs.description),
                 element: lhs,
                 oldFirst: oldFirst
+            ),
+            .from(
+                changeType: .addition(rhs.recursiveDescription()),
+                element: rhs,
+                oldFirst: oldFirst
             )
         ]
-        
-        if !rhs.isSpiInternal {
-            // We only report additions if they are not @_spi
-            changes += [
-                .from(
-                    changeType: .addition(rhs.recursiveDescription()),
-                    element: rhs,
-                    oldFirst: oldFirst
-                )
-            ]
-        }
-        
-        return changes
     }
 }

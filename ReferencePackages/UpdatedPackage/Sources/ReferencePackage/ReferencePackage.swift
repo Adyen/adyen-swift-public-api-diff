@@ -195,6 +195,13 @@ extension CustomEnum: SimpleProtocol {
     }
 }
 
+extension CustomEnum.NestedStructInExtension {
+    
+    var description: String {
+        return string
+    }
+}
+
 public extension CustomEnum where T == String {
     
     var titleOfCaseWithNamedString: String? {

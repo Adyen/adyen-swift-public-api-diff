@@ -9,7 +9,7 @@ import SwiftParser
  */
 class SwiftInterfaceParser: SyntaxVisitor {
     
-    class Root: SwiftInterfaceElement, Equatable {
+    class Root: SwiftInterfaceElement {
         
         var parent: (any SwiftInterfaceElement)? = nil
         
@@ -26,13 +26,20 @@ class SwiftInterfaceParser: SyntaxVisitor {
             return description
         }
         
-        var childGroupName: String { "Root" }
+        var childGroupName: String { moduleName }
         
+        private let moduleName: String
         let children: [any SwiftInterfaceElement]
         
-        init(elements: [any SwiftInterfaceElement]) {
-            elements.forEach { $0.setupParentRelationships() }
+        init(moduleName: String, elements: [any SwiftInterfaceElement]) {
+            self.moduleName = moduleName
             self.children = elements
+            
+            elements.forEach { $0.setupParentRelationships(parent: self) }
+        }
+        
+        func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+            return []
         }
     }
     
@@ -45,10 +52,13 @@ class SwiftInterfaceParser: SyntaxVisitor {
     
     private var scope: Scope = .root(elements: [])
     
-    static public func parse(source: String) -> Root {
+    static public func parse(source: String, moduleName: String) -> Root {
         let visitor = Self()
         visitor.walk(Parser.parse(source: source))
-        return Root(elements: visitor.scope.elements)
+        return Root(
+            moduleName: moduleName,
+            elements: visitor.scope.elements
+        )
     }
     
     /// Designated initializer

@@ -15,8 +15,7 @@ class SwiftInterfaceExtension: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    // TODO: The extensions show up independently on the root - find a way so we can nest them inside the parent (find a way to find the parent)
-    var childGroupName: String { extendedType } // Grouping in extended type
+    var childGroupName: String { extendedType } // Grouping by extended type
     
     /// The members, declarations, ... inside of the body of the struct
     let children: [any SwiftInterfaceElement]
@@ -49,6 +48,19 @@ class SwiftInterfaceExtension: SwiftInterfaceElement {
         self.inheritance = inheritance
         self.genericWhereClauseDescription = genericWhereClauseDescription
         self.children = children
+    }
+}
+
+extension SwiftInterfaceExtension {
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+        var changes = [String?]()
+        guard let other = otherElement as? Self else { return [] }
+        changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
+        changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
+        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance)
+        changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
+        return changes.compactMap { $0 }
     }
 }
 

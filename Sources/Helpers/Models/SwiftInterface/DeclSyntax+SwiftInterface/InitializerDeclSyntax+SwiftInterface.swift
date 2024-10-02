@@ -33,7 +33,6 @@ extension InitializerDeclSyntax {
             genericParameterDescription: self.genericParameterClause?.trimmedDescription,
             parameters: parameters,
             effectSpecifiers: effectSpecifiers,
-            returnType: signature.returnClause?.type.trimmedDescription,
             genericWhereClauseDescription: self.genericWhereClause?.trimmedDescription
         )
     }

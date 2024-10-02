@@ -1,6 +1,6 @@
 import Foundation
 
-extension SwiftInterfaceInitializer {
+extension SwiftInterfaceFunction {
     
     struct Parameter {
         
@@ -34,12 +34,12 @@ extension SwiftInterfaceInitializer {
     }
 }
 
-class SwiftInterfaceInitializer: SwiftInterfaceElement {
+class SwiftInterfaceFunction: SwiftInterfaceElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
     
-    let optionalMark: String?
+    let name: String
     
     /// e.g. <T>
     let genericParameterDescription: String?
@@ -52,6 +52,8 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
     
+    let returnType: String
+    
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
@@ -63,11 +65,11 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     var parent: (any SwiftInterfaceElement)? = nil
     
     var diffableSignature: String {
-        "init(\(parameters.map { "\($0.firstName):" }.joined()))"
+        "\(name)(\(parameters.map { "\($0.firstName):" }.joined()))"
     }
     
     var consolidatableName: String {
-        "init"
+        name
     }
     
     var description: String {
@@ -77,7 +79,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     init(
         attributes: [String],
         modifiers: [String],
-        optionalMark: String?,
+        name: String,
         genericParameterDescription: String?,
         parameters: [Parameter],
         effectSpecifiers: [String],
@@ -86,32 +88,50 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     ) {
         self.attributes = attributes
         self.modifiers = modifiers
-        self.optionalMark = optionalMark
+        self.name = name
         self.genericParameterDescription = genericParameterDescription
         self.parameters = parameters
         self.effectSpecifiers = effectSpecifiers
+        self.returnType = returnType ?? "Swift.Void"
         self.genericWhereClauseDescription = genericWhereClauseDescription
     }
 }
 
-private extension SwiftInterfaceInitializer {
+extension SwiftInterfaceFunction {
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+        var changes = [String?]()
+        guard let other = otherElement as? Self else { return [] }
+        changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
+        changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
+        changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
+        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map { $0.description }, newValues: parameters.map { $0.description }) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(propertyType: "effect", oldValues: other.effectSpecifiers, newValues: effectSpecifiers)
+        changes += diffDescription(propertyType: "return type", oldValue: other.returnType, newValue: returnType)
+        changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
+        return changes.compactMap { $0 }
+    }
+}
+
+private extension SwiftInterfaceFunction {
     
     func compileDescription() -> String {
         var components = [String]()
         
         components += attributes
         components += modifiers
+        components += ["func"]
         
         components += [
             [
-                "init",
-                optionalMark,
+                name,
                 genericParameterDescription,
                 "(\(parameters.map { $0.description }.joined(separator: ", ")))"
             ].compactMap { $0 }.joined()
         ]
         
         components += effectSpecifiers
+        components += ["-> \(returnType)"]
         
         genericWhereClauseDescription.map { components += [$0] }
         

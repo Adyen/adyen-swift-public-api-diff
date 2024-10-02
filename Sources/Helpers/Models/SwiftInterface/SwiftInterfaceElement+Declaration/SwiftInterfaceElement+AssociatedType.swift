@@ -54,6 +54,20 @@ class SwiftInterfaceAssociatedType: SwiftInterfaceElement {
     }
 }
 
+extension SwiftInterfaceAssociatedType {
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+        var changes = [String?]()
+        guard let other = otherElement as? Self else { return [] }
+        changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
+        changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
+        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance)
+        changes += diffDescription(propertyType: "assignment", oldValue: other.initializerValue, newValue: initializerValue)
+        changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
+        return changes.compactMap { $0 }
+    }
+}
+
 private extension SwiftInterfaceAssociatedType {
     
     func compileDescription() -> String {

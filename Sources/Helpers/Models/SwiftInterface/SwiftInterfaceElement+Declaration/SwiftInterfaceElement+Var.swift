@@ -57,6 +57,21 @@ class SwiftInterfaceVar: SwiftInterfaceElement {
     }
 }
 
+extension SwiftInterfaceVar {
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+        var changes = [String?]()
+        guard let other = otherElement as? Self else { return [] }
+        changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
+        changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
+        changes += diffDescription(propertyType: nil, oldValue: other.bindingSpecifier, newValue: bindingSpecifier)
+        changes += diffDescription(propertyType: "type", oldValue: other.typeAnnotation, newValue: typeAnnotation)
+        changes += diffDescription(propertyType: "default value", oldValue: other.initializerValue, newValue: initializerValue)
+        changes += diffDescription(propertyType: "accessors", oldValue: other.accessors, newValue: accessors)
+        return changes.compactMap { $0 }
+    }
+}
+
 private extension SwiftInterfaceVar {
     
     func compileDescription() -> String {

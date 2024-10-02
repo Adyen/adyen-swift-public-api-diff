@@ -94,6 +94,22 @@ class SwiftInterfaceSubscript: SwiftInterfaceElement {
     }
 }
 
+extension SwiftInterfaceSubscript {
+    
+    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+        var changes = [String?]()
+        guard let other = otherElement as? Self else { return [] }
+        changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
+        changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
+        changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
+        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map { $0.description }, newValues: parameters.map { $0.description }) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(propertyType: "return type", oldValue: other.returnType, newValue: returnType)
+        changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
+        changes += diffDescription(propertyType: "accessors", oldValue: other.accessors, newValue: accessors)
+        return changes.compactMap { $0 }
+    }
+}
+
 private extension SwiftInterfaceSubscript {
     
     func compileDescription() -> String {

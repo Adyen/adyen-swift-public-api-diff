@@ -96,9 +96,6 @@ extension IndependentSDKDumpChange {
 
     /// Helper method to construct an IndependentChange from the changeType & element
     static func from(changeType: ChangeType, element: SDKDump.Element, oldFirst: Bool) -> Self {
-        if element.printedName.range(of: "asyncThrowingFunc") != nil {
-            print("Hello")
-        }
         return .init(
             changeType: changeType,
             element: element,
