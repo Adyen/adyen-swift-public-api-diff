@@ -6,7 +6,7 @@
 
 import Foundation
 
-struct Pipeline {
+struct SDKDumpPipeline {
     
     let newProjectSource: ProjectSource
     let oldProjectSource: ProjectSource
@@ -80,7 +80,7 @@ struct Pipeline {
 
 // MARK: - Convenience Methods
 
-private extension Pipeline {
+private extension SDKDumpPipeline {
     
     func buildProjects(oldSource: ProjectSource, newSource: ProjectSource, scheme: String?) async throws -> (URL, URL) {
         async let oldBuildResult = try projectBuilder.build(

@@ -10,6 +10,15 @@ protocol ProjectBuilding {
     func build(source: ProjectSource, scheme: String?) async throws -> URL
 }
 
+enum ProjectType {
+    case swiftPackage
+    case xcodeProject
+}
+
+protocol ProjectSetupHelping {
+    func setup(_ projectSource: ProjectSource, projectType: ProjectType) async throws -> String
+}
+
 struct ABIGeneratorOutput: Equatable {
     let targetName: String
     let abiJsonFileUrl: URL
@@ -25,6 +34,14 @@ protocol SDKDumpGenerating {
 
 protocol SDKDumpAnalyzing {
     func analyze(old: SDKDump, new: SDKDump) throws -> [Change]
+}
+
+protocol SwiftInterfaceParsing {
+    func parse(source: String, moduleName: String) -> any SwiftInterfaceElement
+}
+
+protocol SwiftInterfaceAnalyzing {
+    func analyze(old: some SwiftInterfaceElement, new: some SwiftInterfaceElement) throws -> [Change]
 }
 
 protocol OutputGenerating {

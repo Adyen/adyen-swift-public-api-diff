@@ -58,8 +58,7 @@ class SwiftInterfaceSubscript: SwiftInterfaceElement {
     
     var childGroupName: String { "" }
     
-    /// A function does not have children
-    let children: [any SwiftInterfaceElement] = []
+    var children: [any SwiftInterfaceElement] = []
     
     var parent: (any SwiftInterfaceElement)? = nil
     

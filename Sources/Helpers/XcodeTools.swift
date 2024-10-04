@@ -23,13 +23,16 @@ struct XcodeTools {
     
     private let shell: ShellHandling
     private let fileHandler: FileHandling
+    private let logger: Logging?
     
     init(
         shell: ShellHandling = Shell(),
-        fileHandler: FileHandling = FileManager.default
+        fileHandler: FileHandling = FileManager.default,
+        logger: Logging?
     ) {
         self.shell = shell
         self.fileHandler = fileHandler
+        self.logger = logger
     }
     
     func loadPackageDescription(
@@ -63,6 +66,7 @@ struct XcodeTools {
         }
         
         // print("👾 \(command.joined(separator: " "))")
+        logger?.log("🏗️ Building \(scheme) from \(projectDirectoryPath)", from: String(describing: Self.self))
         let result = shell.execute(command.joined(separator: " "))
         
         if 
@@ -76,6 +80,36 @@ struct XcodeTools {
                 underlyingError: result
             )
         }
+    }
+    
+    func archive(
+        projectDirectoryPath: String,
+        scheme: String
+    ) async throws -> String {
+        let command = "cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath \(Constants.derivedDataPath) -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+        
+        
+        return try await Task {
+            logger?.log("📦 Archiving \(scheme) from \(projectDirectoryPath)", from: String(describing: Self.self))
+            
+            let result = shell.execute(command)
+            
+            let derivedDataPath = "\(projectDirectoryPath)/\(Constants.derivedDataPath)"
+            
+            // It might be that the archive failed but the .swiftinterface files are still created
+            // so we have to check outside if they exist.
+            //
+            // Also see: https://github.com/swiftlang/swift/issues/56573
+            if !fileHandler.fileExists(atPath: derivedDataPath) {
+                print(result)
+                throw XcodeToolsError(
+                    errorDescription: "💥 Building project failed",
+                    underlyingError: result
+                )
+            }
+            
+            return derivedDataPath
+        }.value
     }
     
     func dumpSdk(

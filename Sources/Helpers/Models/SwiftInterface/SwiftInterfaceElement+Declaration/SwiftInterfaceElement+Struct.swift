@@ -20,8 +20,7 @@ class SwiftInterfaceStruct: SwiftInterfaceElement {
     
     var childGroupName: String { name }
     
-    /// The members, declarations, ... inside of the body of the struct
-    let children: [any SwiftInterfaceElement]
+    var children: [any SwiftInterfaceElement]
     
     var parent: (any SwiftInterfaceElement)? = nil
     

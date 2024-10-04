@@ -58,7 +58,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     var childGroupName: String { "" } // Not relevant as only used to group children
     
     /// A function does not have children
-    let children: [any SwiftInterfaceElement] = []
+    var children: [any SwiftInterfaceElement] = []
     
     var parent: (any SwiftInterfaceElement)? = nil
     

@@ -39,7 +39,9 @@ extension SwiftInterfaceElement {
         if let extensionElement = self as? SwiftInterfaceExtension {
             // We want to group all extensions under the type that they are extending
             // so we return the extended type as the parent
-            return extensionElement.extendedType
+            return sanitized(
+                parentPath: extensionElement.extendedType
+            )
         }
         
         var parent = self.parent
@@ -50,8 +52,23 @@ extension SwiftInterfaceElement {
             path += [parent?.childGroupName]
         }
         
-        let sanitizedPath = path.compactMap { $0 }
-        return sanitizedPath.reversed().joined(separator: ".")
+        return sanitized(
+            parentPath: path.compactMap { $0 }.filter { !$0.isEmpty }.reversed().joined(separator: ".")
+        )
+    }
+    
+    /// Removing module name prefix for nicer readability
+    private func sanitized(parentPath: String) -> String {
+        var sanitizedPathComponents = parentPath.components(separatedBy: ".")
+        
+        // The first path component is always the module name so it's safe to remove all prefixes
+        if let moduleName = sanitizedPathComponents.first {
+            while sanitizedPathComponents.first == moduleName {
+                sanitizedPathComponents.removeFirst()
+            }
+        }
+
+        return sanitizedPathComponents.joined(separator: ".")
     }
 }
 
@@ -81,6 +98,11 @@ extension SwiftInterfaceElement {
             }
             recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))}")
         }
+        
+        if indentation == 0 {
+            recursiveDescription.append("\n")
+        }
+        
         return recursiveDescription
     }
 }

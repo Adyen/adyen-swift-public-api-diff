@@ -20,8 +20,7 @@ class SwiftInterfaceActor: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    /// The members, declarations, ... inside of the body of the struct
-    let children: [any SwiftInterfaceElement]
+    var children: [any SwiftInterfaceElement]
     
     var parent: (any SwiftInterfaceElement)? = nil
     

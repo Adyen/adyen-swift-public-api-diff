@@ -6,9 +6,9 @@
 
 import Foundation
 
-// TODO: Add a protocol for this
-
-struct SwiftInterfaceAnalyzer {
+struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
+    
+    // TODO: Surface changes that happened to a subclass/protocol/extension
     
     let changeConsolidator: SwiftInterfaceChangeConsolidating
     
@@ -46,23 +46,31 @@ struct SwiftInterfaceAnalyzer {
         isRoot: Bool = false
     ) -> [IndependentSwiftInterfaceChange] {
         
-        if lhs.recursiveDescription() == rhs.recursiveDescription() { return [] }
-        
         var changes = [IndependentSwiftInterfaceChange]()
+        
+        if lhs.recursiveDescription() == rhs.recursiveDescription() { return changes }
         
         if !isRoot, oldFirst, lhs.description != rhs.description {
             changes += independentChanges(from: lhs, and: rhs, oldFirst: oldFirst)
         }
         
         changes += lhs.children.flatMap { lhsElement in
-
+            
             // Trying to find a matching element
             
-            // First checking if we found an exact match based on the description
+            // First checking if we found an exact match based on the recursive description
             // as we don't want to match a non-change with a change
-            if let exactMatch = rhs.children.first(where: { $0.description == lhsElement.description }) {
-                // We found an exact match so we check if the children changed
-                return Self.recursiveCompare(element: lhsElement, to: exactMatch, oldFirst: oldFirst)
+            //
+            // This is especially important for extensions where the description might
+            // be the same for a lot of different extensions but the body might be completely different
+            if rhs.children.first(where: { $0.recursiveDescription() == lhsElement.recursiveDescription() }) != nil {
+                return [IndependentSwiftInterfaceChange]()
+            }
+            
+            // First checking if we found a match based on the description
+            if let descriptionMatch = rhs.children.first(where: { $0.description == lhsElement.description }) {
+                // so we check if the children changed
+                return Self.recursiveCompare(element: lhsElement, to: descriptionMatch, oldFirst: oldFirst)
             }
             
             // ... then losening the criteria to find a comparable element
@@ -70,7 +78,7 @@ struct SwiftInterfaceAnalyzer {
                 // We found a comparable element so we check if the children changed
                 return Self.recursiveCompare(element: lhsElement, to: rhsChildForName, oldFirst: oldFirst)
             }
-    
+            
             // No matching element was found so either it was removed or added
             let changeType: IndependentSwiftInterfaceChange.ChangeType = oldFirst ?
                 .removal(lhsElement.description) :

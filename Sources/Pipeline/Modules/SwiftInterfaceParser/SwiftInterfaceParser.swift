@@ -7,7 +7,7 @@ import SwiftParser
  Documentation about DeclSyntax:
  - https://swiftpackageindex.com/swiftlang/swift-syntax/600.0.1/documentation/swiftsyntax/declsyntax
  */
-class SwiftInterfaceParser: SyntaxVisitor {
+class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     
     class Root: SwiftInterfaceElement {
         
@@ -52,7 +52,7 @@ class SwiftInterfaceParser: SyntaxVisitor {
     
     private var scope: Scope = .root(elements: [])
     
-    static public func parse(source: String, moduleName: String) -> Root {
+    public func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
         let visitor = Self()
         visitor.walk(Parser.parse(source: source))
         return Root(

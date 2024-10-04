@@ -20,8 +20,8 @@ class SwiftInterfaceProtocol: SwiftInterfaceElement {
     var childGroupName: String { name } // Not relevant as only used to group children
     
     /// The members, declarations, ... inside of the body of the struct
-    let children: [any SwiftInterfaceElement]
-   
+    var children: [any SwiftInterfaceElement]
+    
     var parent: (any SwiftInterfaceElement)? = nil
     
     var diffableSignature: String {

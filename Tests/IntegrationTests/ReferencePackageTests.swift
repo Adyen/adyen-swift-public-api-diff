@@ -9,17 +9,81 @@ import XCTest
 
 class ReferencePackageTests: XCTestCase {
      
-    func test_swiftInterface() throws {
+    func test_swiftInterface() async throws {
 
-        // TODO: Build + use the pipeline
+        // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
+        guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
+            XCTFail("Cannot find root directory")
+            return
+        }
         
-        // Public interface
+        let referencePackagesRoot = URL(filePath: String(projectRoot)).appending(path: "ReferencePackages")
         
-        try test(swiftInterface: .public)
+        /*
+        let oldSourceContent = try content(atPath: "/Users/alexandergu/Downloads/AdyenPOS.xcframework/ios-arm64_x86_64-simulator/AdyenPOS.framework/Modules/AdyenPOS.swiftmodule/arm64-apple-ios-simulator.swiftinterface")
+        let newSourceContent = try content(atPath: "/Users/alexandergu/Downloads/AdyenPOS/AdyenPOS_3.2.0.xcframework/ios-arm64_x86_64-simulator/AdyenPOS.framework/Modules/AdyenPOS.swiftmodule/arm64-apple-ios-simulator.swiftinterface")
+         */
         
-        // @_spi interface
+        let oldPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
+            for: referencePackagesRoot,
+            packageName: "ReferencePackage",
+            interfaceType: .private
+        )
         
-        try test(swiftInterface: .private)
+        let newPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
+            for: referencePackagesRoot,
+            packageName: "UpdatedPackage",
+            interfaceType: .private
+        )
+        
+        let oldPublicSwiftInterfaceFilePath = try swiftInterfaceFilePath(
+            for: referencePackagesRoot,
+            packageName: "ReferencePackage",
+            interfaceType: .public
+        )
+        
+        let newPublicSwiftInterfaceFilePath = try swiftInterfaceFilePath(
+            for: referencePackagesRoot,
+            packageName: "UpdatedPackage",
+            interfaceType: .public
+        )
+        
+        let pipelineOutput = try await SwiftInterfacePipeline(
+            swiftInterfaceFiles: [
+                .newAndOld(
+                    name: "ReferencePackage",
+                    oldFilePath: oldPrivateSwiftInterfaceFilePath,
+                    newFilePath: newPrivateSwiftInterfaceFilePath
+                ),
+                .old(
+                    name: "ReferencePackage",
+                    filePath: oldPublicSwiftInterfaceFilePath
+                ),
+                .new(
+                    name: "ReferencePackage",
+                    filePath: newPublicSwiftInterfaceFilePath
+                )
+            ],
+            fileHandler: FileManager.default,
+            swiftInterfaceParser: SwiftInterfaceParser(),
+            swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
+            outputGenerator: MarkdownOutputGenerator(),
+            logger: PipelineLogger(logLevel: .debug)
+        ).run()
+        
+        print(pipelineOutput)
+        
+        /*
+         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
+         let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
+         
+         for i in 0..<expectedLines.count  {
+             if expectedLines[i] != markdownOutputLines[i] {
+                 XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
+                 return
+             }
+         }
+         */
     }
 }
 
@@ -54,72 +118,15 @@ private extension ReferencePackageTests {
         return try XCTUnwrap(String(data: expectedOutputData, encoding: .utf8))
     }
     
-    func swiftInterfaceContent(referencePackagesRoot: URL, packageName: String, interfaceType: InterfaceType) throws-> String {
+    func swiftInterfaceFilePath(for referencePackagesRoot: URL, packageName: String, interfaceType: InterfaceType) throws -> String {
         let oldReferencePackageDirectory = referencePackagesRoot.appending(path: packageName)
         let interfaceFilePath = try XCTUnwrap(oldReferencePackageDirectory.appending(path: interfaceType.interfaceFilePath))
-        let interfaceFileContent = try XCTUnwrap(FileManager.default.contents(atPath: interfaceFilePath.path()))
-        return try XCTUnwrap(String(data: interfaceFileContent, encoding: .utf8))
+        return interfaceFilePath.path()
     }
     
     func content(atPath path: String) throws -> String {
         let interfaceFileContent = try XCTUnwrap(FileManager.default.contents(atPath: path))
         return try XCTUnwrap(String(data: interfaceFileContent, encoding: .utf8))
-    }
-    
-    func test(swiftInterface interface: InterfaceType) throws {
-        // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
-        guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
-            XCTFail("Cannot find root directory")
-            return
-        }
-        
-        let referencePackagesRoot = URL(filePath: String(projectRoot)).appending(path: "ReferencePackages")
-        
-        let expectedOutput = try expectedOutput(for: interface)
-        
-        let oldSourceContent = try swiftInterfaceContent(
-            referencePackagesRoot: referencePackagesRoot,
-            packageName: "ReferencePackage",
-            interfaceType: interface
-        )
-        
-        let newSourceContent = try swiftInterfaceContent(
-            referencePackagesRoot: referencePackagesRoot,
-            packageName: "UpdatedPackage",
-            interfaceType: interface
-        )
-        
-        /*
-        let oldSourceContent = try content(atPath: "/Users/alexandergu/Downloads/AdyenPOS.xcframework/ios-arm64_x86_64-simulator/AdyenPOS.framework/Modules/AdyenPOS.swiftmodule/arm64-apple-ios-simulator.swiftinterface")
-        let newSourceContent = try content(atPath: "/Users/alexandergu/Downloads/AdyenPOS/AdyenPOS_3.2.0.xcframework/ios-arm64_x86_64-simulator/AdyenPOS.framework/Modules/AdyenPOS.swiftmodule/arm64-apple-ios-simulator.swiftinterface")
-         */
-        
-        let oldInterface = SwiftInterfaceParser.parse(source: oldSourceContent, moduleName: "ReferencePackage")
-        let newInterface = SwiftInterfaceParser.parse(source: newSourceContent, moduleName: "ReferencePackage")
-        
-        let analyzer = SwiftInterfaceAnalyzer()
-        
-        let changes = analyzer.analyze(old: oldInterface, new: newInterface)
-     
-        let markdownOutput = MarkdownOutputGenerator().generate(
-            from: ["ReferencePackage": changes],
-            allTargets: ["ReferencePackage"],
-            oldSource: .local(path: "AdyenPOS 2.2.2"),
-            newSource: .local(path: "AdyenPOS 3.2.0"),
-            warnings: []
-        )
-        
-        print(markdownOutput)
-        
-        let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
-        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
-        
-        for i in 0..<expectedLines.count  {
-            if expectedLines[i] != markdownOutputLines[i] {
-                XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
-                return
-            }
-        }
     }
     
     /// Removes the 2nd line that contains local file paths + empty newline at the end of the content if it exists

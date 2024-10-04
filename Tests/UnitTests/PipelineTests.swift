@@ -54,7 +54,7 @@ class PipelineTests: XCTestCase {
             "Output"
         ]
         
-        let pipeline = Pipeline(
+        let pipeline = SDKDumpPipeline(
             newProjectSource: newProjectSource,
             oldProjectSource: oldProjectSource,
             scheme: nil,

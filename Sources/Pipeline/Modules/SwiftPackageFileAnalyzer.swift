@@ -13,10 +13,11 @@ struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
     
     init(
         fileHandler: FileHandling = FileManager.default,
-        xcodeTools: XcodeTools = XcodeTools()
+        shell: ShellHandling = Shell(),
+        logger: Logging?
     ) {
         self.fileHandler = fileHandler
-        self.xcodeTools = xcodeTools
+        self.xcodeTools = XcodeTools(shell: shell, fileHandler: fileHandler, logger: logger)
     }
     
     func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> ProjectAnalyzerResult {

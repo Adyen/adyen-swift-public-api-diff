@@ -18,7 +18,7 @@ class SwiftInterfaceExtension: SwiftInterfaceElement {
     var childGroupName: String { extendedType } // Grouping by extended type
     
     /// The members, declarations, ... inside of the body of the struct
-    let children: [any SwiftInterfaceElement]
+    var children: [any SwiftInterfaceElement]
     
     var parent: (any SwiftInterfaceElement)? = nil
     
