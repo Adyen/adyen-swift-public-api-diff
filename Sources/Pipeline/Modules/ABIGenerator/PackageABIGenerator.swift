@@ -10,7 +10,7 @@ struct PackageABIGenerator: ABIGenerating {
     
     let fileHandler: FileHandling
     let xcodeTools: XcodeTools
-    let packageFileHelper: PackageFileHelper
+    let packageFileHelper: SwiftPackageFileHelper
     let logger: Logging?
     
     func generate(

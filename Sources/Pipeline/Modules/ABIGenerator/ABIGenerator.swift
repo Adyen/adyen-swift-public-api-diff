@@ -10,7 +10,7 @@ struct ABIGenerator: ABIGenerating {
     
     private let shell: ShellHandling
     private let xcodeTools: XcodeTools
-    private let packageFileHelper: PackageFileHelper
+    private let packageFileHelper: SwiftPackageFileHelper
     private let fileHandler: FileHandling
     private let logger: Logging?
     

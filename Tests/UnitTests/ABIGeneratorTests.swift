@@ -15,8 +15,7 @@ class ABIGeneratorTests: XCTestCase {
         shell.handleExecute = { _ in
             let packageDescription = SwiftPackageDescription(
                 defaultLocalization: "en-en",
-                products: [],
-                targets: [],
+                name: "Name",
                 toolsVersion: "1.0"
             )
             let encodedPackageDescription = try! JSONEncoder().encode(packageDescription)
