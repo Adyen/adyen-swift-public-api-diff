@@ -1,5 +1,14 @@
 import Foundation
 
+protocol SwiftInterfaceExtendableElement: AnyObject {
+    
+    var typeName: String { get }
+    
+    var inheritance: [String]? { get set }
+    
+    var children: [any SwiftInterfaceElement] { get set }
+}
+
 protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
     
     /// Used to group children together
@@ -88,6 +97,7 @@ extension SwiftInterfaceElement {
 }
 
 extension SwiftInterfaceElement {
+    
     func recursiveDescription(indentation: Int = 0) -> String {
         let spacer = "  "
         var recursiveDescription = "\(String(repeating: spacer, count: indentation))\(description)"

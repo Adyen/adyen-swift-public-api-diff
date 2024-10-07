@@ -9,40 +9,6 @@ import SwiftParser
  */
 class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     
-    class Root: SwiftInterfaceElement {
-        
-        var parent: (any SwiftInterfaceElement)? = nil
-        
-        var diffableSignature: String { "" }
-        
-        var consolidatableName: String { "" }
-        
-        var description: String {
-            var description = ""
-            children.forEach { child in
-                description.append(child.recursiveDescription())
-                description.append("\n")
-            }
-            return description
-        }
-        
-        var childGroupName: String { moduleName }
-        
-        private let moduleName: String
-        let children: [any SwiftInterfaceElement]
-        
-        init(moduleName: String, elements: [any SwiftInterfaceElement]) {
-            self.moduleName = moduleName
-            self.children = elements
-            
-            elements.forEach { $0.setupParentRelationships(parent: self) }
-        }
-        
-        func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
-            return []
-        }
-    }
-    
     // TODO: Handle (Nice to have)
     // - DeinitializerDeclSyntax
     // - PrecedenceGroupDeclSyntax

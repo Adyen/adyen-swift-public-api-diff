@@ -1,6 +1,6 @@
 import Foundation
 
-class SwiftInterfaceEnum: SwiftInterfaceElement {
+class SwiftInterfaceEnum: SwiftInterfaceElement, SwiftInterfaceExtendableElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
@@ -13,7 +13,7 @@ class SwiftInterfaceEnum: SwiftInterfaceElement {
     /// e.g. <T>
     let genericParameterDescription: String?
     
-    let inheritance: [String]?
+    var inheritance: [String]?
     
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
@@ -35,6 +35,8 @@ class SwiftInterfaceEnum: SwiftInterfaceElement {
     var description: String {
         compileDescription()
     }
+    
+    var typeName: String { name }
     
     init(
         attributes: [String],

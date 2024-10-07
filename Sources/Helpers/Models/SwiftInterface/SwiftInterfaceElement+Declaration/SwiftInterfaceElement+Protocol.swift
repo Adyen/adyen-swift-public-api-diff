@@ -1,6 +1,6 @@
 import Foundation
 
-class SwiftInterfaceProtocol: SwiftInterfaceElement {
+class SwiftInterfaceProtocol: SwiftInterfaceElement, SwiftInterfaceExtendableElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
@@ -9,7 +9,7 @@ class SwiftInterfaceProtocol: SwiftInterfaceElement {
     
     let primaryAssociatedTypes: [String]?
     
-    let inheritance: [String]?
+    var inheritance: [String]?
     
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
@@ -35,6 +35,8 @@ class SwiftInterfaceProtocol: SwiftInterfaceElement {
     var description: String {
         compileDescription()
     }
+    
+    var typeName: String { name }
     
     init(
         attributes: [String],
