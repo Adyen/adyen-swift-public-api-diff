@@ -9,6 +9,34 @@ import XCTest
 
 class ReferencePackageTests: XCTestCase {
     
+    override func setUp() async throws {
+        
+        let referencePackagesRoot = try Self.referencePackagesPath()
+        let oldReferencePackageDirectory = referencePackagesRoot.appending(path: "ReferencePackage")
+        let newReferencePackageDirectory = referencePackagesRoot.appending(path: "UpdatedPackage")
+        
+        if
+            FileManager.default.fileExists(atPath: oldReferencePackageDirectory.appending(path: XcodeTools.Constants.derivedDataPath).path()),
+            FileManager.default.fileExists(atPath: newReferencePackageDirectory.appending(path: XcodeTools.Constants.derivedDataPath).path()) {
+            return // Nothing to build
+        }
+        
+        let xcodeTools = XcodeTools(logger: nil)
+        
+        _ = try await xcodeTools.archive(projectDirectoryPath: oldReferencePackageDirectory.path(), scheme: "ReferencePackage")
+        _ = try await xcodeTools.archive(projectDirectoryPath: newReferencePackageDirectory.path(), scheme: "ReferencePackage")
+    }
+    
+    override static func tearDown() {
+        
+        guard let referencePackagesRoot = try? Self.referencePackagesPath() else { return }
+        let oldReferencePackageDirectory = referencePackagesRoot.appending(path: "ReferencePackage").appending(path: XcodeTools.Constants.derivedDataPath)
+        let newReferencePackageDirectory = referencePackagesRoot.appending(path: "UpdatedPackage").appending(path: XcodeTools.Constants.derivedDataPath)
+        
+        try? FileManager.default.removeItem(at: oldReferencePackageDirectory)
+        try? FileManager.default.removeItem(at: newReferencePackageDirectory)
+    }
+    
     func test_swiftInterface_public() async throws {
         
         let interfaceType: InterfaceType = .public
@@ -64,6 +92,16 @@ class ReferencePackageTests: XCTestCase {
 
 private extension ReferencePackageTests {
     
+    static func referencePackagesPath() throws -> URL {
+        // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
+        guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
+            struct CannotFindRootDirectoryError: Error {}
+            throw CannotFindRootDirectoryError()
+        }
+        
+        return URL(filePath: String(projectRoot)).appending(path: "ReferencePackages")
+    }
+    
     enum InterfaceType {
         case `public`
         case `private`
@@ -80,9 +118,9 @@ private extension ReferencePackageTests {
         var interfaceFilePath: String {
             switch self {
             case .public:
-                "_build/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.swiftinterface"
+                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.swiftinterface"
             case .private:
-                "_build/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.private.swiftinterface"
+                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.private.swiftinterface"
             }
         }
     }
@@ -100,14 +138,8 @@ private extension ReferencePackageTests {
     }
     
     func runPipeline(for interfaceType: InterfaceType) async throws -> [String: [Change]] {
-        
-        // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
-        guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
-            struct CannotFindRootDirectoryError: Error {}
-            throw CannotFindRootDirectoryError()
-        }
-        
-        let referencePackagesRoot = URL(filePath: String(projectRoot)).appending(path: "ReferencePackages")
+
+        let referencePackagesRoot = try Self.referencePackagesPath()
         
         let oldPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
             for: referencePackagesRoot,
