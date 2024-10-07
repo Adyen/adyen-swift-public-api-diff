@@ -144,7 +144,7 @@ private extension PublicApiDiff {
         switch projectType {
         case .swiftPackage:
             archiveScheme = "_AllTargets"
-            let packageFileHelper = PackageFileHelper(fileHandler: fileHandler, xcodeTools: xcodeTools)
+            let packageFileHelper = SwiftPackageFileHelper(fileHandler: fileHandler, xcodeTools: xcodeTools)
             try packageFileHelper
                 .preparePackageWithConsolidatedLibrary(named: archiveScheme, at: newProjectDirectoryPath)
             try packageFileHelper
