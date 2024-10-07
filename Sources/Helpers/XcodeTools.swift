@@ -66,7 +66,7 @@ struct XcodeTools {
         }
         
         // print("👾 \(command.joined(separator: " "))")
-        logger?.log("🏗️ Building \(scheme) from \(projectDirectoryPath)", from: String(describing: Self.self))
+        logger?.log("🏗️ Building \(scheme) from `\(projectDirectoryPath)`", from: String(describing: Self.self))
         let result = shell.execute(command.joined(separator: " "))
         
         if 

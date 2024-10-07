@@ -22,7 +22,7 @@ class XcodeToolsTests: XCTestCase {
             return ""
         }
         
-        let xcodeTools = XcodeTools(shell: mockShell)
+        let xcodeTools = XcodeTools(shell: mockShell, logger: nil)
         xcodeTools.dumpSdk(projectDirectoryPath: projectDirectoryPath, module: module, outputFilePath: outputFilePath)
     }
     
@@ -44,7 +44,7 @@ class XcodeToolsTests: XCTestCase {
             return true
         })
         
-        let xcodeTools = XcodeTools(shell: mockShell, fileHandler: fileHandler)
+        let xcodeTools = XcodeTools(shell: mockShell, fileHandler: fileHandler, logger: nil)
         try xcodeTools.build(projectDirectoryPath: projectDirectoryPath, scheme: allTargetsLibraryName, isPackage: true)
     }
     
@@ -59,7 +59,7 @@ class XcodeToolsTests: XCTestCase {
             return false
         })
         
-        let xcodeTools = XcodeTools(shell: mockShell, fileHandler: fileHandler)
+        let xcodeTools = XcodeTools(shell: mockShell, fileHandler: fileHandler, logger: nil)
         do {
             try xcodeTools.build(projectDirectoryPath: projectDirectoryPath, scheme: allTargetsLibraryName, isPackage: true)
             XCTFail("Build should have failed")

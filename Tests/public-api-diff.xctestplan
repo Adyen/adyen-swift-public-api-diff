@@ -52,21 +52,6 @@
       }
     },
     {
-      "enabled" : false,
-      "skippedTests" : [
-        "ABIGeneratorTests",
-        "FileHandlingTests",
-        "GitTests",
-        "OutputGeneratorTests",
-        "PipelineTests",
-        "ProjectBuilderTests",
-        "ProjectSourceTests",
-        "SDKDumpAnalyzerTests",
-        "SDKDumpGeneratorTests",
-        "SDKDumpTests",
-        "SwiftPackageFileAnalyzerTests",
-        "XcodeToolsTests"
-      ],
       "target" : {
         "containerPath" : "container:",
         "identifier" : "UnitTests",

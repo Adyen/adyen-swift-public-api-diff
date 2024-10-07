@@ -63,10 +63,18 @@ class ProjectBuilderTests: XCTestCase {
                 return ""
             }
         }
+        
+        var expectedLogs: [(message: String, subsystem: String)] = [
+            (message: "🛠️ Building project `\(localPath)` at\n`\(baseWorkingDirectoryPath)/\(randomString)`", subsystem: "ProjectBuilder"),
+            (message: "🏗️ Building _AllTargets from `\(baseWorkingDirectoryPath)/\(randomString)`", subsystem: "XcodeTools")
+        ]
+        
         var logger = MockLogger()
         logger.handleLog = { message, subsystem in
-            XCTAssertEqual(message, "🛠️ Building project `\(localPath)` at\n`\(baseWorkingDirectoryPath)/\(randomString)`")
-            XCTAssertEqual(subsystem, "ProjectBuilder")
+            let expectedLog = expectedLogs.first!
+            XCTAssertEqual(message, expectedLog.message)
+            XCTAssertEqual(subsystem, expectedLog.subsystem)
+            expectedLogs.removeFirst()
         }
         logger.handleDebug = { message, subsystem in
             XCTAssertEqual(message, "✅ `\(localPath)` was built successfully")

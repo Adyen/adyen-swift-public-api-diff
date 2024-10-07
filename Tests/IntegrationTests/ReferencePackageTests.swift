@@ -8,82 +8,57 @@
 import XCTest
 
 class ReferencePackageTests: XCTestCase {
-     
-    func test_swiftInterface() async throws {
-
-        // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
-        guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
-            XCTFail("Cannot find root directory")
-            return
+    
+    func test_swiftInterface_public() async throws {
+        
+        let interfaceType: InterfaceType = .public
+        
+        let expectedOutput = try expectedOutput(for: interfaceType)
+        let pipelineOutput = try await runPipeline(for: interfaceType)
+        
+        let markdownOutput = MarkdownOutputGenerator().generate(
+            from: pipelineOutput,
+            allTargets: ["ReferencePackage"],
+            oldSource: .local(path: "old_public"),
+            newSource: .local(path: "new_public"),
+            warnings: []
+        )
+        
+        let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
+        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
+        
+        for i in 0..<expectedLines.count  {
+            if expectedLines[i] != markdownOutputLines[i] {
+                XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
+                return
+            }
         }
+    }
+    
+    func test_swiftInterface_private() async throws {
         
-        let referencePackagesRoot = URL(filePath: String(projectRoot)).appending(path: "ReferencePackages")
+        let interfaceType: InterfaceType = .private
         
-        /*
-        let oldSourceContent = try content(atPath: "/Users/alexandergu/Downloads/AdyenPOS.xcframework/ios-arm64_x86_64-simulator/AdyenPOS.framework/Modules/AdyenPOS.swiftmodule/arm64-apple-ios-simulator.swiftinterface")
-        let newSourceContent = try content(atPath: "/Users/alexandergu/Downloads/AdyenPOS/AdyenPOS_3.2.0.xcframework/ios-arm64_x86_64-simulator/AdyenPOS.framework/Modules/AdyenPOS.swiftmodule/arm64-apple-ios-simulator.swiftinterface")
-         */
+        let expectedOutput = try expectedOutput(for: interfaceType)
+        let pipelineOutput = try await runPipeline(for: interfaceType)
         
-        let oldPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
-            for: referencePackagesRoot,
-            packageName: "ReferencePackage",
-            interfaceType: .private
+        let markdownOutput = MarkdownOutputGenerator().generate(
+            from: pipelineOutput,
+            allTargets: ["ReferencePackage"],
+            oldSource: .local(path: "old_private"),
+            newSource: .local(path: "new_private"),
+            warnings: []
         )
         
-        let newPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
-            for: referencePackagesRoot,
-            packageName: "UpdatedPackage",
-            interfaceType: .private
-        )
+        let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
+        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
         
-        let oldPublicSwiftInterfaceFilePath = try swiftInterfaceFilePath(
-            for: referencePackagesRoot,
-            packageName: "ReferencePackage",
-            interfaceType: .public
-        )
-        
-        let newPublicSwiftInterfaceFilePath = try swiftInterfaceFilePath(
-            for: referencePackagesRoot,
-            packageName: "UpdatedPackage",
-            interfaceType: .public
-        )
-        
-        let pipelineOutput = try await SwiftInterfacePipeline(
-            swiftInterfaceFiles: [
-                .newAndOld(
-                    name: "ReferencePackage",
-                    oldFilePath: oldPrivateSwiftInterfaceFilePath,
-                    newFilePath: newPrivateSwiftInterfaceFilePath
-                ),
-                .old(
-                    name: "ReferencePackage",
-                    filePath: oldPublicSwiftInterfaceFilePath
-                ),
-                .new(
-                    name: "ReferencePackage",
-                    filePath: newPublicSwiftInterfaceFilePath
-                )
-            ],
-            fileHandler: FileManager.default,
-            swiftInterfaceParser: SwiftInterfaceParser(),
-            swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
-            outputGenerator: MarkdownOutputGenerator(),
-            logger: PipelineLogger(logLevel: .debug)
-        ).run()
-        
-        print(pipelineOutput)
-        
-        /*
-         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
-         let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
-         
-         for i in 0..<expectedLines.count  {
-             if expectedLines[i] != markdownOutputLines[i] {
-                 XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
-                 return
-             }
-         }
-         */
+        for i in 0..<expectedLines.count {
+            if expectedLines[i] != markdownOutputLines[i] {
+                XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
+                return
+            }
+        }
     }
 }
 
@@ -124,9 +99,41 @@ private extension ReferencePackageTests {
         return interfaceFilePath.path()
     }
     
-    func content(atPath path: String) throws -> String {
-        let interfaceFileContent = try XCTUnwrap(FileManager.default.contents(atPath: path))
-        return try XCTUnwrap(String(data: interfaceFileContent, encoding: .utf8))
+    func runPipeline(for interfaceType: InterfaceType) async throws -> [String: [Change]] {
+        
+        // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
+        guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
+            struct CannotFindRootDirectoryError: Error {}
+            throw CannotFindRootDirectoryError()
+        }
+        
+        let referencePackagesRoot = URL(filePath: String(projectRoot)).appending(path: "ReferencePackages")
+        
+        let oldPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
+            for: referencePackagesRoot,
+            packageName: "ReferencePackage",
+            interfaceType: interfaceType
+        )
+        
+        let newPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
+            for: referencePackagesRoot,
+            packageName: "UpdatedPackage",
+            interfaceType: interfaceType
+        )
+        
+        return try await SwiftInterfacePipeline(
+            swiftInterfaceFiles: [
+                .init(
+                    name: "ReferencePackage",
+                    oldFilePath: oldPrivateSwiftInterfaceFilePath,
+                    newFilePath: newPrivateSwiftInterfaceFilePath
+                )
+            ],
+            fileHandler: FileManager.default,
+            swiftInterfaceParser: SwiftInterfaceParser(),
+            swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
+            logger: PipelineLogger(logLevel: .debug)
+        ).run()
     }
     
     /// Removes the 2nd line that contains local file paths + empty newline at the end of the content if it exists

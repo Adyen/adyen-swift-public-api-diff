@@ -31,11 +31,10 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             return String(data: encodedPackageDescription, encoding: .utf8)!
         }
         
-        let xcodeTools = XcodeTools(shell: shell)
-        
         let projectAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
-            xcodeTools: xcodeTools
+            shell: shell,
+            logger: nil
         )
         
         let changes = try projectAnalyzer.analyze(
@@ -84,9 +83,11 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             return String(data: encodedPackageDescription, encoding: .utf8)!
         }
         
-        let xcodeTools = XcodeTools(shell: shell)
-        
-        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler, xcodeTools: xcodeTools)
+        let projectAnalyzer = SwiftPackageFileAnalyzer(
+            fileHandler: fileHandler,
+            shell: shell,
+            logger: nil
+        )
         
         let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldPackage"),
@@ -111,7 +112,10 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             handleFileExpectation.fulfill()
             return false // Package.swift file does not exist
         }
-        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler)
+        let projectAnalyzer = SwiftPackageFileAnalyzer(
+            fileHandler: fileHandler,
+            logger: nil
+        )
         
         let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldProject"),
