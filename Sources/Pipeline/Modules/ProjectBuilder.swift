@@ -193,7 +193,7 @@ private extension ProjectBuilder {
             try xcodeTools.build(
                 projectDirectoryPath: projectDirectoryPath,
                 scheme: schemeToBuild,
-                isPackage: scheme == nil
+                projectType: scheme == nil ? .swiftPackage : .xcodeProject
             )
             logger?.debug("✅ `\(description)` was built successfully", from: String(describing: Self.self))
         } catch {

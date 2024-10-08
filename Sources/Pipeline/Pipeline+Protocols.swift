@@ -75,7 +75,6 @@ enum LogLevel {
 
 protocol Logging {
     
-    init(logLevel: LogLevel)
     func log(_ message: String, from subsystem: String)
     func debug(_ message: String, from subsystem: String)
 }

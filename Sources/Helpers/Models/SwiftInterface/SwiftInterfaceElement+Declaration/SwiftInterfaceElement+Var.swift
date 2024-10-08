@@ -42,7 +42,7 @@ class SwiftInterfaceVar: SwiftInterfaceElement {
         modifiers: [String],
         bindingSpecifier: String,
         name: String,
-        typeAnnotation: String?,
+        typeAnnotation: String,
         initializerValue: String?,
         accessors: String?
     ) {
@@ -50,7 +50,7 @@ class SwiftInterfaceVar: SwiftInterfaceElement {
         self.modifiers = modifiers
         self.bindingSpecifier = bindingSpecifier
         self.name = name
-        self.typeAnnotation = typeAnnotation ?? "UNKNOWN_TYPE"
+        self.typeAnnotation = typeAnnotation
         self.initializerValue = initializerValue
         self.accessors = accessors
     }

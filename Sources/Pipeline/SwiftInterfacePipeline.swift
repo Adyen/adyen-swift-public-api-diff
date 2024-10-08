@@ -41,6 +41,7 @@ struct SwiftInterfacePipeline {
         var changes = [String: [Change]]()
         
         try swiftInterfaceFiles.forEach { file in
+            logger?.log("🧑‍🔬 Analyzing \(file.name)", from: String(describing: Self.self))
             let newContent = try fileHandler.loadString(from: file.newFilePath)
             let oldContent = try fileHandler.loadString(from: file.oldFilePath)
             let newParsed = swiftInterfaceParser.parse(source: newContent, moduleName: file.name)

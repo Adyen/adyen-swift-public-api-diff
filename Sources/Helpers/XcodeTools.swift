@@ -49,9 +49,9 @@ struct XcodeTools {
     func build(
         projectDirectoryPath: String,
         scheme: String,
-        isPackage: Bool
+        projectType: ProjectType
     ) throws {
-        var command = [
+        var commandComponents = [
             "cd \(projectDirectoryPath);",
             "xcodebuild -scheme \"\(scheme)\"",
             "-derivedDataPath \(Constants.derivedDataPath)",
@@ -59,15 +59,18 @@ struct XcodeTools {
             "-destination \"platform=iOS,name=Any iOS Device\""
         ]
         
-        if isPackage {
-            command += [
-                "-skipPackagePluginValidation"
-            ]
+        switch projectType {
+        case .swiftPackage:
+            commandComponents += ["-skipPackagePluginValidation"]
+        case .xcodeProject:
+            break // Nothing to add
         }
+        
+        let command = commandComponents.joined(separator: " ")
         
         // print("👾 \(command.joined(separator: " "))")
         logger?.log("🏗️ Building \(scheme) from `\(projectDirectoryPath)`", from: String(describing: Self.self))
-        let result = shell.execute(command.joined(separator: " "))
+        let result = shell.execute(command)
         
         if 
             !fileHandler.fileExists(atPath: "\(projectDirectoryPath)/\(Constants.derivedDataPath)") ||
@@ -84,24 +87,43 @@ struct XcodeTools {
     
     func archive(
         projectDirectoryPath: String,
-        scheme: String
+        scheme: String,
+        projectType: ProjectType
     ) async throws -> String {
-        let command = "cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath \(Constants.derivedDataPath) -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         
+        let derivedDataPath = "\(projectDirectoryPath)/\(Constants.derivedDataPath)"
+        
+        var commandComponents = [
+            "cd \(projectDirectoryPath);",
+            "xcodebuild clean build -scheme \"\(scheme)\"",
+            "-sdk `\(Constants.simulatorSdkCommand)`",
+            "-derivedDataPath \(derivedDataPath)",
+            "-destination \"generic/platform=iOS\"",
+            "SKIP_INSTALL=NO",
+            "BUILD_LIBRARY_FOR_DISTRIBUTION=YES",
+        ]
+        
+        switch projectType {
+        case .swiftPackage:
+            commandComponents += ["-skipPackagePluginValidation"]
+        case .xcodeProject:
+            break // Nothing to add
+        }
+        
+        let command = commandComponents.joined(separator: " ")
         
         return try await Task {
             logger?.log("📦 Archiving \(scheme) from \(projectDirectoryPath)", from: String(describing: Self.self))
             
             let result = shell.execute(command)
             
-            let derivedDataPath = "\(projectDirectoryPath)/\(Constants.derivedDataPath)"
-            
             // It might be that the archive failed but the .swiftinterface files are still created
             // so we have to check outside if they exist.
             //
             // Also see: https://github.com/swiftlang/swift/issues/56573
-            if !fileHandler.fileExists(atPath: derivedDataPath) {
+            guard fileHandler.fileExists(atPath: derivedDataPath) else {
                 print(result)
+                
                 throw XcodeToolsError(
                     errorDescription: "💥 Building project failed",
                     underlyingError: result

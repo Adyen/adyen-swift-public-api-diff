@@ -7,7 +7,7 @@
 import Foundation
 import OSLog
 
-struct PipelineLogger: Logging {
+struct SystemLogger: Logging {
     
     private let logLevel: LogLevel
     
@@ -40,7 +40,7 @@ struct PipelineLogger: Logging {
     }
 }
 
-private extension PipelineLogger {
+private extension SystemLogger {
     
     func logger(for subsystem: String) -> Logger {
         Logger(
