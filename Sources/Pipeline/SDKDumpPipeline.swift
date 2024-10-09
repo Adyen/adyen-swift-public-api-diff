@@ -83,19 +83,18 @@ struct SDKDumpPipeline {
 private extension SDKDumpPipeline {
     
     func buildProjects(oldSource: ProjectSource, newSource: ProjectSource, scheme: String?) async throws -> (URL, URL) {
-        async let oldBuildResult = try projectBuilder.build(
+        
+        // We don't run them in parallel to not conflict with resolving dependencies concurrently
+        
+        let oldProjectUrl = try await projectBuilder.build(
             source: oldProjectSource,
             scheme: scheme
         )
         
-        async let newBuildResult = try projectBuilder.build(
+        let newProjectUrl = try await projectBuilder.build(
             source: newProjectSource,
             scheme: scheme
         )
-        
-        // Awaiting the result of the async builds
-        let oldProjectUrl = try await oldBuildResult
-        let newProjectUrl = try await newBuildResult
         
         return (oldProjectUrl, newProjectUrl)
     }
