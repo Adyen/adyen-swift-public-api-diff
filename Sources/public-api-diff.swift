@@ -28,84 +28,119 @@ struct PublicApiDiff: AsyncParsableCommand {
     public func run() async throws {
         
         let logLevel: LogLevel = .debug
+        let projectType: ProjectType = .swiftPackage // Only needed when we have to produce the .swiftinterface files
+        let swiftInterfaceType: SwiftInterfaceType = .public // Only needed when we have to produce the .swiftinterface files
         
         let fileHandler: FileHandling = FileManager.default
         let shell: any ShellHandling = Shell()
-        let logger = logger(with: logLevel, fileHandler: fileHandler)
+        let logger = Self.logger(with: logLevel, logOutputFilePath: logOutput, fileHandler: fileHandler)
         
         do {
-            let oldSource = try ProjectSource.from(old, fileHandler: fileHandler)
-            let newSource = try ProjectSource.from(new, fileHandler: fileHandler)
+            var warnings = [String]()
+            var changes = [String: [Change]]()
             
-            logger.log("Comparing `\(newSource.description)` to `\(oldSource.description)`", from: "Main")
+            // MARK: START: BUILD PROJECT RELATED
+            
+            let oldSource: ProjectSource = try ProjectSource.from(old, fileHandler: fileHandler)
+            let newSource: ProjectSource = try ProjectSource.from(new, fileHandler: fileHandler)
+            
+            let oldVersionName = oldSource.description
+            let newVersionName = oldSource.description
+            
+            logger.log("Comparing `\(newVersionName)` to `\(oldVersionName)`", from: "Main")
             
             let currentDirectory = fileHandler.currentDirectoryPath
             let workingDirectoryPath = currentDirectory.appending("/tmp-public-api-diff")
             
-            // MARK: - Generate the .swiftinterface files on the fly (optional)
-            // TODO: Allow passing of .swiftinterface files
+            // MARK: - Setup projects
             
-            let projectType: ProjectType = .swiftPackage
-            let swiftInterfaceType: SwiftInterfaceType = .public
-            
-            let (oldProjectUrl, newProjectUrl) = try await setupProject(
-                oldSource: oldSource,
-                newSource: newSource,
+            let projectSetupHelper = ProjectSetupHelper(
                 workingDirectoryPath: workingDirectoryPath,
-                projectType: projectType,
+                shell: shell,
+                fileHandler: fileHandler,
                 logger: logger
             )
             
-            let swiftInterfaceFiles = try await generateSwiftInterfaceFiles(
-                newProjectUrl: newProjectUrl,
-                oldProjectUrl: oldProjectUrl,
+            let projectDirectories = try await projectSetupHelper.setupProjects(
+                oldSource: oldSource,
+                newSource: newSource,
+                projectType: projectType
+            )
+            
+            // MARK: - Analyze Package.swift (optional)
+            
+            switch projectType {
+            case .swiftPackage:
+                let swiftPackageFileAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler, shell: shell, logger: logger)
+                let swiftPackageAnalysis = try swiftPackageFileAnalyzer.analyze(
+                    oldProjectUrl: projectDirectories.old,
+                    newProjectUrl: projectDirectories.new
+                )
+                
+                warnings = swiftPackageAnalysis.warnings
+                if !swiftPackageAnalysis.changes.isEmpty {
+                    changes["Package.swift"] = swiftPackageAnalysis.changes
+                }
+            case .xcodeProject:
+                warnings = []
+                break // Nothing to do
+            }
+            
+            // MARK: - Produce .swiftinterface files
+            
+            let producer = SwiftInterfaceProducer(
+                workingDirectoryPath: workingDirectoryPath,
                 projectType: projectType,
                 swiftInterfaceType: swiftInterfaceType,
-                workingDirectoryPath: workingDirectoryPath,
                 fileHandler: fileHandler,
                 shell: shell,
                 logger: logger
             )
             
+            let swiftInterfaceFiles = try await producer.produceInterfaceFiles(
+                oldProjectDirectory: projectDirectories.old,
+                newProjectDirectory: projectDirectories.new
+            )
+            
             // MARK: - Analyze .swiftinterface files
             
-            var changes = try await SwiftInterfacePipeline(
-                swiftInterfaceFiles: swiftInterfaceFiles,
+            let pipeline = SwiftInterfacePipeline(
                 fileHandler: fileHandler,
                 swiftInterfaceParser: SwiftInterfaceParser(),
                 swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
                 logger: logger
-            ).run()
-            
-            // MARK: - Analyze Package.swift (optional)
-            
-            let swiftPackageFileAnalyzer = SwiftPackageFileAnalyzer(logger: logger)
-            let swiftPackageAnalysis = try swiftPackageFileAnalyzer.analyze(
-                oldProjectUrl: oldProjectUrl,
-                newProjectUrl: newProjectUrl
             )
             
-            if !swiftPackageAnalysis.changes.isEmpty {
-                changes["Package.swift"] = swiftPackageAnalysis.changes
+            let pipelineOutput = try await pipeline.run(
+                with: swiftInterfaceFiles
+            )
+            
+            // Merging pipeline output into existing changes - making sure we're not overriding any keys
+            pipelineOutput.forEach { key, value in
+                var keyToUse = key
+                if changes[key] != nil {
+                    keyToUse = "\(key) (\(UUID().uuidString))"
+                }
+                changes[keyToUse] = value
             }
             
-            let allTargets = swiftInterfaceFiles.map(\.name)
+            // MARK: - Generate Output
             
-            // MARK: - Generate Output (optional)
+            let outputGenerator: any OutputGenerating = MarkdownOutputGenerator()
             
-            let markdownOutput =  MarkdownOutputGenerator().generate(
+            let generatedOutput = try outputGenerator.generate(
                 from: changes,
-                allTargets: allTargets.sorted(),
-                oldSource: oldSource,
-                newSource: newSource,
-                warnings: swiftPackageAnalysis.warnings
+                allTargets: swiftInterfaceFiles.map(\.name).sorted(),
+                oldVersionName: oldVersionName,
+                newVersionName: newVersionName,
+                warnings: warnings
             )
             
             if let output {
-                try fileHandler.write(markdownOutput, to: output)
+                try fileHandler.write(generatedOutput, to: output)
             } else {
                 // We're not using a logger here as we always want to have it printed if no output was specified
-                print(markdownOutput)
+                print(generatedOutput)
             }
             
             logger.log("✅ Success", from: "Main")
@@ -117,164 +152,13 @@ struct PublicApiDiff: AsyncParsableCommand {
 
 private extension PublicApiDiff {
     
-    func logger(with logLevel: LogLevel, fileHandler: any FileHandling) -> any Logging {
+    static func logger(with logLevel: LogLevel, logOutputFilePath: String?, fileHandler: any FileHandling) -> any Logging {
         var loggers = [any Logging]()
-        if let logOutput {
-            loggers += [LogFileLogger(fileHandler: fileHandler, outputFilePath: logOutput)]
+        if let logOutputFilePath {
+            loggers += [LogFileLogger(fileHandler: fileHandler, outputFilePath: logOutputFilePath)]
         }
-        loggers += [SystemLogger(logLevel: logLevel)] // LogLevel should be provided by a parameter
+        loggers += [SystemLogger(logLevel: logLevel)]
         
         return LoggingGroup(with: loggers, logLevel: logLevel)
-    }
-    
-    func setupProject(
-        oldSource: ProjectSource,
-        newSource: ProjectSource,
-        workingDirectoryPath: String,
-        projectType: ProjectType,
-        logger: (any Logging)?
-    ) async throws -> (old: URL, new: URL) {
-        let projectSetupHelper = ProjectSetupHelper(
-            workingDirectoryPath: workingDirectoryPath,
-            logger: logger
-        )
-        
-        // async let to make them perform in parallel
-        async let asyncNewProjectDirectoryPath = try projectSetupHelper.setup(newSource, projectType: projectType)
-        async let asyncOldProjectDirectoryPath = try projectSetupHelper.setup(oldSource, projectType: projectType)
-        
-        return try await (URL(filePath: asyncOldProjectDirectoryPath), URL(filePath: asyncNewProjectDirectoryPath))
-    }
-    
-    // TODO: Move this to it's own pipeline that can be used optionally
-    func generateSwiftInterfaceFiles(
-        newProjectUrl: URL,
-        oldProjectUrl: URL,
-        projectType: ProjectType,
-        swiftInterfaceType: SwiftInterfaceType,
-        workingDirectoryPath: String,
-        fileHandler: any FileHandling,
-        shell: any ShellHandling,
-        logger: (any Logging)?
-    ) async throws -> [SwiftInterfacePipeline.SwiftInterfaceFile] {
-        
-        let newProjectDirectoryPath = newProjectUrl.path()
-        let oldProjectDirectoryPath = oldProjectUrl.path()
-        
-        let (archiveScheme, schemesToCompare) = try prepareProjectsForArchiving(
-            newProjectDirectoryPath: newProjectDirectoryPath,
-            oldProjectDirectoryPath: oldProjectDirectoryPath,
-            projectType: projectType,
-            fileHandler: fileHandler,
-            shell: shell,
-            logger: logger
-        )
-        
-        let xcodeTools = XcodeTools(shell: shell, fileHandler: fileHandler, logger: logger)
-        
-        let (newDerivedDataPath, oldDerivedDataPath) = try await archiveProjects(
-            newProjectDirectoryPath: newProjectDirectoryPath,
-            oldProjectDirectoryPath: oldProjectDirectoryPath,
-            scheme: archiveScheme,
-            projectType: projectType,
-            xcodeTools: xcodeTools
-        )
-        
-        return try locateInterfaceFiles(
-            newDerivedDataPath: newDerivedDataPath,
-            oldDerivedDataPath: oldDerivedDataPath,
-            schemes: schemesToCompare,
-            swiftInterfaceType: swiftInterfaceType,
-            logger: logger
-        )
-    }
-    
-    func prepareProjectsForArchiving(
-        newProjectDirectoryPath: String,
-        oldProjectDirectoryPath: String,
-        projectType: ProjectType,
-        fileHandler: any FileHandling,
-        shell: any ShellHandling,
-        logger: (any Logging)?
-    ) throws -> (archiveScheme: String, schemesToCompare: [String]) { // TODO: Typed return type
-        let archiveScheme: String
-        let schemesToCompare: [String]
-        
-        switch projectType {
-        case .swiftPackage:
-            archiveScheme = "_AllTargets"
-            let packageFileHelper = SwiftPackageFileHelper(fileHandler: fileHandler, shell: shell, logger: logger)
-            try packageFileHelper
-                .preparePackageWithConsolidatedLibrary(named: archiveScheme, at: newProjectDirectoryPath)
-            try packageFileHelper
-                .preparePackageWithConsolidatedLibrary(named: archiveScheme, at: oldProjectDirectoryPath)
-            
-            let newTargets = try Set(packageFileHelper.availableTargets(at: newProjectDirectoryPath))
-            let oldTargets = try Set(packageFileHelper.availableTargets(at: oldProjectDirectoryPath))
-            
-            schemesToCompare = newTargets.intersection(oldTargets).sorted()
-            
-            if schemesToCompare.isEmpty {
-                throw PipelineError.noTargetFound
-            }
-            
-        case .xcodeProject:
-            guard let scheme else {
-                throw PipelineError.noTargetFound // TODO: Better error!
-            }
-            archiveScheme = scheme
-            schemesToCompare = [scheme]
-        }
-        
-        return (archiveScheme, schemesToCompare)
-    }
-    
-    func archiveProjects(
-        newProjectDirectoryPath: String,
-        oldProjectDirectoryPath: String,
-        scheme: String,
-        projectType: ProjectType,
-        xcodeTools: XcodeTools
-    ) async throws -> (newDerivedDataPath: String, oldDerivedDataPath: String) { // TODO: Typed return type
-        
-        // We don't run them in parallel to not conflict with resolving dependencies concurrently
-        
-        let newDerivedDataPath = try await xcodeTools.archive(
-            projectDirectoryPath: newProjectDirectoryPath,
-            scheme: scheme,
-            projectType: projectType
-        )
-        let oldDerivedDataPath = try await xcodeTools.archive(
-            projectDirectoryPath: oldProjectDirectoryPath,
-            scheme: scheme,
-            projectType: projectType
-        )
-        
-        return (newDerivedDataPath, oldDerivedDataPath)
-    }
-    
-    func locateInterfaceFiles(
-        newDerivedDataPath: String,
-        oldDerivedDataPath: String,
-        schemes schemesToCompare: [String],
-        swiftInterfaceType: SwiftInterfaceType,
-        logger: (any Logging)?
-    ) throws -> [SwiftInterfacePipeline.SwiftInterfaceFile] {
-        logger?.log("🔎 Locating interface files for \(schemesToCompare.joined(separator: ", "))", from: "Main")
-        
-        // TODO: Ideally concatenate all .swiftinterface files so all the information is in one file
-        // and cross-module extensions can be applied correctly
-        
-        let interfaceFileLocator = SwiftInterfaceFileLocator(logger: logger)
-        return schemesToCompare.compactMap { scheme in
-            do {
-                let newSwiftInterfaceUrl = try interfaceFileLocator.locate(for: scheme, derivedDataPath: newDerivedDataPath, type: swiftInterfaceType)
-                let oldSwiftInterfaceUrl = try interfaceFileLocator.locate(for: scheme, derivedDataPath: oldDerivedDataPath, type: swiftInterfaceType)
-                return .init(name: scheme, oldFilePath: oldSwiftInterfaceUrl.path(), newFilePath: newSwiftInterfaceUrl.path())
-            } catch {
-                logger?.log("👻 \(error.localizedDescription)", from: "Main")
-                return nil
-            }
-        }
     }
 }

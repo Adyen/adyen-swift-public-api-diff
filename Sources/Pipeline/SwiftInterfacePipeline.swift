@@ -1,35 +1,32 @@
 import Foundation
 
+struct SwiftInterfaceFile {
+    let name: String
+    let oldFilePath: String
+    let newFilePath: String
+}
+
+/// Takes a list of ``SwiftInterfaceFile`` and detects changes between the old and new version
 struct SwiftInterfacePipeline {
-    
-    let swiftInterfaceFiles: [SwiftInterfaceFile]
     
     let fileHandler: any FileHandling
     let swiftInterfaceParser: any SwiftInterfaceParsing
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
     let logger: (any Logging)?
     
-    struct SwiftInterfaceFile {
-        let name: String
-        let oldFilePath: String
-        let newFilePath: String
-    }
-    
     init(
-        swiftInterfaceFiles: [SwiftInterfaceFile],
         fileHandler: FileHandling,
         swiftInterfaceParser: any SwiftInterfaceParsing,
         swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing,
         logger: (any Logging)?
     ) {
-        self.swiftInterfaceFiles = swiftInterfaceFiles
         self.fileHandler = fileHandler
         self.swiftInterfaceParser = swiftInterfaceParser
         self.swiftInterfaceAnalyzer = swiftInterfaceAnalyzer
         self.logger = logger
     }
     
-    func run() async throws -> [String: [Change]] {
+    func run(with swiftInterfaceFiles: [SwiftInterfaceFile]) async throws -> [String: [Change]] {
         
         var changes = [String: [Change]]()
         

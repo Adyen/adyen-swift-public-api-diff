@@ -25,7 +25,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
     func setup(
         _ projectSource: ProjectSource,
         projectType: ProjectType
-    ) async throws -> String {
+    ) async throws -> URL {
         try await Task {
             let checkoutPath = workingDirectoryPath + "\(randomStringGenerator.generateRandomString())"
             switch projectSource {
@@ -37,7 +37,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
             }
             
             filterProjectFiles(at: checkoutPath, for: projectType)
-            return checkoutPath
+            return URL(filePath: checkoutPath)
         }.value
     }
     
@@ -47,6 +47,31 @@ struct ProjectSetupHelper: ProjectSetupHelping {
             .forEach { filePath in
                 try? fileHandler.removeItem(atPath: "\(checkoutPath)/\(filePath)")
             }
+    }
+}
+
+extension ProjectSetupHelper {
+    
+    struct ProjectDirectories {
+        let old: URL
+        let new: URL
+    }
+    
+    func setupProjects(
+        oldSource: ProjectSource,
+        newSource: ProjectSource,
+        projectType: ProjectType
+    ) async throws -> ProjectDirectories {
+        let projectSetupHelper = ProjectSetupHelper(
+            workingDirectoryPath: workingDirectoryPath,
+            logger: logger
+        )
+        
+        // async let to make them perform in parallel
+        async let newProjectDirectoryPath = try projectSetupHelper.setup(newSource, projectType: projectType)
+        async let oldProjectDirectoryPath = try projectSetupHelper.setup(oldSource, projectType: projectType)
+        
+        return try await .init(old: oldProjectDirectoryPath, new: newProjectDirectoryPath)
     }
 }
 

@@ -47,8 +47,8 @@ class ReferencePackageTests: XCTestCase {
         let markdownOutput = MarkdownOutputGenerator().generate(
             from: pipelineOutput,
             allTargets: ["ReferencePackage"],
-            oldSource: .local(path: "old_public"),
-            newSource: .local(path: "new_public"),
+            oldVersionName: ProjectSource.local(path: "old_public").description,
+            newVersionName: ProjectSource.local(path: "new_public").description,
             warnings: []
         )
         
@@ -73,8 +73,8 @@ class ReferencePackageTests: XCTestCase {
         let markdownOutput = MarkdownOutputGenerator().generate(
             from: pipelineOutput,
             allTargets: ["ReferencePackage"],
-            oldSource: .local(path: "old_private"),
-            newSource: .local(path: "new_private"),
+            oldVersionName: ProjectSource.local(path: "old_private").description,
+            newVersionName: ProjectSource.local(path: "new_private").description,
             warnings: []
         )
         
@@ -153,19 +153,20 @@ private extension ReferencePackageTests {
             interfaceType: interfaceType
         )
         
+        let interfaceFiles = [
+            SwiftInterfaceFile(
+                name: "ReferencePackage",
+                oldFilePath: oldPrivateSwiftInterfaceFilePath,
+                newFilePath: newPrivateSwiftInterfaceFilePath
+            )
+        ]
+        
         return try await SwiftInterfacePipeline(
-            swiftInterfaceFiles: [
-                .init(
-                    name: "ReferencePackage",
-                    oldFilePath: oldPrivateSwiftInterfaceFilePath,
-                    newFilePath: newPrivateSwiftInterfaceFilePath
-                )
-            ],
             fileHandler: FileManager.default,
             swiftInterfaceParser: SwiftInterfaceParser(),
             swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
             logger: nil
-        ).run()
+        ).run(with: interfaceFiles)
     }
     
     /// Removes the 2nd line that contains local file paths + empty newline at the end of the content if it exists

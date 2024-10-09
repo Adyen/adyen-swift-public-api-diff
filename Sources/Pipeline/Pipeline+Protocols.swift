@@ -8,11 +8,11 @@ import Foundation
 
 enum ProjectType {
     case swiftPackage
-    case xcodeProject
+    case xcodeProject(scheme: String)
 }
 
 protocol ProjectSetupHelping {
-    func setup(_ projectSource: ProjectSource, projectType: ProjectType) async throws -> String
+    func setup(_ projectSource: ProjectSource, projectType: ProjectType) async throws -> URL
 }
 
 struct ABIGeneratorOutput: Equatable {
@@ -36,8 +36,8 @@ protocol OutputGenerating {
     func generate(
         from changesPerTarget: [String: [Change]],
         allTargets: [String],
-        oldSource: ProjectSource,
-        newSource: ProjectSource,
+        oldVersionName: String,
+        newVersionName: String,
         warnings: [String]
     ) throws -> String
 }

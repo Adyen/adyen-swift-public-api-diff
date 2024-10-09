@@ -13,8 +13,8 @@ struct MarkdownOutputGenerator: OutputGenerating {
     func generate(
         from changesPerTarget: [String: [Change]],
         allTargets: [String],
-        oldSource: ProjectSource,
-        newSource: ProjectSource,
+        oldVersionName: String,
+        newVersionName: String,
         warnings: [String]
     ) -> String {
         
@@ -23,7 +23,7 @@ struct MarkdownOutputGenerator: OutputGenerating {
         
         var lines = [
             Self.title(changesPerTarget: changesPerTarget),
-            Self.repoInfo(oldSource: oldSource, newSource: newSource),
+            Self.repoInfo(oldVersionName: oldVersionName, newVersionName: newVersionName),
             separator
         ]
         
@@ -57,8 +57,8 @@ private extension MarkdownOutputGenerator {
         return "# 👀 \(totalChangeCount) public \(totalChangeCount == 1 ? "change" : "changes") detected"
     }
     
-    static func repoInfo(oldSource: ProjectSource, newSource: ProjectSource) -> String {
-        "_Comparing `\(newSource.description)` to `\(oldSource.description)`_"
+    static func repoInfo(oldVersionName: String, newVersionName: String) -> String {
+        "_Comparing `\(newVersionName)` to `\(oldVersionName)`_"
     }
     
     static func analyzedModulesInfo(allTargets: [String]) -> String {
