@@ -90,17 +90,13 @@ struct XcodeTools {
         scheme: String,
         projectType: ProjectType
     ) async throws -> String {
-        
-        let derivedDataPath = "\(projectDirectoryPath)/\(Constants.derivedDataPath)"
-        
         var commandComponents = [
             "cd \(projectDirectoryPath);",
             "xcodebuild clean build -scheme \"\(scheme)\"",
-            "-sdk `\(Constants.simulatorSdkCommand)`",
-            "-derivedDataPath \(derivedDataPath)",
             "-destination \"generic/platform=iOS\"",
-            "SKIP_INSTALL=NO",
-            "BUILD_LIBRARY_FOR_DISTRIBUTION=YES",
+            "-derivedDataPath \(Constants.derivedDataPath)",
+            "-sdk `\(Constants.simulatorSdkCommand)`",
+            "BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         ]
         
         switch projectType {
@@ -116,6 +112,9 @@ struct XcodeTools {
             logger?.log("📦 Archiving \(scheme) from \(projectDirectoryPath)", from: String(describing: Self.self))
             
             let result = shell.execute(command)
+            let derivedDataPath = "\(projectDirectoryPath)/\(Constants.derivedDataPath)"
+            
+            logger?.debug(result, from: String(describing: Self.self))
             
             // It might be that the archive failed but the .swiftinterface files are still created
             // so we have to check outside if they exist.

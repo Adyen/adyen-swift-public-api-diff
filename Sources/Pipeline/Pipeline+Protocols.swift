@@ -71,6 +71,28 @@ enum LogLevel {
     case quiet
     case `default`
     case debug
+    
+    var shouldLog: Bool {
+        switch self {
+        case .quiet:
+            return false
+        case .default:
+            return true
+        case .debug:
+            return true
+        }
+    }
+    
+    var shouldDebugLog: Bool {
+        switch self {
+        case .quiet:
+            return false
+        case .default:
+            return false
+        case .debug:
+            return true
+        }
+    }
 }
 
 protocol Logging {

@@ -226,18 +226,21 @@ private extension PublicApiDiff {
         projectType: ProjectType,
         xcodeTools: XcodeTools
     ) async throws -> (newDerivedDataPath: String, oldDerivedDataPath: String) { // TODO: Typed return type
-        async let asyncNewDerivedDataPath = try xcodeTools.archive(
+        
+        // We don't run them in parallel to not conflict with resolving dependencies concurrently
+        
+        let newDerivedDataPath = try await xcodeTools.archive(
             projectDirectoryPath: newProjectDirectoryPath,
             scheme: scheme,
             projectType: projectType
         )
-        async let asyncOldDerivedDataPath = try xcodeTools.archive(
+        let oldDerivedDataPath = try await xcodeTools.archive(
             projectDirectoryPath: oldProjectDirectoryPath,
             scheme: scheme,
             projectType: projectType
         )
         
-        return try await (asyncNewDerivedDataPath, asyncOldDerivedDataPath)
+        return (newDerivedDataPath, oldDerivedDataPath)
     }
     
     func locateInterfaceFiles(

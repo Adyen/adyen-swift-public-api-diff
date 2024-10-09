@@ -15,28 +15,14 @@ struct SystemLogger: Logging {
         self.logLevel = logLevel
     }
     
-    func log(
-        _ message: String,
-        from subsystem: String
-    ) {
-        switch logLevel {
-        case .quiet:
-            break
-        case .debug, .default:
-            logger(for: subsystem).log("\(message)")
-        }
+    func log(_ message: String, from subsystem: String) {
+        guard logLevel.shouldLog else { return }
+        logger(for: subsystem).log("\(message)")
     }
     
-    func debug(
-        _ message: String,
-        from subsystem: String
-    ) {
-        switch logLevel {
-        case .quiet, .default:
-            break
-        case .debug:
-            logger(for: subsystem).debug("\(message)")
-        }
+    func debug(_ message: String, from subsystem: String) {
+        guard logLevel.shouldDebugLog else { return }
+        logger(for: subsystem).debug("\(message)")
     }
 }
 

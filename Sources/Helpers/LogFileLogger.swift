@@ -26,13 +26,13 @@ class LogFileLogger: Logging {
     
     func log(_ message: String, from subsystem: String) {
         Task { @MainActor in
-            output += ["[\(subsystem)] \(message)\n"]
+            output += ["🪵 [\(subsystem)] \(message)\n"]
         }
     }
     
     func debug(_ message: String, from subsystem: String) {
         Task { @MainActor in
-            output += ["[\(subsystem)] \(message)\n"]
+            output += ["🐞 [\(subsystem)] \(message)\n"]
         }
     }
 }
