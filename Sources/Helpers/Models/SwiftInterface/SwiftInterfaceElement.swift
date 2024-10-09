@@ -1,6 +1,6 @@
 import Foundation
 
-protocol SwiftInterfaceExtendableElement: AnyObject {
+protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
     
     /// Name of the type
     ///
@@ -51,6 +51,12 @@ extension SwiftInterfaceElement {
         }
     }
     
+    /// The path to the parent based on the `pathComponentName`
+    ///
+    /// The path does not including the own `pathComponentName`
+    ///
+    /// - Important: `SwiftInterfaceExtension`'s parentPath is always the `extendedType` 
+    /// of the element to group them under the extended element
     var parentPath: String {
         if let extensionElement = self as? SwiftInterfaceExtension {
             // We want to group all extensions under the type that they are extending
@@ -105,6 +111,7 @@ extension SwiftInterfaceElement {
 
 extension SwiftInterfaceElement {
     
+    /// Produces the complete recursive description of the element
     func recursiveDescription(indentation: Int = 0) -> String {
         let spacer = "  "
         var recursiveDescription = "\(String(repeating: spacer, count: indentation))\(description)"

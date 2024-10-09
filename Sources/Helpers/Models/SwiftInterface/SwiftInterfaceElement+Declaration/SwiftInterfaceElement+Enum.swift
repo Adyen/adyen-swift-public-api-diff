@@ -1,6 +1,6 @@
 import Foundation
 
-class SwiftInterfaceEnum: SwiftInterfaceElement, SwiftInterfaceExtendableElement {
+class SwiftInterfaceEnum: SwiftInterfaceExtendableElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

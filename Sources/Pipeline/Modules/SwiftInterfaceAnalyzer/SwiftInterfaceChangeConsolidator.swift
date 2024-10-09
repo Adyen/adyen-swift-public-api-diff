@@ -50,9 +50,10 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
             let newDescription = change.oldFirst ? match.element.description : change.element.description
             let listOfChanges = listOfChanges(between: change, and: match)
             
-            // TODO: We should not even end up here if an element does not have any changes
-            // This is just a quick fix for now but we should explore why we sometimes get here
-            if listOfChanges.isEmpty { break }
+            if listOfChanges.isEmpty {
+                assertionFailure("We should not end up here - investigate how this happened")
+                break
+            }
             
             consolidatedChanges.append(
                 .init(

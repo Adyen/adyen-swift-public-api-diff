@@ -1,6 +1,6 @@
 import Foundation
 
-class SwiftInterfaceActor: SwiftInterfaceElement, SwiftInterfaceExtendableElement {
+class SwiftInterfaceActor: SwiftInterfaceExtendableElement {
     
     var pathComponentName: String { name }
     

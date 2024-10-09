@@ -1,5 +1,6 @@
 import Foundation
 
+/// A helper to locate `.swiftinterface` files
 struct SwiftInterfaceFileLocator {
     
     let fileHandler: any FileHandling
@@ -16,6 +17,14 @@ struct SwiftInterfaceFileLocator {
         self.logger = logger
     }
     
+    
+    /// Tries to locate a `.swiftinterface` files in the derivedData folder for a specific scheme
+    /// - Parameters:
+    ///   - scheme: The scheme to find the `.swiftinterface` file for
+    ///   - derivedDataPath: The path to the derived data directory (e.g. .../.build)
+    ///   - type: The swift interface type (.public, .private) to look for
+    /// - Returns: The file url to the found `.swiftinterface`
+    /// - Throws: An error if no `.swiftinterface` file can be found for the given scheme + derived data path
     func locate(for scheme: String, derivedDataPath: String, type: SwiftInterfaceType) throws -> URL {
         let schemeSwiftModuleName = "\(scheme).swiftmodule"
         
@@ -24,7 +33,7 @@ struct SwiftInterfaceFileLocator {
             .map { URL(filePath: $0) }
 
         guard let swiftModulePath = swiftModulePathsForScheme.first?.path() else {
-            throw FileHandlerError.pathDoesNotExist(path: "find . -type d -name '\(schemeSwiftModuleName)'") // TODO: Better error
+            throw FileHandlerError.pathDoesNotExist(path: "find . -type d -name '\(schemeSwiftModuleName)'")
         }
         
         let completeSwiftModulePath = derivedDataPath + "/" + swiftModulePath
@@ -42,9 +51,9 @@ struct SwiftInterfaceFileLocator {
         guard let swiftInterfacePath = swiftInterfacePaths.first else {
             switch type {
             case .private:
-                throw FileHandlerError.pathDoesNotExist(path: "'\(scheme).private.swiftinterface'") // TODO: Better error
+                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).private.swiftinterface'")
             case .public:
-                throw FileHandlerError.pathDoesNotExist(path: "'\(scheme).swiftinterface'") // TODO: Better error
+                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).swiftinterface'")
             }
         }
         

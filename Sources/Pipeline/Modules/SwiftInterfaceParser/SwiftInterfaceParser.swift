@@ -3,7 +3,6 @@ import SwiftSyntax
 import SwiftParser
 
 /**
- Inspired by: https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
  Documentation about DeclSyntax:
  - https://swiftpackageindex.com/swiftlang/swift-syntax/600.0.1/documentation/swiftsyntax/declsyntax
  */
@@ -177,9 +176,8 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     }
 }
 
-// MARK: - Models
+// MARK: - Scope
 
-/// Inspired by: https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
 fileprivate indirect enum Scope {
 
     /// The root scope of a file

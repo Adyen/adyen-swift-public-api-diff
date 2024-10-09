@@ -8,8 +8,6 @@ import Foundation
 
 struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     
-    // TODO: Surface changes that happened to a subclass/protocol/extension
-    
     let changeConsolidator: SwiftInterfaceChangeConsolidating
     
     init(
@@ -22,6 +20,9 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
         old: some SwiftInterfaceElement,
         new: some SwiftInterfaceElement
     ) -> [Change] {
+        
+        // Very naive diff from both sides
+        // There is room for improvement here but it's "performant enough" for now
         
         let individualChanges = Self.recursiveCompare(
             element: old,

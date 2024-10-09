@@ -41,4 +41,7 @@ The `ChangeConsolidator` takes 2 independent changes (`addition` & `removal`) an
 
 ### OutputGenerator
 
-Receives a list of `Change`s and processes them into a human readable format.
+Receives a dictionary of `[{SCOPE_NAME}: [Change]]` and processes them into a human readable format.
+
+## Inspiration
+- SwiftInterfaceParser: https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift

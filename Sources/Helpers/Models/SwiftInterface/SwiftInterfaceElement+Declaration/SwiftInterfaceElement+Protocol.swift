@@ -1,6 +1,6 @@
 import Foundation
 
-class SwiftInterfaceProtocol: SwiftInterfaceElement, SwiftInterfaceExtendableElement {
+class SwiftInterfaceProtocol: SwiftInterfaceExtendableElement {
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

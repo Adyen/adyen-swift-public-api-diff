@@ -1,6 +1,7 @@
 import Foundation
 import ArgumentParser
 
+/// The type of the .swiftinterface to parse/generate
 enum SwiftInterfaceType {
     case `private`
     case `public`

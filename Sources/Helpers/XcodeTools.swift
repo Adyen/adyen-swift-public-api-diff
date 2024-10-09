@@ -16,7 +16,6 @@ struct XcodeToolsError: LocalizedError, CustomDebugStringConvertible {
 struct XcodeTools {
     
     internal enum Constants {
-        static let deviceTarget: String = "x86_64-apple-ios17.4-simulator" // TODO: Match the iOS version to the sdk
         static let derivedDataPath: String = ".build"
         static let simulatorSdkCommand = "xcrun --sdk iphonesimulator --show-sdk-path"
     }
@@ -81,9 +80,5 @@ struct XcodeTools {
             
             return derivedDataPath
         }.value
-    }
-    
-    private var iOSTarget: String {
-        "-sdk `\(Constants.simulatorSdkCommand)` -target \(Constants.deviceTarget)"
     }
 }
