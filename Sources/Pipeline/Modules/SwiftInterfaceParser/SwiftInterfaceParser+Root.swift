@@ -26,7 +26,7 @@ extension SwiftInterfaceParser {
             return description
         }
         
-        var childGroupName: String { moduleName }
+        var pathComponentName: String { moduleName }
         
         private let moduleName: String
         private(set) var children: [any SwiftInterfaceElement]

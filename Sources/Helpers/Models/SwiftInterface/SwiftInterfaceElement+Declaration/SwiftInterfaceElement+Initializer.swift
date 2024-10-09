@@ -55,10 +55,10 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    var childGroupName: String { "" } // Not relevant as only used to group children
+    var pathComponentName: String { "" } // Not relevant as / no children
     
-    /// A function does not have children
-    var children: [any SwiftInterfaceElement] = []
+    /// A initializer does not have children
+    let children: [any SwiftInterfaceElement] = []
     
     var parent: (any SwiftInterfaceElement)? = nil
     
@@ -66,9 +66,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
         "init(\(parameters.map { "\($0.firstName):" }.joined()))"
     }
     
-    var consolidatableName: String {
-        "init"
-    }
+    var consolidatableName: String { "init" }
     
     var description: String {
         compileDescription()

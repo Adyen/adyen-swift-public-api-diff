@@ -2,8 +2,12 @@ import Foundation
 
 protocol SwiftInterfaceExtendableElement: AnyObject {
     
+    /// Name of the type
+    ///
+    /// Is used to match an extension's `extendedType` to the element it extends
     var typeName: String { get }
     
+    /// Types/Protocols the element inherits from
     var inheritance: [String]? { get set }
     
     var children: [any SwiftInterfaceElement] { get set }
@@ -11,11 +15,13 @@ protocol SwiftInterfaceExtendableElement: AnyObject {
 
 protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
     
-    /// Used to group children together
-    var childGroupName: String { get }
+    /// The name of the element used to construct the parent path for its children
+    var pathComponentName: String { get }
     
+    /// The full description of the element (without children)
     var description: String { get }
     
+    /// The cildren of the element (e.g. properties/functions of a struct/class/...)
     var children: [any SwiftInterfaceElement] { get }
     
     /// A reduced signature of the element to be used to find 2 versions of the same element in a diff
@@ -32,6 +38,7 @@ protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
     /// The parent of the element (setup by using ``setupParentRelationships(parent:)``
     var parent: (any SwiftInterfaceElement)? { get set }
     
+    /// Produces a list of differences between one and another element
     func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String]
 }
 
@@ -54,11 +61,11 @@ extension SwiftInterfaceElement {
         }
         
         var parent = self.parent
-        var path = [parent?.childGroupName]
+        var path = [parent?.pathComponentName]
         
         while parent != nil {
             parent = parent?.parent
-            path += [parent?.childGroupName]
+            path += [parent?.pathComponentName]
         }
         
         return sanitized(

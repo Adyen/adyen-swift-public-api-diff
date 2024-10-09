@@ -18,23 +18,17 @@ class SwiftInterfaceEnum: SwiftInterfaceElement, SwiftInterfaceExtendableElement
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    var childGroupName: String { name }
+    var pathComponentName: String { name }
     
     var children: [any SwiftInterfaceElement]
     
     var parent: (any SwiftInterfaceElement)? = nil
     
-    var diffableSignature: String {
-        name
-    }
+    var diffableSignature: String { name }
     
-    var consolidatableName: String {
-        name
-    }
+    var consolidatableName: String { name }
     
-    var description: String {
-        compileDescription()
-    }
+    var description: String { compileDescription() }
     
     var typeName: String { name }
     

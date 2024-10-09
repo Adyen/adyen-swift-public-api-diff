@@ -56,23 +56,19 @@ class SwiftInterfaceSubscript: SwiftInterfaceElement {
     
     let accessors: String?
     
-    var childGroupName: String { "" }
+    var pathComponentName: String { "" } // Not relevant as / no children
     
-    var children: [any SwiftInterfaceElement] = []
+    let children: [any SwiftInterfaceElement] = []
     
     var parent: (any SwiftInterfaceElement)? = nil
     
     var diffableSignature: String {
-        parameters.description
+        "\(name)(\(parameters.map { "\($0.firstName):" }.joined()))"
     }
     
-    var consolidatableName: String {
-        name
-    }
+    var consolidatableName: String { name }
     
-    var description: String {
-        compileDescription()
-    }
+    var description: String { compileDescription() }
     
     init(
         attributes: [String],

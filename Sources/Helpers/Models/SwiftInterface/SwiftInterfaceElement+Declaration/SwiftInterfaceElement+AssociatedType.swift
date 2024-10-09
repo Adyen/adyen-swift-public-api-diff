@@ -5,8 +5,10 @@ class SwiftInterfaceAssociatedType: SwiftInterfaceElement {
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
     
+    /// The name of the element
     let name: String
     
+    /// Types/Protocols the element inherits from
     let inheritance: [String]?
     
     /// e.g. any Swift.Equatable
@@ -18,23 +20,18 @@ class SwiftInterfaceAssociatedType: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    var childGroupName: String { "" } // Not relevant as only used to group children
+    var pathComponentName: String { name }
     
-    var children: [any SwiftInterfaceElement] = []
+    /// A associatedtype does not have children
+    let children: [any SwiftInterfaceElement] = []
     
     var parent: (any SwiftInterfaceElement)? = nil
     
-    var diffableSignature: String {
-        name
-    }
+    var diffableSignature: String { name }
     
-    var consolidatableName: String {
-        name
-    }
+    var consolidatableName: String { name }
     
-    var description: String {
-        compileDescription()
-    }
+    var description: String { compileDescription() }
     
     init(
         attributes: [String],

@@ -17,13 +17,11 @@ struct LoggingGroup: Logging {
         self.logLevel = logLevel
     }
     
-    @MainActor
     func log(_ message: String, from subsystem: String) {
         guard logLevel.shouldLog else { return }
         logger.forEach { $0.log(message, from: subsystem) }
     }
     
-    @MainActor
     func debug(_ message: String, from subsystem: String) {
         guard logLevel.shouldDebugLog else { return }
         logger.forEach { $0.debug(message, from: subsystem) }

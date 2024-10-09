@@ -17,24 +17,18 @@ class SwiftInterfaceProtocol: SwiftInterfaceElement, SwiftInterfaceExtendableEle
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    var childGroupName: String { name } // Not relevant as only used to group children
+    var pathComponentName: String { name }
     
     /// The members, declarations, ... inside of the body of the struct
     var children: [any SwiftInterfaceElement]
     
     var parent: (any SwiftInterfaceElement)? = nil
     
-    var diffableSignature: String {
-        name
-    }
+    var diffableSignature: String { name }
     
-    var consolidatableName: String {
-        name
-    }
+    var consolidatableName: String { name }
     
-    var description: String {
-        compileDescription()
-    }
+    var description: String { compileDescription() }
     
     var typeName: String { name }
     

@@ -19,19 +19,15 @@ class SwiftInterfaceTypeAlias: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    var childGroupName: String { "" } // Not relevant as only used to group children
+    var pathComponentName: String { "" } // Not relevant as / no children
     
-    var children: [any SwiftInterfaceElement] = []
+    let children: [any SwiftInterfaceElement] = []
     
     var parent: (any SwiftInterfaceElement)? = nil
     
-    var diffableSignature: String {
-        name
-    }
+    var diffableSignature: String { name }
     
-    var consolidatableName: String {
-        name
-    }
+    var consolidatableName: String { name }
     
     var description: String {
         compileDescription()

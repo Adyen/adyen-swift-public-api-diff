@@ -15,20 +15,18 @@ class SwiftInterfaceExtension: SwiftInterfaceElement {
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
     
-    var childGroupName: String { extendedType } // Grouping by extended type
+    var pathComponentName: String {
+        [extendedType, genericWhereClauseDescription.map { "[\($0)]"}].compactMap { $0 }.joined()
+    }
     
     /// The members, declarations, ... inside of the body of the struct
     var children: [any SwiftInterfaceElement]
     
     var parent: (any SwiftInterfaceElement)? = nil
     
-    var diffableSignature: String {
-        extendedType
-    }
+    var diffableSignature: String { extendedType }
     
-    var consolidatableName: String {
-        extendedType
-    }
+    var consolidatableName: String { extendedType }
     
     var description: String {
         compileDescription()

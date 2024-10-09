@@ -2,16 +2,18 @@ import Foundation
 
 class SwiftInterfaceActor: SwiftInterfaceElement, SwiftInterfaceExtendableElement {
     
-    var childGroupName: String { name }
+    var pathComponentName: String { name }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
     
+    /// The name of the element
     let name: String
     
     /// e.g. <T>
     let genericParameterDescription: String?
     
+    /// Types/Protocols the element inherits from
     var inheritance: [String]?
     
     /// e.g. public, private, package, open, internal
@@ -24,17 +26,11 @@ class SwiftInterfaceActor: SwiftInterfaceElement, SwiftInterfaceExtendableElemen
     
     var parent: (any SwiftInterfaceElement)? = nil
     
-    var diffableSignature: String {
-        name
-    }
+    var diffableSignature: String { name }
     
-    var consolidatableName: String {
-        name
-    }
+    var consolidatableName: String { name }
     
-    var description: String {
-        compileDescription()
-    }
+    var description: String { compileDescription() }
     
     var typeName: String { name }
     

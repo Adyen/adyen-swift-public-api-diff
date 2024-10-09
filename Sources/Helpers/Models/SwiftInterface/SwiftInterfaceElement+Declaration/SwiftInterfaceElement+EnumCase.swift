@@ -47,24 +47,18 @@ class SwiftInterfaceEnumCase: SwiftInterfaceElement {
     
     let rawValue: String?
     
-    var childGroupName: String { "" }
+    var pathComponentName: String { "" } // Not relevant as / no children
     
-    /// A typealias does not have children
-    var children: [any SwiftInterfaceElement] = []
+    /// An enum case does not have children
+    let children: [any SwiftInterfaceElement] = []
     
     var parent: (any SwiftInterfaceElement)? = nil
     
-    var diffableSignature: String {
-        name
-    }
+    var diffableSignature: String { name }
     
-    var consolidatableName: String {
-        name
-    }
+    var consolidatableName: String { name }
     
-    var description: String {
-        compileDescription()
-    }
+    var description: String { compileDescription() }
     
     init(
         attributes: [String],
@@ -88,7 +82,7 @@ extension SwiftInterfaceEnumCase {
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
-        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters?.map { $0.description }, newValues: parameters?.map { $0.description }) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters?.map { $0.description }, newValues: parameters?.map { $0.description })
         changes += diffDescription(propertyType: "raw value", oldValue: other.rawValue, newValue: rawValue)
         return changes.compactMap { $0 }
     }
