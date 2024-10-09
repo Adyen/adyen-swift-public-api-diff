@@ -8,8 +8,10 @@ import Foundation
 
 struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
     
-    let fileHandler: FileHandling
-    let xcodeTools: XcodeTools
+    private let fileHandler: any FileHandling
+    private let xcodeTools: XcodeTools
+    private let shell: any ShellHandling
+    private let logger: (any Logging)?
     
     private enum Constants {
         static let packageFileName = "Package.swift"
@@ -21,10 +23,12 @@ struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
     init(
         fileHandler: FileHandling = FileManager.default,
         shell: ShellHandling = Shell(),
-        logger: Logging?
+        logger: (any Logging)?
     ) {
         self.fileHandler = fileHandler
         self.xcodeTools = XcodeTools(shell: shell, fileHandler: fileHandler, logger: logger)
+        self.logger = logger
+        self.shell = shell
     }
     
     func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> ProjectAnalyzerResult {
@@ -38,7 +42,8 @@ struct SwiftPackageFileAnalyzer: ProjectAnalyzing {
         if fileHandler.fileExists(atPath: oldPackagePath), fileHandler.fileExists(atPath: newPackagePath) {
             let packageHelper = SwiftPackageFileHelper(
                 fileHandler: fileHandler,
-                xcodeTools: xcodeTools
+                shell: shell,
+                logger: logger
             )
             
             return try analyze(

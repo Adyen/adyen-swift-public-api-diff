@@ -28,20 +28,15 @@ struct PublicApiDiff: AsyncParsableCommand {
     public func run() async throws {
         
         let logLevel: LogLevel = .debug
-        let fileHandler: FileHandling = FileManager.default
-        var loggers = [any Logging]()
-        if let logOutput {
-            loggers += [LogFileLogger(fileHandler: fileHandler, outputFilePath: logOutput)]
-        }
-        loggers += [SystemLogger(logLevel: logLevel)] // LogLevel should be provided by a parameter
         
-        let logger: any Logging = LoggingGroup(with: loggers, logLevel: logLevel)
+        let fileHandler: FileHandling = FileManager.default
+        let shell: any ShellHandling = Shell()
+        let logger = logger(with: logLevel, fileHandler: fileHandler)
         
         do {
             let oldSource = try ProjectSource.from(old, fileHandler: fileHandler)
             let newSource = try ProjectSource.from(new, fileHandler: fileHandler)
             
-            let xcodeTools = XcodeTools(logger: logger)
             logger.log("Comparing `\(newSource.description)` to `\(oldSource.description)`", from: "Main")
             
             let currentDirectory = fileHandler.currentDirectoryPath
@@ -68,7 +63,7 @@ struct PublicApiDiff: AsyncParsableCommand {
                 swiftInterfaceType: swiftInterfaceType,
                 workingDirectoryPath: workingDirectoryPath,
                 fileHandler: fileHandler,
-                xcodeTools: xcodeTools,
+                shell: shell,
                 logger: logger
             )
             
@@ -122,6 +117,16 @@ struct PublicApiDiff: AsyncParsableCommand {
 
 private extension PublicApiDiff {
     
+    func logger(with logLevel: LogLevel, fileHandler: any FileHandling) -> any Logging {
+        var loggers = [any Logging]()
+        if let logOutput {
+            loggers += [LogFileLogger(fileHandler: fileHandler, outputFilePath: logOutput)]
+        }
+        loggers += [SystemLogger(logLevel: logLevel)] // LogLevel should be provided by a parameter
+        
+        return LoggingGroup(with: loggers, logLevel: logLevel)
+    }
+    
     func setupProject(
         oldSource: ProjectSource,
         newSource: ProjectSource,
@@ -149,7 +154,7 @@ private extension PublicApiDiff {
         swiftInterfaceType: SwiftInterfaceType,
         workingDirectoryPath: String,
         fileHandler: any FileHandling,
-        xcodeTools: XcodeTools,
+        shell: any ShellHandling,
         logger: (any Logging)?
     ) async throws -> [SwiftInterfacePipeline.SwiftInterfaceFile] {
         
@@ -161,8 +166,11 @@ private extension PublicApiDiff {
             oldProjectDirectoryPath: oldProjectDirectoryPath,
             projectType: projectType,
             fileHandler: fileHandler,
-            xcodeTools: xcodeTools
+            shell: shell,
+            logger: logger
         )
+        
+        let xcodeTools = XcodeTools(shell: shell, fileHandler: fileHandler, logger: logger)
         
         let (newDerivedDataPath, oldDerivedDataPath) = try await archiveProjects(
             newProjectDirectoryPath: newProjectDirectoryPath,
@@ -186,7 +194,8 @@ private extension PublicApiDiff {
         oldProjectDirectoryPath: String,
         projectType: ProjectType,
         fileHandler: any FileHandling,
-        xcodeTools: XcodeTools
+        shell: any ShellHandling,
+        logger: (any Logging)?
     ) throws -> (archiveScheme: String, schemesToCompare: [String]) { // TODO: Typed return type
         let archiveScheme: String
         let schemesToCompare: [String]
@@ -194,7 +203,7 @@ private extension PublicApiDiff {
         switch projectType {
         case .swiftPackage:
             archiveScheme = "_AllTargets"
-            let packageFileHelper = SwiftPackageFileHelper(fileHandler: fileHandler, xcodeTools: xcodeTools)
+            let packageFileHelper = SwiftPackageFileHelper(fileHandler: fileHandler, shell: shell, logger: logger)
             try packageFileHelper
                 .preparePackageWithConsolidatedLibrary(named: archiveScheme, at: newProjectDirectoryPath)
             try packageFileHelper

@@ -34,8 +34,6 @@ let package = Package(
                 // Copy Tests/ExampleTests/Resources directories as-is.
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
-                .copy("Resources/dummy.abi.json"),
-                .copy("Resources/dummi-abi-flat-definition.md"),
                 .copy("Resources/expected-reference-changes.md")
             ]
         ),
@@ -46,7 +44,6 @@ let package = Package(
                 // Copy Tests/ExampleTests/Resources directories as-is.
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
-                .copy("Resources/expected-reference-changes-sdk-dump.md"),
                 .copy("Resources/expected-reference-changes-swift-interface-private.md"),
                 .copy("Resources/expected-reference-changes-swift-interface-public.md")
             ]

@@ -35,56 +35,6 @@ struct XcodeTools {
         self.logger = logger
     }
     
-    func loadPackageDescription(
-        projectDirectoryPath: String
-    ) throws -> String {
-        let command = [
-            "cd \(projectDirectoryPath);",
-            "swift package describe --type json"
-        ]
-        
-        return shell.execute(command.joined(separator: " "))
-    }
-    
-    func build(
-        projectDirectoryPath: String,
-        scheme: String,
-        projectType: ProjectType
-    ) throws {
-        var commandComponents = [
-            "cd \(projectDirectoryPath);",
-            "xcodebuild -scheme \"\(scheme)\"",
-            "-derivedDataPath \(Constants.derivedDataPath)",
-            iOSTarget,
-            "-destination \"platform=iOS,name=Any iOS Device\""
-        ]
-        
-        switch projectType {
-        case .swiftPackage:
-            commandComponents += ["-skipPackagePluginValidation"]
-        case .xcodeProject:
-            break // Nothing to add
-        }
-        
-        let command = commandComponents.joined(separator: " ")
-        
-        // print("👾 \(command.joined(separator: " "))")
-        logger?.log("🏗️ Building \(scheme) from `\(projectDirectoryPath)`", from: String(describing: Self.self))
-        let result = shell.execute(command)
-        
-        if 
-            !fileHandler.fileExists(atPath: "\(projectDirectoryPath)/\(Constants.derivedDataPath)") ||
-            result.range(of: "xcodebuild: error:") != nil ||
-            result.range(of: "BUILD FAILED") != nil
-        {
-            print(result)
-            throw XcodeToolsError(
-                errorDescription: "💥 Building project failed",
-                underlyingError: result
-            )
-        }
-    }
-    
     func archive(
         projectDirectoryPath: String,
         scheme: String,
@@ -131,43 +81,6 @@ struct XcodeTools {
             
             return derivedDataPath
         }.value
-    }
-    
-    func dumpSdk(
-        projectDirectoryPath: String,
-        module: String,
-        outputFilePath: String
-    ) {
-        let sdkDumpInputPath = "\(Constants.derivedDataPath)/Build/Products/Debug-iphonesimulator"
-        
-        let command = [
-            "cd \(projectDirectoryPath);",
-            "xcrun swift-api-digester -dump-sdk",
-            "-module \(module)",
-            "-I \(sdkDumpInputPath)",
-            "-o \(outputFilePath)",
-            iOSTarget,
-            "-abort-on-module-fail"
-        ]
-        
-        // print("👾 \(command.joined(separator: " "))")
-        shell.execute(command.joined(separator: " "))
-    }
-    
-    func diagnoseSdk(
-        oldAbiJsonFilePath: String,
-        newAbiJsonFilePath: String,
-        module: String
-    ) -> String {
-        
-        let command = [
-            "xcrun --sdk iphoneos swift-api-digester -diagnose-sdk",
-            "-module \(module)",
-            "-input-paths \(oldAbiJsonFilePath)",
-            "-input-paths \(newAbiJsonFilePath)"
-        ]
-        
-        return shell.execute(command.joined(separator: " "))
     }
     
     private var iOSTarget: String {

@@ -27,13 +27,18 @@ struct SwiftPackageFileHelper {
     
     private let fileHandler: FileHandling
     private let xcodeTools: XcodeTools
+    private let shell: any ShellHandling
+    private let logger: (any Logging)?
     
     init(
         fileHandler: FileHandling,
-        xcodeTools: XcodeTools
+        shell: any ShellHandling,
+        logger: (any Logging)?
     ) {
         self.fileHandler = fileHandler
-        self.xcodeTools = xcodeTools
+        self.xcodeTools = XcodeTools(shell: shell, fileHandler: fileHandler, logger: logger)
+        self.shell = shell
+        self.logger = logger
     }
     
     static func packagePath(for projectDirectoryPath: String) -> String {
@@ -93,7 +98,7 @@ private extension SwiftPackageFileHelper {
     
     func generatePackageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
         
-        let result = try xcodeTools.loadPackageDescription(projectDirectoryPath: projectDirectoryPath)
+        let result = try loadPackageDescription(projectDirectoryPath: projectDirectoryPath)
         
         let newLine = "\n"
         let errorTag = "error: "
@@ -131,6 +136,17 @@ private extension SwiftPackageFileHelper {
         }
         
         throw SwiftPackageFileHelperError.couldNotGeneratePackageDescription
+    }
+    
+    func loadPackageDescription(
+        projectDirectoryPath: String
+    ) throws -> String {
+        let command = [
+            "cd \(projectDirectoryPath);",
+            "swift package describe --type json"
+        ]
+        
+        return shell.execute(command.joined(separator: " "))
     }
     
     func decodePackageDescription(from packageDescriptionData: Data, warnings: [String]) throws -> SwiftPackageDescription {
