@@ -269,34 +269,3 @@ private extension PublicApiDiff {
         }
     }
 }
-
-internal extension SDKDumpPipeline {
-    
-    static func run(
-        newSource: ProjectSource,
-        oldSource: ProjectSource,
-        scheme: String?,
-        workingDirectoryPath: String,
-        fileHandler: FileHandling,
-        logger: Logging?
-    ) async throws -> String {
-        
-        defer {
-            logger?.debug("Cleaning up", from: "Main")
-            try? fileHandler.removeItem(atPath: workingDirectoryPath)
-        }
-        
-        return try await SDKDumpPipeline(
-            newProjectSource: newSource,
-            oldProjectSource: oldSource,
-            scheme: scheme,
-            projectBuilder: ProjectBuilder(baseWorkingDirectoryPath: workingDirectoryPath, logger: logger),
-            abiGenerator: ABIGenerator(logger: logger),
-            projectAnalyzer: SwiftPackageFileAnalyzer(logger: logger),
-            sdkDumpGenerator: SDKDumpGenerator(),
-            sdkDumpAnalyzer: SDKDumpAnalyzer(),
-            outputGenerator: MarkdownOutputGenerator(),
-            logger: logger
-        ).run()
-    }
-}

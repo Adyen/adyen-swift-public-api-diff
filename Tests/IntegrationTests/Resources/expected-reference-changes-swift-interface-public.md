@@ -101,19 +101,19 @@ extension Swift.Array
 ### `CustomClass`
 #### ❇️ Added
 ```javascript
-final public let a: Swift.Int
+final public let a: Swift.Int { get }
 
 ```
 ```javascript
-final public let b: Swift.Int
+final public let b: Swift.Int { get }
 
 ```
 ```javascript
-final public let c: Swift.Int
+final public let c: Swift.Int { get }
 
 ```
 ```javascript
-final public let d: Swift.Double
+final public let d: Swift.Double { get }
 
 ```
 ```javascript
@@ -199,7 +199,7 @@ extension ReferencePackage.CustomEnum where T == Swift.String
 ```javascript
 public struct NestedStructInExtension
 {
-  public let string: Swift.String
+  public let string: Swift.String { get }
   public init(string: Swift.String = "Hello")
 }
 
@@ -301,8 +301,8 @@ typealias CustomAssociatedType = Swift.Equatable
 ```javascript
 @available(macOS, unavailable, message: "Unavailable on macOS") public struct NestedStruct
 {
-  @available(*, deprecated, renamed: "nestedVar") public let nestedLet: Swift.String
-  @available(swift 5.9) public let nestedVar: Swift.String
+  @available(*, deprecated, renamed: "nestedVar") public let nestedLet: Swift.String { get }
+  @available(swift 5.9) public let nestedVar: Swift.String { get }
 }
 
 ```

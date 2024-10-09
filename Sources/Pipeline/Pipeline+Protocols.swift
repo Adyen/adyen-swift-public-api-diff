@@ -6,10 +6,6 @@
 
 import Foundation
 
-protocol ProjectBuilding {
-    func build(source: ProjectSource, scheme: String?) async throws -> URL
-}
-
 enum ProjectType {
     case swiftPackage
     case xcodeProject
@@ -26,14 +22,6 @@ struct ABIGeneratorOutput: Equatable {
 
 protocol ABIGenerating {
     func generate(for projectDirectory: URL, scheme: String?, description: String) throws -> [ABIGeneratorOutput]
-}
-
-protocol SDKDumpGenerating {
-    func generate(for abiJsonFileUrl: URL) throws -> SDKDump
-}
-
-protocol SDKDumpAnalyzing {
-    func analyze(old: SDKDump, new: SDKDump) throws -> [Change]
 }
 
 protocol SwiftInterfaceParsing {

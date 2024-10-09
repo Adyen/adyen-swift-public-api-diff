@@ -45,7 +45,7 @@ class XcodeToolsTests: XCTestCase {
         })
         
         let xcodeTools = XcodeTools(shell: mockShell, fileHandler: fileHandler, logger: nil)
-        try xcodeTools.build(projectDirectoryPath: projectDirectoryPath, scheme: allTargetsLibraryName, isPackage: true)
+        try xcodeTools.build(projectDirectoryPath: projectDirectoryPath, scheme: allTargetsLibraryName, projectType: .swiftPackage)
     }
     
     func test_build_failing() throws {
@@ -61,7 +61,7 @@ class XcodeToolsTests: XCTestCase {
         
         let xcodeTools = XcodeTools(shell: mockShell, fileHandler: fileHandler, logger: nil)
         do {
-            try xcodeTools.build(projectDirectoryPath: projectDirectoryPath, scheme: allTargetsLibraryName, isPackage: true)
+            try xcodeTools.build(projectDirectoryPath: projectDirectoryPath, scheme: allTargetsLibraryName, projectType: .swiftPackage)
             XCTFail("Build should have failed")
         } catch {
             let xcodeToolsError = try XCTUnwrap(error as? XcodeToolsError)

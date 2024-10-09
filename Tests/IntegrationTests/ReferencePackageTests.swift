@@ -23,8 +23,8 @@ class ReferencePackageTests: XCTestCase {
         
         let xcodeTools = XcodeTools(logger: nil)
         
-        _ = try await xcodeTools.archive(projectDirectoryPath: oldReferencePackageDirectory.path(), scheme: "ReferencePackage")
-        _ = try await xcodeTools.archive(projectDirectoryPath: newReferencePackageDirectory.path(), scheme: "ReferencePackage")
+        _ = try await xcodeTools.archive(projectDirectoryPath: oldReferencePackageDirectory.path(), scheme: "ReferencePackage", projectType: .swiftPackage)
+        _ = try await xcodeTools.archive(projectDirectoryPath: newReferencePackageDirectory.path(), scheme: "ReferencePackage", projectType: .swiftPackage)
     }
     
     override static func tearDown() {
@@ -164,7 +164,7 @@ private extension ReferencePackageTests {
             fileHandler: FileManager.default,
             swiftInterfaceParser: SwiftInterfaceParser(),
             swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
-            logger: PipelineLogger(logLevel: .debug)
+            logger: nil
         ).run()
     }
     
