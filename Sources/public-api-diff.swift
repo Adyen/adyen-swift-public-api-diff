@@ -27,14 +27,15 @@ struct PublicApiDiff: AsyncParsableCommand {
     
     public func run() async throws {
         
+        let logLevel: LogLevel = .debug
         let fileHandler: FileHandling = FileManager.default
         var loggers = [any Logging]()
         if let logOutput {
             loggers += [LogFileLogger(fileHandler: fileHandler, outputFilePath: logOutput)]
         }
-        loggers += [SystemLogger(logLevel: .debug)] // LogLevel should be provided by a parameter
+        loggers += [SystemLogger(logLevel: logLevel)] // LogLevel should be provided by a parameter
         
-        let logger: any Logging = LoggingGroup(with: loggers)
+        let logger: any Logging = LoggingGroup(with: loggers, logLevel: logLevel)
         
         do {
             let oldSource = try ProjectSource.from(old, fileHandler: fileHandler)

@@ -25,7 +25,7 @@ struct LoggingGroup: Logging {
     
     @MainActor
     func debug(_ message: String, from subsystem: String) {
-        guard logLevel.shouldDebug else { return }
+        guard logLevel.shouldDebugLog else { return }
         logger.forEach { $0.debug(message, from: subsystem) }
     }
 }
