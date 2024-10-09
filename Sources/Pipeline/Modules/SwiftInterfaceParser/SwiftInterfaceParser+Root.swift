@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Alexander Guretzki on 07/10/2024.
-//
-
 import Foundation
 
 extension SwiftInterfaceParser {

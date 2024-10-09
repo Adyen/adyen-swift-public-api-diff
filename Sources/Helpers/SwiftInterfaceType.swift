@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Alexander Guretzki on 08/10/2024.
-//
-
 import Foundation
 import ArgumentParser
 

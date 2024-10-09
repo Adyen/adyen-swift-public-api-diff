@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Alexander Guretzki on 04/10/2024.
-//
-
 import Foundation
 
 struct ProjectSetupHelper: ProjectSetupHelping {
