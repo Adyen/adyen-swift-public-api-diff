@@ -8,28 +8,34 @@ Alternatively you could use `xcrun swift-api-digester -diagnose-sdk` and pass th
 
 ## How it works
 
-![image](https://github.com/user-attachments/assets/cc04d21a-06f6-42bc-8e73-4aef7af21d7a)
+### Analyzing .swiftinterface files
 
+![image](https://github.com/user-attachments/assets/f836c963-6c16-4694-a481-9f0e598fbcd5)
 
-### Project Builder
+### ProjectSetupHelper
 
-Builds the swift package project which is required for the next step to run the `xcrun swift-api-digester -dump-sdk`
+Helps setting up the projects from a `ProjectSource` which includes cloning the repository if needed
 
-### ABIGenerator
+### SwiftPackageFileAnalyzer
 
-Makes use of `xcrun swift-api-digester -dump-sdk` to "dump" the public interface into an abi.json file.
+If the project type is of type `swift package` the Package.swift gets analyzed for added/removed/changed products/targets/dependencies and any issues/warnings
 
-### SDKDumpGenerator
+### SwiftInterfaceProducer
 
-Parses the abi.json files into an `SDKDump` object
+Archives the project and locates the `.swiftinterface` files for the available targets.
+If the project is of type `swift package` the `Package.swift` gets altered by adding a new product that contains all targets.
 
-### SDKDumpAnalyzer
+### SwiftInterfaceParser
 
-Analyzes 2 `SDKDump` objects and detects `addition`s & `removal`s.
+Parses the `.swiftinterface` file into a list of `SwiftInterfaceElement`s for easier analysing.
 
-### ChangeConsolidator
+### SwiftInterfaceAnalyzer
 
-The `ChangeConsolidator` takes 2 independent changes (`addition` & `removal`) and tries to match them based on the name, declKind and parent.
+Analyzes 2 root `SwiftInterfaceElement`s and detects `addition`s & `removal`s.
+
+### SwiftInterfaceChangeConsolidator
+
+The `ChangeConsolidator` takes 2 independent changes (`addition` & `removal`) and tries to match them into a list of `Change`s based on the consoldiatableName, type and parent.
 
 | Match |
 | --- |
