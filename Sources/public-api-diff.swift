@@ -157,8 +157,8 @@ private extension PublicApiDiff {
         if let logOutputFilePath {
             loggers += [LogFileLogger(fileHandler: fileHandler, outputFilePath: logOutputFilePath)]
         }
-        loggers += [SystemLogger(logLevel: logLevel)]
+        loggers += [SystemLogger().withLogLevel(logLevel)]
         
-        return LoggingGroup(with: loggers, logLevel: logLevel)
+        return LoggingGroup(with: loggers)
     }
 }
