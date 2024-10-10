@@ -1,10 +1,8 @@
 # Swift Public API diff
 
-This tool allows comparing 2 versions of a swift package project and lists all changes in a human readable way.
+This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
 
-It makes use of `xcrun swift-api-digester -dump-sdk` to create a dump of the public api of your swift package and then runs it through a custom parser to process them.
-
-Alternatively you could use `xcrun swift-api-digester -diagnose-sdk` and pass the abi dumps into it.
+It makes use of `.swiftinterface` files that get produced during the archiving of a swift project and parses them using [`swift-syntax`](https://github.com/swiftlang/swift-syntax).
 
 ## How it works
 
@@ -49,5 +47,9 @@ The `ChangeConsolidator` takes 2 independent changes (`addition` & `removal`) an
 
 Receives a dictionary of `[{SCOPE_NAME}: [Change]]` and processes them into a human readable format.
 
-## Inspiration
-- SwiftInterfaceParser: https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
+# Alternatives
+- `xcrun swift-api-digester -dump-sdk` & `xcrun swift-api-digester -diagnose-sdk`
+
+# Inspiration
+- https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
+  - For parsing swift files using [swift-syntax](https://github.com/swiftlang/swift-syntax)'s [`SyntaxVisitor`](https://github.com/swiftlang/swift-syntax/blob/main/Sources/SwiftSyntax/generated/SyntaxVisitor.swift)
