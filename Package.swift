@@ -24,6 +24,9 @@ let package = Package(
         .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.6")
     ],
     targets: [
+        
+        // MARK: - Executable Targets
+        
         .executableTarget(
             name: "public-api-diff",
             dependencies: [
@@ -35,33 +38,55 @@ let package = Package(
                 "SwiftInterfaceAnalyzerModule",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
-            path: "Sources/CommandLineTool"
+            path: "Sources/ExecutableTargets/CommandLineTool"
         ),
         
-        // MARK: - Modules
+        // MARK: - Shared Helper Modules
         
-        .target(name: "CoreModule"),
-        .target(name: "FileHandlingModule", dependencies: []),
-        .target(name: "ShellModule"),
-        .target(name: "LoggingModule", dependencies: [
-            "FileHandlingModule"
-        ]),
-        .target(name: "OutputGeneratorModule", dependencies: [
-            "CoreModule"
-        ]),
-        .target(name: "SwiftInterfaceAnalyzerModule", dependencies: [
-            "CoreModule",
-            .product(name: "SwiftSyntax", package: "swift-syntax"),
-            .product(name: "SwiftParser", package: "swift-syntax"),
-        ]),
-        .target(name: "ProjectBuilderModule", dependencies: [
-            "CoreModule",
-            "FileHandlingModule",
-            "LoggingModule",
-            "ShellModule",
-            .product(name: "SwiftSyntax", package: "swift-syntax"),
-            .product(name: "SwiftParser", package: "swift-syntax"),
-        ]),
+        .target(
+            name: "CoreModule",
+            path: "Sources/SharedHelperModules/CoreModule"
+        ),
+        .target(
+            name: "FileHandlingModule",
+            path: "Sources/SharedHelperModules/FileHandlingModule"
+        ),
+        .target(
+            name: "ShellModule",
+            path: "Sources/SharedHelperModules/ShellModule"
+        ),
+        .target(
+            name: "LoggingModule",
+            dependencies: ["FileHandlingModule"],
+            path: "Sources/SharedHelperModules/LoggingModule"
+        ),
+        
+        // MARK: - Pipeline Modules
+        
+        .target(
+            name: "SwiftInterfaceAnalyzerModule",
+            dependencies: [
+                "CoreModule",
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+            ],
+            path: "Sources/PipelineModules/SwiftInterfaceAnalyzerModule"
+        ),
+        .target(
+            name: "ProjectBuilderModule",
+            dependencies: [
+                "CoreModule",
+                "FileHandlingModule",
+                "LoggingModule",
+                "ShellModule"
+            ],
+            path: "Sources/PipelineModules/ProjectBuilderModule"
+        ),
+        .target(
+            name: "OutputGeneratorModule",
+            dependencies: ["CoreModule"],
+            path: "Sources/PipelineModules/OutputGeneratorModule"
+        ),
         
         // MARK: - Test Targets
         
