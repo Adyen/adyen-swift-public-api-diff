@@ -22,6 +22,16 @@ extension AccessorBlockSyntax {
     ///
     /// e.g. "get\n set\n" -> "get set"
     var sanitizedDescription: String {
-        accessors.trimmedDescription.replacingOccurrences(of: "[\n ]+", with: " ", options: .regularExpression)
+        accessors.trimmedDescription.sanitizingNewlinesAndSpaces
+    }
+}
+
+extension String {
+    
+    /// Produces a string where all newlines and spaces are replaced by a single space
+    ///
+    /// e.g. "get\n set\n" -> "get set"
+    var sanitizingNewlinesAndSpaces: String {
+        self.replacingOccurrences(of: "[\n ]+", with: " ", options: .regularExpression)
     }
 }

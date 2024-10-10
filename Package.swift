@@ -15,7 +15,10 @@ let package = Package(
         ),
         .library(
             name: "SwiftInterfaceDiff",
-            targets: ["SwiftInterfaceAnalyzerModule"]
+            targets: [
+                "SwiftInterfaceAnalyzerModule",
+                "OutputGeneratorModule"
+            ]
         )
     ],
     dependencies: [
@@ -67,6 +70,8 @@ let package = Package(
             name: "SwiftInterfaceAnalyzerModule",
             dependencies: [
                 "CoreModule",
+                "FileHandlingModule",
+                "LoggingModule",
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
             ],

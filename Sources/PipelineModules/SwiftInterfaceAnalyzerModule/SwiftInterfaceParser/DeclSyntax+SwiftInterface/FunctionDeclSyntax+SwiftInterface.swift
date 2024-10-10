@@ -22,7 +22,7 @@ extension FunctionDeclSyntax {
                 firstName: $0.firstName.trimmedDescription,
                 secondName: $0.secondName?.trimmedDescription,
                 type: $0.type.trimmedDescription,
-                defaultValue: $0.defaultValue?.value.description
+                defaultValue: $0.defaultValue?.value.trimmedDescription.sanitizingNewlinesAndSpaces
             )
         }
         

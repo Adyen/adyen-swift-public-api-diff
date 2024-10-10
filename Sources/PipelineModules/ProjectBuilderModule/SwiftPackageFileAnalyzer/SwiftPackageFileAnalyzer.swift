@@ -20,7 +20,7 @@ public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     private enum Constants {
         static let packageFileName = "Package.swift"
         static func packageFileName(child: String) -> String {
-            "\(packageFileName) / \(child)"
+            ".\(child)"
         }
     }
 
