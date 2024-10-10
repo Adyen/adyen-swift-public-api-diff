@@ -9,7 +9,7 @@ import XCTest
 
 class PipelineTests: XCTestCase {
     
-    func test_pipeline_success() async throws {
+    func test_pipeline() async throws {
         
         let swiftInterfaceFile = SwiftInterfaceFile(
             name: "MODULE_NAME",

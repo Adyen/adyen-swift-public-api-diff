@@ -9,7 +9,63 @@ import XCTest
 
 class XcodeToolsTests: XCTestCase {
     
-    func test_archive() throws {
-        XCTFail("Implement!")
+    func test_archive_swiftPackage() async throws {
+        
+        let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
+        let scheme = "SCHEME"
+        let projectType = ProjectType.swiftPackage
+        
+        let archiveResult = "ARCHIVE_RESULT"
+        let expectedDerivedDataPath = "\(projectDirectoryPath)/.build"
+        var expectedHandleExecuteCalls = ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES -skipPackagePluginValidation"]
+        var expectedHandleLogCalls: [(message: String, subsystem: String)] = [
+            ("📦 Archiving SCHEME from PROJECT_DIRECTORY_PATH", "XcodeTools")
+        ]
+        var expectedHandleDebugCalls: [(message: String, subsystem: String)] = [
+            (archiveResult, "XcodeTools")
+        ]
+        var expectedHandleFileExistsCalls = ["PROJECT_DIRECTORY_PATH/.build"]
+        
+        var shell = MockShell()
+        shell.handleExecute = { command in
+            let expectedInput = expectedHandleExecuteCalls.removeFirst()
+            XCTAssertEqual(command, expectedInput)
+            return archiveResult
+        }
+        var fileHandler = MockFileHandler()
+        fileHandler.handleFileExists = { path in
+            let expectedInput = expectedHandleFileExistsCalls.removeFirst()
+            XCTAssertEqual(path, expectedInput)
+            return true
+        }
+        var logger = MockLogger()
+        logger.handleLog = { message, subsystem in
+            let expectedInput = expectedHandleLogCalls.removeFirst()
+            XCTAssertEqual(message, expectedInput.message)
+            XCTAssertEqual(subsystem, expectedInput.subsystem)
+        }
+        logger.handleDebug = { message, subsystem in
+            let expectedInput = expectedHandleDebugCalls.removeFirst()
+            XCTAssertEqual(message, expectedInput.message)
+            XCTAssertEqual(subsystem, expectedInput.subsystem)
+        }
+        
+        let xcodeTools = XcodeTools(
+            shell: shell,
+            fileHandler: fileHandler,
+            logger: logger
+        )
+        
+        let derivedDataPath = try await xcodeTools.archive(
+            projectDirectoryPath: projectDirectoryPath,
+            scheme: scheme,
+            projectType: projectType
+        )
+        
+        XCTAssertEqual(derivedDataPath, expectedDerivedDataPath)
+        XCTAssertTrue(expectedHandleExecuteCalls.isEmpty)
+        XCTAssertTrue(expectedHandleLogCalls.isEmpty)
+        XCTAssertTrue(expectedHandleDebugCalls.isEmpty)
+        XCTAssertTrue(expectedHandleFileExistsCalls.isEmpty)
     }
 }
