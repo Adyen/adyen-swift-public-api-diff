@@ -71,6 +71,8 @@ class LoggerTests: XCTestCase {
         let logFileLogger = LogFileLogger(fileHandler: fileHandler, outputFilePath: outputFilePath)
         
         logFileLogger.log("log", from: "test")
+        // Small sleep because the file manager calls are done on a detached Task and we want to guarantee the order
+        try await Task.sleep(for: .milliseconds(10))
         logFileLogger.debug("debug", from: "test")
         
         await fulfillment(of: [removeExpectation])

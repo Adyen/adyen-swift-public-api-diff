@@ -13,11 +13,45 @@ class XcodeToolsTests: XCTestCase {
         
         let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
         let scheme = "SCHEME"
-        let projectType = ProjectType.swiftPackage
+        
+        try await testArchiving(
+            projectDirectoryPath: projectDirectoryPath,
+            scheme: scheme,
+            projectType: .swiftPackage
+        )
+    }
+    
+    func test_archive_xcodeProject() async throws {
+        
+        let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
+        let scheme = "SCHEME"
+        
+        try await testArchiving(
+            projectDirectoryPath: projectDirectoryPath,
+            scheme: scheme,
+            projectType: .xcodeProject(scheme: scheme)
+        )
+    }
+}
+
+private extension XcodeToolsTests {
+    
+    func testArchiving(
+        projectDirectoryPath: String,
+        scheme: String,
+        projectType: ProjectType
+    ) async throws {
         
         let archiveResult = "ARCHIVE_RESULT"
         let expectedDerivedDataPath = "\(projectDirectoryPath)/.build"
-        var expectedHandleExecuteCalls = ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES -skipPackagePluginValidation"]
+        var expectedHandleExecuteCalls: [String] = {
+            switch projectType {
+            case .swiftPackage:
+                ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES -skipPackagePluginValidation"]
+            case .xcodeProject(let scheme):
+                ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES"]
+            }
+        }()
         var expectedHandleLogCalls: [(message: String, subsystem: String)] = [
             ("📦 Archiving SCHEME from PROJECT_DIRECTORY_PATH", "XcodeTools")
         ]

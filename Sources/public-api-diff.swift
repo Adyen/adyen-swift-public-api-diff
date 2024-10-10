@@ -28,7 +28,10 @@ struct PublicApiDiff: AsyncParsableCommand {
     public func run() async throws {
         
         let logLevel: LogLevel = .debug
-        let projectType: ProjectType = .swiftPackage // Only needed when we have to produce the .swiftinterface files
+        let projectType: ProjectType = { // Only needed when we have to produce the .swiftinterface files
+            if let scheme { return .xcodeProject(scheme: scheme) }
+            return .swiftPackage
+        }()
         let swiftInterfaceType: SwiftInterfaceType = .public // Only needed when we have to produce the .swiftinterface files
         
         let fileHandler: FileHandling = FileManager.default

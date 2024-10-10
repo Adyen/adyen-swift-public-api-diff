@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Alexander Guretzki on 09/10/2024.
-//
-
 import Foundation
 
 /// Allows building of the old & new project and returns the `.swiftinterface` files
