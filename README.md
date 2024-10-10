@@ -1,3 +1,5 @@
+[![🧪 Run Tests](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml)
+
 # Swift Public API diff
 
 This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
