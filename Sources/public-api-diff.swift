@@ -48,7 +48,7 @@ struct PublicApiDiff: AsyncParsableCommand {
             let newSource: ProjectSource = try ProjectSource.from(new, fileHandler: fileHandler)
             
             let oldVersionName = oldSource.description
-            let newVersionName = oldSource.description
+            let newVersionName = newSource.description
             
             logger.log("Comparing `\(newVersionName)` to `\(oldVersionName)`", from: "Main")
             
