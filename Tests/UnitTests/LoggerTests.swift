@@ -9,7 +9,7 @@ import XCTest
 
 class LoggerTests: XCTestCase {
     
-    func test_logger() async throws {
+    func test_logLevels() async throws {
         
         var logger = MockLogger()
         
@@ -42,5 +42,38 @@ class LoggerTests: XCTestCase {
         }
         logger.withLogLevel(.debug).log("log", from: "debug")
         logger.withLogLevel(.debug).debug("debug", from: "debug")
+    }
+    
+    func test_logFileLogger() async throws {
+        
+        let outputFilePath = "output_file_path"
+        
+        let removeExpectation = expectation(description: "remove was called twice")
+        removeExpectation.expectedFulfillmentCount = 2
+        
+        var expectedHandleCreateFileCalls = [
+            "🪵 [test] log\n",
+            "🪵 [test] log\n\n🐞 [test] debug\n"
+        ]
+        
+        var fileHandler = MockFileHandler()
+        fileHandler.handleRemoveItem = { path in
+            XCTAssertEqual(path, outputFilePath)
+            removeExpectation.fulfill()
+        }
+        fileHandler.handleCreateFile = { path, data in
+            XCTAssertEqual(path, outputFilePath)
+            let expectedInput = expectedHandleCreateFileCalls.removeFirst()
+            XCTAssertEqual(String(data: data, encoding: .utf8), expectedInput)
+            return true
+        }
+        
+        let logFileLogger = LogFileLogger(fileHandler: fileHandler, outputFilePath: outputFilePath)
+        
+        logFileLogger.log("log", from: "test")
+        logFileLogger.debug("debug", from: "test")
+        
+        await fulfillment(of: [removeExpectation])
+        XCTAssertTrue(expectedHandleCreateFileCalls.isEmpty)
     }
 }
