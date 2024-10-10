@@ -4,7 +4,6 @@ import FileHandlingModule
 import ShellModule
 import LoggingModule
 import CoreModule
-import SwiftPackageFileHelperModule
 
 /// Allows building of the old & new project and returns the `.swiftinterface` files
 public struct SwiftInterfaceProducer {

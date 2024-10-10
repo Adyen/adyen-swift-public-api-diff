@@ -10,7 +10,6 @@ import CoreModule
 import FileHandlingModule
 import ShellModule
 import LoggingModule
-import SwiftPackageFileHelperModule
 
 public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     

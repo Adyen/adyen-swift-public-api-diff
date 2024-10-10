@@ -7,15 +7,12 @@
 import ArgumentParser
 import Foundation
 
-import LoggingModule
-import FileHandlingModule
 import CoreModule
-import ProjectSetupModule
-import ShellModule
-import SwiftInterfaceProducerModule
+import LoggingModule
+
 import SwiftInterfaceAnalyzerModule
-import OutputGeneratorModule
 import ProjectBuilderModule
+import OutputGeneratorModule
 
 @main
 struct PublicApiDiff: AsyncParsableCommand {
@@ -44,21 +41,19 @@ struct PublicApiDiff: AsyncParsableCommand {
         }()
         let swiftInterfaceType: SwiftInterfaceType = .public // Only needed when we have to produce the .swiftinterface files
         
-        let fileHandler: FileHandling = FileManager.default
-        let shell: any ShellHandling = Shell()
-        let logger = Self.logger(with: logLevel, logOutputFilePath: logOutput, fileHandler: fileHandler)
+        let logger = Self.logger(with: logLevel, logOutputFilePath: logOutput)
         
         do {
             var warnings = [String]()
             var changes = [String: [Change]]()
             
-            let oldSource: ProjectSource = try ProjectSource.from(old, fileHandler: fileHandler)
-            let newSource: ProjectSource = try ProjectSource.from(new, fileHandler: fileHandler)
+            // MARK: - Producing .swiftinterface files
+            
+            let oldSource: ProjectSource = try ProjectSource.from(old)
+            let newSource: ProjectSource = try ProjectSource.from(new)
             
             let oldVersionName = oldSource.description
             let newVersionName = newSource.description
-            
-            // MARK: - Producing .swiftinterface files
             
             let projectBuilder = ProjectBuilder(
                 projectType: projectType,
@@ -106,7 +101,7 @@ struct PublicApiDiff: AsyncParsableCommand {
             )
             
             if let output {
-                try fileHandler.write(generatedOutput, to: output)
+                try FileManager.default.write(generatedOutput, to: output)
             } else {
                 // We're not using a logger here as we always want to have it printed if no output was specified
                 print(generatedOutput)
@@ -121,10 +116,13 @@ struct PublicApiDiff: AsyncParsableCommand {
 
 private extension PublicApiDiff {
     
-    static func logger(with logLevel: LogLevel, logOutputFilePath: String?, fileHandler: any FileHandling) -> any Logging {
+    static func logger(
+        with logLevel: LogLevel,
+        logOutputFilePath: String?
+    ) -> any Logging {
         var loggers = [any Logging]()
         if let logOutputFilePath {
-            loggers += [LogFileLogger(fileHandler: fileHandler, outputFilePath: logOutputFilePath)]
+            loggers += [LogFileLogger(outputFilePath: logOutputFilePath)]
         }
         loggers += [SystemLogger().withLogLevel(logLevel)]
         

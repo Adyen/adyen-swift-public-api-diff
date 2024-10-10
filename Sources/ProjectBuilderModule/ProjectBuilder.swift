@@ -8,12 +8,9 @@
 import Foundation
 
 import FileHandlingModule
-import ProjectSetupModule
 import LoggingModule
 import CoreModule
 import ShellModule
-import SwiftPackageFileAnalyzerModule
-import SwiftInterfaceProducerModule
 
 public struct ProjectBuilder {
     

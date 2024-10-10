@@ -26,7 +26,7 @@ public enum ProjectSource: Equatable {
     case local(path: String)
     case remote(branch: String, repository: String)
  
-    public static func from(_ rawValue: String, fileHandler: FileHandling) throws -> ProjectSource {
+    public static func from(_ rawValue: String, fileHandler: FileHandling = FileManager.default) throws -> ProjectSource {
         if fileHandler.fileExists(atPath: rawValue) {
             return .local(path: rawValue)
         }

@@ -5,7 +5,6 @@
 //
 
 import Foundation
-import CoreModule
 
 public enum FileHandlerError: LocalizedError, Equatable {
     /// Could not encode the output string into data

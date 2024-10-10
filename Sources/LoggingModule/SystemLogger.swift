@@ -1,6 +1,5 @@
 import Foundation
 import OSLog
-import CoreModule
 
 public struct SystemLogger: Logging {
     

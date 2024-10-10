@@ -1,5 +1,4 @@
 import Foundation
-import CoreModule
 import FileHandlingModule
 
 public class LogFileLogger: Logging {
@@ -14,7 +13,7 @@ public class LogFileLogger: Logging {
         }
     }
     
-    public init(fileHandler: any FileHandling, outputFilePath: String) {
+    public init(fileHandler: any FileHandling = FileManager.default, outputFilePath: String) {
         self.fileHandler = fileHandler
         self.outputFilePath = outputFilePath
     }

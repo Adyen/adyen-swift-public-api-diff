@@ -1,6 +1,5 @@
 import Foundation
 import OSLog
-import CoreModule
 
 public enum LogLevel {
     /// No logs

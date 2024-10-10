@@ -1,5 +1,4 @@
 import Foundation
-import CoreModule
 
 public struct LoggingGroup: Logging {
     

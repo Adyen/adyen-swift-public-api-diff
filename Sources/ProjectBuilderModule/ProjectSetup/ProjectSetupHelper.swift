@@ -4,7 +4,6 @@ import CoreModule
 import ShellModule
 import FileHandlingModule
 import LoggingModule
-import GitModule
 
 public struct ProjectSetupHelper: ProjectSetupHelping {
     

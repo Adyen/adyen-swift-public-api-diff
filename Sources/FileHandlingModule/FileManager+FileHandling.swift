@@ -5,7 +5,6 @@
 //
 
 import Foundation
-import CoreModule
 
 extension FileManager: FileHandling {
     
