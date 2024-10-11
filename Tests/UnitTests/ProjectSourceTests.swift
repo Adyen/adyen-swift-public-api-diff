@@ -51,11 +51,11 @@ class ProjectSourceTests: XCTestCase {
             )
             XCTAssertNil(source) // Guard to make sure that we catch if it succeeds
         } catch {
-            let projectSourceError = try XCTUnwrap(error as? ProjectSourceError)
+            let projectSourceError = try XCTUnwrap(error as? PADProjectSource.Error)
             
             XCTAssertEqual(
                 projectSourceError,
-                ProjectSourceError.invalidSourceValue(value: rawProjectSourceValue)
+                PADProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
             )
         }
     }
@@ -78,11 +78,11 @@ class ProjectSourceTests: XCTestCase {
             )
             XCTAssertNil(source) // Guard to make sure that we catch if it succeeds
         } catch {
-            let projectSourceError = try XCTUnwrap(error as? ProjectSourceError)
+            let projectSourceError = try XCTUnwrap(error as? PADProjectSource.Error)
             
             XCTAssertEqual(
                 projectSourceError,
-                ProjectSourceError.invalidSourceValue(value: rawProjectSourceValue)
+                PADProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
             )
         }
     }
