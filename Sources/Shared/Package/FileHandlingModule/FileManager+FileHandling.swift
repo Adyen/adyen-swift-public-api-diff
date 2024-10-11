@@ -9,16 +9,16 @@ import Foundation
 extension FileManager: FileHandling {
     
     /// Creates a directory at the specified path
-    public func createDirectory(atPath path: String) throws {
+    package func createDirectory(atPath path: String) throws {
         try createDirectory(atPath: path, withIntermediateDirectories: true)
     }
     
     /// Creates a file at the specified path with the provided content
-    public func createFile(atPath path: String, contents data: Data) -> Bool {
+    package func createFile(atPath path: String, contents data: Data) -> Bool {
         createFile(atPath: path, contents: data, attributes: nil)
     }
     
-    public func loadData(from filePath: String) throws -> Data {
+    package func loadData(from filePath: String) throws -> Data {
         guard let data = self.contents(atPath: filePath) else {
             throw FileHandlerError.couldNotLoadFile(filePath: filePath)
         }

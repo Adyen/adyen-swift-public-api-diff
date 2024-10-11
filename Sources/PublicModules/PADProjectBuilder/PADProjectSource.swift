@@ -13,9 +13,9 @@ public enum PADProjectSource: Equatable, CustomStringConvertible {
     /// The separator used to join branch & repository
     static var gitSourceSeparator: String { "~" }
     
-    /// The project source is at a local `path`
+    /// Representing a local `path`
     case local(path: String)
-    /// The project source is a `branch` of a **git** `repository`
+    /// Representing a `branch` of a **git** `repository`
     case git(branch: String, repository: String)
  
     /// Creates a ``PADProjectSource`` from a rawValue

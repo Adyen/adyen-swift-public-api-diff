@@ -1,5 +1,6 @@
 import Foundation
 
+/// A group of loggers
 public struct PADLoggingGroup: PADLogging {
     
     let logger: [any PADLogging]

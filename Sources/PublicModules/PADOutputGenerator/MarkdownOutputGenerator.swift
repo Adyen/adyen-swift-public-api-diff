@@ -156,3 +156,14 @@ private extension PADMarkdownOutputGenerator {
         }
     }
 }
+
+private extension [String: [PADChange]] {
+    
+    var totalChangeCount: Int {
+        var totalChangeCount = 0
+        keys.forEach { targetName in
+            totalChangeCount += self[targetName]?.count ?? 0
+        }
+        return totalChangeCount
+    }
+}

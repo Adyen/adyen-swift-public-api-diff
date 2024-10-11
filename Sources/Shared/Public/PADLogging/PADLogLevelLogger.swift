@@ -1,6 +1,7 @@
 import Foundation
 import OSLog
 
+/// A log level specifying the granularity of the emitted logs
 public enum PADLogLevel {
     /// No logs
     case quiet
@@ -59,6 +60,7 @@ public struct PADLogLevelLogger<LoggerType: PADLogging>: PADLogging {
 // MARK: - Logging Extension
 
 extension PADLogging {
+    /// Wraps a logger into a ``PADLogLevelLogger`` to make them respect the ``PADLogLevel``
     public func withLogLevel(_ logLevel: PADLogLevel) -> PADLogLevelLogger<Self> {
         .init(with: self, logLevel: logLevel)
     }

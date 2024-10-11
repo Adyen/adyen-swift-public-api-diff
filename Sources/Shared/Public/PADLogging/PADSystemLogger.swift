@@ -1,6 +1,7 @@
 import Foundation
 import OSLog
 
+/// A logger that outputs logs to the console
 public struct PADSystemLogger: PADLogging {
     
     public init() {}

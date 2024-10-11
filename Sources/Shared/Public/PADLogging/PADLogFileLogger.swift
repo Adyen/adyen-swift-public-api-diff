@@ -1,6 +1,7 @@
 import Foundation
 import FileHandlingModule
 
+/// Logs into a log file at a specified output path
 public class PADLogFileLogger: PADLogging {
     
     private let fileHandler: any FileHandling
@@ -13,6 +14,7 @@ public class PADLogFileLogger: PADLogging {
         }
     }
     
+    /// Creates a new instance that targets the specified output path
     public convenience init(outputFilePath: String) {
         self.init(fileHandler: FileManager.default, outputFilePath: outputFilePath)
     }

@@ -14,24 +14,33 @@ import PADSwiftInterfaceDiff
 import PADProjectBuilder
 import PADOutputGenerator
 
+/// The command line tool to analyze public api changes
 @main
 struct PublicApiDiff: AsyncParsableCommand {
     
+    /// The representation of the new/updated project source
     @Option(help: "Specify the updated version to compare to")
     public var new: String
     
+    /// The representation of the old/reference project source
     @Option(help: "Specify the old version to compare to")
     public var old: String
     
+    /// The (optional) output file path
+    ///
+    /// If not defined the output will be printed to the console
     @Option(help: "Where to output the result (File path)")
     public var output: String?
     
+    /// The (optional) path to the log output file
     @Option(help: "Where to output the logs (File path)")
     public var logOutput: String?
     
-    @Option(help: "Which scheme to build (Needed when comparing 2 swift frameworks)")
+    /// The (optional) scheme to build (Needed when comparing 2 xcode projects)
+    @Option(help: "Which scheme to build (Needed when comparing 2 xcode projects)")
     public var scheme: String?
     
+    /// Entry point of the command line tool
     public func run() async throws {
         
         let logLevel: PADLogLevel = .debug
