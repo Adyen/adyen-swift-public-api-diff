@@ -6,9 +6,9 @@
 
 import Foundation
 
-// See: https://docs.swift.org/package-manager/PackageDescription/index.html
-// See: https://github.com/swiftlang/swift-package-manager/blob/main/Sources/PackageDescription/PackageDescriptionSerialization.swift
-
+/// The object representation of a `Package.swift` file
+///
+/// See: [PackageDescription](https://docs.swift.org/package-manager/PackageDescription/index.html) & [PackageDescriptionSerialization](https://github.com/swiftlang/swift-package-manager/blob/main/Sources/PackageDescription/PackageDescriptionSerialization.swift)
 struct SwiftPackageDescription: Codable, Equatable {
     
     let name: String

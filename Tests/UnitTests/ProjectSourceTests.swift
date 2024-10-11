@@ -29,7 +29,7 @@ class ProjectSourceTests: XCTestCase {
         
         XCTAssertEqual(
             projectSource,
-            .remote(branch: branch, repository: repositoryUrl)
+            .git(branch: branch, repository: repositoryUrl)
         )
     }
     

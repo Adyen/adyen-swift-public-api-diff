@@ -6,11 +6,28 @@ import PADCore
 import ShellModule
 import FileHandlingModule
 
+/// The ``PADProjectBuilder/PADProjectBuilder`` builds the old & new project and outputs a list
+/// of ``PADCore/PADSwiftInterfaceFile``s as well as changes that happened to the
+/// project files including any warnings if applicable.
+///
+/// Following tasks are performed:
+/// - Fetch remote projects (if applicable)
+/// - Archiving projects
+/// - Inspecting `Package.swift` for any changes between versions (if applicable / if ``PADProjectType/swiftPackage``)
+/// - Returning a ``PADProjectBuilder/PADProjectBuilder/Result`` containing package file changes, warnings + the found ``PADCore/PADSwiftInterfaceFile``s
 public struct PADProjectBuilder {
     
+    /// The result returned by the build function of ``PADProjectBuilder/PADProjectBuilder``
     public struct Result {
+        /// Any changes found between the 2 versions of the `Package.swift` file
+        ///
+        /// Only applicable if the `projectType` specified is ``PADProjectType/swiftPackage``
         public let packageFileChanges: [PADChange]
+        
+        /// Any warnings that occured while building the project or inspecting the `Package.swift`
         public let warnings: [String]
+        
+        /// The `.swiftinterface` file references found
         public let swiftInterfaceFiles: [PADSwiftInterfaceFile]
     }
     

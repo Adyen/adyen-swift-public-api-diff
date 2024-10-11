@@ -3,6 +3,7 @@ import SwiftParser
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/actordeclsyntax
 extension ActorDeclSyntax {
+    
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> SwiftInterfaceActor {
         SwiftInterfaceActor(
             attributes: self.attributes.sanitizedList,

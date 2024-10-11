@@ -4,7 +4,7 @@ import PADCore
 import PADLogging
 import FileHandlingModule
 
-/// Takes a list of ``PADSwiftInterfaceFile`` and detects changes between the old and new version
+/// Takes a list of ``PADCore/PADSwiftInterfaceFile``s and detects changes between the old and new version
 public struct PADSwiftInterfaceDiff {
     
     let fileHandler: any FileHandling
@@ -12,6 +12,9 @@ public struct PADSwiftInterfaceDiff {
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
     let logger: (any PADLogging)?
     
+    
+    /// Creates a new instance of ``PADSwiftInterfaceDiff``
+    /// - Parameter logger: The (optional) logger
     public init(
         logger: (any PADLogging)? = nil
     ) {
@@ -35,6 +38,10 @@ public struct PADSwiftInterfaceDiff {
         self.logger = logger
     }
     
+    
+    /// Analyzes the passed ``PADCore/PADSwiftInterfaceFile``s and returns a list of changes grouped by scheme/target
+    /// - Parameter swiftInterfaceFiles: The ``PADCore/PADSwiftInterfaceFile``s to analyze
+    /// - Returns: A list of changes grouped by scheme/target
     public func run(with swiftInterfaceFiles: [PADSwiftInterfaceFile]) async throws -> [String: [PADChange]] {
         
         var changes = [String: [PADChange]]()

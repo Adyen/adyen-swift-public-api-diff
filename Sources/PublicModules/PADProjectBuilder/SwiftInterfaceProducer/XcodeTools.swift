@@ -18,6 +18,7 @@ struct XcodeToolsError: LocalizedError, CustomDebugStringConvertible {
     var debugDescription: String { errorDescription }
 }
 
+/// A helper that provides tools to build a project
 struct XcodeTools {
     
     internal enum Constants {
@@ -39,6 +40,12 @@ struct XcodeTools {
         self.logger = logger
     }
     
+    /// Archives a project at the specified path / scheme by building for library evolution
+    /// - Parameters:
+    ///   - projectDirectoryPath: The path to the project root directory
+    ///   - scheme: The scheme/target to build
+    ///   - projectType: The type of the project
+    /// - Returns: The derived data directory path
     func archive(
         projectDirectoryPath: String,
         scheme: String,

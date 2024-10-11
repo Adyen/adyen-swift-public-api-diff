@@ -7,25 +7,22 @@
 import Foundation
 import FileHandlingModule
 
-enum ProjectSourceError: LocalizedError, Equatable {
-    case invalidSourceValue(value: String)
-    
-    var errorDescription: String? {
-        switch self {
-        case let .invalidSourceValue(value):
-            "Invalid source parameter `\(value)`. It needs to either be a local file path or a repository in the format `[BRANCH_OR_TAG]\(PADProjectSource.gitSourceSeparator)[REPOSITORY_URL]"
-        }
-    }
-}
-
+/// The source type of the project (local/remote)
 public enum PADProjectSource: Equatable, CustomStringConvertible {
     
     /// The separator used to join branch & repository
     static var gitSourceSeparator: String { "~" }
     
+    /// The project source is at a local `path`
     case local(path: String)
-    case remote(branch: String, repository: String)
+    /// The project source is a `branch` of a **git** `repository`
+    case git(branch: String, repository: String)
  
+    /// Creates a ``PADProjectSource`` from a rawValue
+    /// - Parameters:
+    ///   - rawValue: The rawValue presentation of a ``PADProjectSource``
+    /// - Returns: A valid ``PADProjectSource``
+    /// - Throws: An error if the `rawValue` does not match a ``PADProjectSource`` representation
     public static func from(_ rawValue: String) throws -> Self {
         try from(rawValue, fileHandler: FileManager.default)
     }
@@ -37,17 +34,17 @@ public enum PADProjectSource: Equatable, CustomStringConvertible {
         
         let remoteComponents = rawValue.components(separatedBy: gitSourceSeparator)
         if remoteComponents.count == 2, let branch = remoteComponents.first, let repository = remoteComponents.last, URL(string: repository) != nil {
-            return .remote(branch: branch, repository: repository)
+            return .git(branch: branch, repository: repository)
         }
         
-        throw ProjectSourceError.invalidSourceValue(value: rawValue)
+        throw Error.invalidSourceValue(value: rawValue)
     }
     
     public var description: String {
         switch self {
         case let .local(path):
             return path
-        case let .remote(branch, repository):
+        case let .git(branch, repository):
             return "\(repository) @ \(branch)"
         }
     }

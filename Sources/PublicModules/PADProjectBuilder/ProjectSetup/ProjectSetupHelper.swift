@@ -6,6 +6,9 @@ import PADLogging
 import ShellModule
 import FileHandlingModule
 
+/// Helps setting up the project by:
+/// - Copying project files into a working directory (and skipping unwanted files)
+/// - Fetching a remote project (if applicable)
 struct ProjectSetupHelper: ProjectSetupHelping {
     
     let workingDirectoryPath: String
@@ -37,7 +40,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
             switch projectSource {
             case .local(let path):
                 shell.execute("cp -a '\(path)' '\(checkoutPath)'")
-            case .remote(let branch, let repository):
+            case .git(let branch, let repository):
                 let git = Git(shell: shell, fileHandler: fileHandler, logger: logger)
                 try git.clone(repository, at: branch, targetDirectoryPath: checkoutPath)
             }
@@ -63,6 +66,7 @@ extension ProjectSetupHelper {
         let new: URL
     }
     
+    /// Convenience method that calls into `setup(_:projectType:)` for the old and new source
     func setupProjects(
         oldSource: PADProjectSource,
         newSource: PADProjectSource,

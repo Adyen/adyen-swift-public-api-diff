@@ -6,7 +6,7 @@ import PADLogging
 import FileHandlingModule
 import ShellModule
 
-enum GitError: LocalizedError, Equatable {
+internal enum GitError: LocalizedError, Equatable {
     case couldNotClone(branchOrTag: String, repository: String)
     
     var errorDescription: String? {
@@ -17,7 +17,7 @@ enum GitError: LocalizedError, Equatable {
     }
 }
 
-struct Git {
+internal struct Git {
     
     private let shell: ShellHandling
     private let fileHandler: FileHandling

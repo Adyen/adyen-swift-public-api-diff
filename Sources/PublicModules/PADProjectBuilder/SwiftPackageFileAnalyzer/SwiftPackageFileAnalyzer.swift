@@ -11,6 +11,7 @@ import FileHandlingModule
 import ShellModule
 import PADLogging
 
+/// Analyzes 2 versions of a `Package.swift`
 struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     
     private let fileHandler: any FileHandling
@@ -34,7 +35,10 @@ struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
         self.shell = shell
     }
     
-    func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> SwiftPackageFileAnalyzingResult {
+    func analyze(
+        oldProjectUrl: URL,
+        newProjectUrl: URL
+    ) throws -> SwiftPackageFileAnalyzingResult {
         
         let oldProjectPath = oldProjectUrl.path()
         let newProjectPath = newProjectUrl.path()
@@ -61,6 +65,7 @@ struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
 
 private extension SwiftPackageFileAnalyzer {
     
+    /// Compiles all changes between 2 `SwiftPackageDescription`s
     private func analyze(
         old: SwiftPackageDescription,
         new: SwiftPackageDescription

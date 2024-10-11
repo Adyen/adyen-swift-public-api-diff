@@ -95,7 +95,7 @@ extension SwiftInterfaceProducer {
             schemesToCompare = newTargets.intersection(oldTargets).sorted()
             
             if schemesToCompare.isEmpty {
-                throw SwiftInterfaceProducerError.noTargetFound
+                throw Error.noTargetFound
             }
             
         case let .xcodeProject(scheme):

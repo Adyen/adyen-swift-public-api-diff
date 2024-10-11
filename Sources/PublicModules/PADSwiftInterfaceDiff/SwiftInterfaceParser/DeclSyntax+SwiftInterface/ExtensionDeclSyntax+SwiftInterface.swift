@@ -5,7 +5,7 @@ import SwiftParser
 extension ExtensionDeclSyntax {
     
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> SwiftInterfaceExtension {
-        return SwiftInterfaceExtension(
+        SwiftInterfaceExtension(
             attributes: self.attributes.sanitizedList,
             modifiers: self.modifiers.sanitizedList,
             extendedType: self.extendedType.trimmedDescription,
