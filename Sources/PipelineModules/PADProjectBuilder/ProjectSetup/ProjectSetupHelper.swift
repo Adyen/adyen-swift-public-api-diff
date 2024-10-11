@@ -1,11 +1,11 @@
 import Foundation
 
-import CoreModule
-import ShellModule
-import FileHandlingModule
-import LoggingModule
+import PADCore
+import PADShell
+import PADFileHandling
+import PADLogging
 
-public struct ProjectSetupHelper: ProjectSetupHelping {
+struct ProjectSetupHelper: ProjectSetupHelping {
     
     let workingDirectoryPath: String
     let shell: any ShellHandling
@@ -13,7 +13,7 @@ public struct ProjectSetupHelper: ProjectSetupHelping {
     let fileHandler: any FileHandling
     let logger: (any Logging)?
     
-    public init(
+    init(
         workingDirectoryPath: String,
         randomStringGenerator: any RandomStringGenerating = RandomStringGenerator(),
         shell: any ShellHandling = Shell(),
@@ -27,7 +27,7 @@ public struct ProjectSetupHelper: ProjectSetupHelping {
         self.logger = logger
     }
     
-    public func setup(
+    func setup(
         _ projectSource: ProjectSource,
         projectType: ProjectType
     ) async throws -> URL {
@@ -57,12 +57,12 @@ public struct ProjectSetupHelper: ProjectSetupHelping {
 
 extension ProjectSetupHelper {
     
-    public struct ProjectDirectories {
+    struct ProjectDirectories {
         public let old: URL
         public let new: URL
     }
     
-    public func setupProjects(
+    func setupProjects(
         oldSource: ProjectSource,
         newSource: ProjectSource,
         projectType: ProjectType

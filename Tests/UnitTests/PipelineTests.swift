@@ -4,8 +4,8 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import SwiftInterfaceAnalyzerModule
-@testable import CoreModule
+@testable import PADSwiftInterfaceDiff
+@testable import PADCore
 import XCTest
 
 class PipelineTests: XCTestCase {
@@ -28,7 +28,7 @@ class PipelineTests: XCTestCase {
             (.init(moduleName: "MODULE_NAME", elements: []), .init(moduleName: "MODULE_NAME", elements: []))
         ]
         var expectedHandleLogCalls: [(message: String, subsystem: String)] = [
-            ("🧑‍🔬 Analyzing MODULE_NAME", "SwiftInterfacePipeline")
+            ("🧑‍🔬 Analyzing MODULE_NAME", "PADSwiftInterfaceDiff")
         ]
         let expectedPipelineOutput: [String: [Change]] = ["MODULE_NAME": expectedChanges]
         
@@ -66,7 +66,7 @@ class PipelineTests: XCTestCase {
         
         // Pipeline run
         
-        let pipeline = SwiftInterfacePipeline(
+        let pipeline = PADSwiftInterfaceDiff(
             fileHandler: fileHandler,
             swiftInterfaceParser: swiftInterfaceParser,
             swiftInterfaceAnalyzer: swiftInterfaceAnalyzer,

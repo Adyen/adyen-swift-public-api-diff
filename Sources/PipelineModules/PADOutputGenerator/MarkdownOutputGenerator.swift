@@ -5,7 +5,7 @@
 //
 
 import Foundation
-import CoreModule
+import PADCore
 
 /// Allows generation of human readable output from the provided information
 public struct MarkdownOutputGenerator: OutputGenerating {

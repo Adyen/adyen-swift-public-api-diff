@@ -5,7 +5,7 @@
 //
 
 import Foundation
-import FileHandlingModule
+import PADFileHandling
 
 enum ProjectSourceError: LocalizedError, Equatable {
     case invalidSourceValue(value: String)
@@ -18,7 +18,7 @@ enum ProjectSourceError: LocalizedError, Equatable {
     }
 }
 
-public enum ProjectSource: Equatable {
+public enum ProjectSource: Equatable, CustomStringConvertible {
     
     /// The separator used to join branch & repository
     static var gitSourceSeparator: String { "~" }

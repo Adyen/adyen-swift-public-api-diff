@@ -4,11 +4,11 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import ProjectBuilderModule
-@testable import OutputGeneratorModule
-@testable import ProjectBuilderModule
-@testable import SwiftInterfaceAnalyzerModule
-@testable import CoreModule
+@testable import PADProjectBuilder
+@testable import PADOutputGenerator
+@testable import PADProjectBuilder
+@testable import PADSwiftInterfaceDiff
+@testable import PADCore
 import XCTest
 
 class ReferencePackageTests: XCTestCase {
@@ -165,7 +165,7 @@ private extension ReferencePackageTests {
             )
         ]
         
-        return try await SwiftInterfacePipeline(
+        return try await PADSwiftInterfaceDiff(
             fileHandler: FileManager.default,
             swiftInterfaceParser: SwiftInterfaceParser(),
             swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),

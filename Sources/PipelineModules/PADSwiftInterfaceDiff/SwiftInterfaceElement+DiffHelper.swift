@@ -1,5 +1,5 @@
 import Foundation
-import CoreModule
+import PADCore
 
 extension SwiftInterfaceElement {
     

@@ -1,9 +1,9 @@
 import Foundation
 
-import CoreModule
-import ShellModule
-import FileHandlingModule
-import LoggingModule
+import PADCore
+import PADShell
+import PADFileHandling
+import PADLogging
 
 enum GitError: LocalizedError, Equatable {
     case couldNotClone(branchOrTag: String, repository: String)
@@ -16,7 +16,7 @@ enum GitError: LocalizedError, Equatable {
     }
 }
 
-public struct Git {
+struct Git {
     
     private let shell: ShellHandling
     private let fileHandler: FileHandling

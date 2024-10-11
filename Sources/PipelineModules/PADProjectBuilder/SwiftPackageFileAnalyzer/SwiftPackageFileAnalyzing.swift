@@ -1,12 +1,12 @@
 import Foundation
-import CoreModule
+import PADCore
 
-public struct SwiftPackageFileAnalyzingResult {
+struct SwiftPackageFileAnalyzingResult {
     public let changes: [Change]
     public let warnings: [String]
 }
 
-public protocol SwiftPackageFileAnalyzing {
+protocol SwiftPackageFileAnalyzing {
     /// Analyzes whether or not the available libraries changed between the old and new version
     func analyze(
         oldProjectUrl: URL,

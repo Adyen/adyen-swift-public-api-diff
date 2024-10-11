@@ -1,8 +1,8 @@
 import Foundation
 
-import FileHandlingModule
-import ShellModule
-import LoggingModule
+import PADFileHandling
+import PADShell
+import PADLogging
 
 /// A helper to locate `.swiftinterface` files
 struct SwiftInterfaceFileLocator {

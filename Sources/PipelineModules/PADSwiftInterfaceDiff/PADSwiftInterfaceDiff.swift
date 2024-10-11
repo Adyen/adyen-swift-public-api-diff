@@ -1,11 +1,11 @@
 import Foundation
 
-import CoreModule
-import FileHandlingModule
-import LoggingModule
+import PADCore
+import PADFileHandling
+import PADLogging
 
 /// Takes a list of ``SwiftInterfaceFile`` and detects changes between the old and new version
-public struct SwiftInterfacePipeline {
+public struct PADSwiftInterfaceDiff {
     
     let fileHandler: any FileHandling
     let swiftInterfaceParser: any SwiftInterfaceParsing

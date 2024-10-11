@@ -5,15 +5,17 @@
 //
 
 import Foundation
-import CoreModule
+import PADCore
 
 public struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     
     let changeConsolidator: SwiftInterfaceChangeConsolidating
     
-    public init(
-        changeConsolidator: SwiftInterfaceChangeConsolidating = SwiftInterfaceChangeConsolidator()
-    ) {
+    public init() {
+        self.init(changeConsolidator: SwiftInterfaceChangeConsolidator())
+    }
+    
+    init(changeConsolidator: SwiftInterfaceChangeConsolidating) {
         self.changeConsolidator = changeConsolidator
     }
     

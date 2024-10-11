@@ -5,7 +5,7 @@
 //
 
 import Foundation
-import CoreModule
+import PADCore
 
 public protocol OutputGenerating {
     func generate(

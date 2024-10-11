@@ -6,12 +6,12 @@
 
 import Foundation
 
-public protocol RandomStringGenerating {
+protocol RandomStringGenerating {
     
     func generateRandomString() -> String
 }
 
-public struct RandomStringGenerator: RandomStringGenerating {
+struct RandomStringGenerator: RandomStringGenerating {
     
     public init() {}
     

@@ -16,8 +16,16 @@ let package = Package(
         .library(
             name: "SwiftInterfaceDiff",
             targets: [
-                "SwiftInterfaceAnalyzerModule",
-                "OutputGeneratorModule"
+                "PADSwiftInterfaceDiff",
+                "PADOutputGenerator"
+            ]
+        ),
+        .library(
+            name: "PublicApiDiff",
+            targets: [
+                "PADProjectBuilder",
+                "PADSwiftInterfaceDiff",
+                "PADOutputGenerator"
             ]
         )
     ],
@@ -33,12 +41,12 @@ let package = Package(
         .executableTarget(
             name: "public-api-diff",
             dependencies: [
-                "CoreModule",
-                "LoggingModule",
-                "OutputGeneratorModule",
-                "FileHandlingModule",
-                "ProjectBuilderModule",
-                "SwiftInterfaceAnalyzerModule",
+                "PADCore",
+                "PADLogging",
+                "PADOutputGenerator",
+                "PADFileHandling",
+                "PADProjectBuilder",
+                "PADSwiftInterfaceDiff",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
             path: "Sources/ExecutableTargets/CommandLineTool"
@@ -47,50 +55,50 @@ let package = Package(
         // MARK: - Shared Helper Modules
         
         .target(
-            name: "CoreModule",
-            path: "Sources/SharedHelperModules/CoreModule"
+            name: "PADCore",
+            path: "Sources/SharedHelperModules/PADCore"
         ),
         .target(
-            name: "FileHandlingModule",
-            path: "Sources/SharedHelperModules/FileHandlingModule"
+            name: "PADFileHandling",
+            path: "Sources/SharedHelperModules/PADFileHandling"
         ),
         .target(
-            name: "ShellModule",
-            path: "Sources/SharedHelperModules/ShellModule"
+            name: "PADShell",
+            path: "Sources/SharedHelperModules/PADShell"
         ),
         .target(
-            name: "LoggingModule",
-            dependencies: ["FileHandlingModule"],
-            path: "Sources/SharedHelperModules/LoggingModule"
+            name: "PADLogging",
+            dependencies: ["PADFileHandling"],
+            path: "Sources/SharedHelperModules/PADLogging"
         ),
         
         // MARK: - Pipeline Modules
         
         .target(
-            name: "SwiftInterfaceAnalyzerModule",
+            name: "PADSwiftInterfaceDiff",
             dependencies: [
-                "CoreModule",
-                "FileHandlingModule",
-                "LoggingModule",
+                "PADCore",
+                "PADFileHandling",
+                "PADLogging",
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
             ],
-            path: "Sources/PipelineModules/SwiftInterfaceAnalyzerModule"
+            path: "Sources/PipelineModules/PADSwiftInterfaceDiff"
         ),
         .target(
-            name: "ProjectBuilderModule",
+            name: "PADProjectBuilder",
             dependencies: [
-                "CoreModule",
-                "FileHandlingModule",
-                "LoggingModule",
-                "ShellModule"
+                "PADCore",
+                "PADFileHandling",
+                "PADLogging",
+                "PADShell"
             ],
-            path: "Sources/PipelineModules/ProjectBuilderModule"
+            path: "Sources/PipelineModules/PADProjectBuilder"
         ),
         .target(
-            name: "OutputGeneratorModule",
-            dependencies: ["CoreModule"],
-            path: "Sources/PipelineModules/OutputGeneratorModule"
+            name: "PADOutputGenerator",
+            dependencies: ["PADCore"],
+            path: "Sources/PipelineModules/PADOutputGenerator"
         ),
         
         // MARK: - Test Targets

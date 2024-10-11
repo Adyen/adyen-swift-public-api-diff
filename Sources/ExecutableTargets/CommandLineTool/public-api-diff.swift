@@ -7,12 +7,12 @@
 import ArgumentParser
 import Foundation
 
-import CoreModule
-import LoggingModule
+import PADCore
+import PADLogging
 
-import SwiftInterfaceAnalyzerModule
-import ProjectBuilderModule
-import OutputGeneratorModule
+import PADSwiftInterfaceDiff
+import PADProjectBuilder
+import PADOutputGenerator
 
 @main
 struct PublicApiDiff: AsyncParsableCommand {
@@ -73,7 +73,7 @@ struct PublicApiDiff: AsyncParsableCommand {
             
             // MARK: - Analyze .swiftinterface files
             
-            let pipeline = SwiftInterfacePipeline(logger: logger)
+            let pipeline = PADSwiftInterfaceDiff(logger: logger)
             
             let pipelineOutput = try await pipeline.run(
                 with: projectBuilderResult.swiftInterfaceFiles

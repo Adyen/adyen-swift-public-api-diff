@@ -1,12 +1,12 @@
 import Foundation
 
-import FileHandlingModule
-import ShellModule
-import LoggingModule
-import CoreModule
+import PADFileHandling
+import PADShell
+import PADLogging
+import PADCore
 
 /// Allows building of the old & new project and returns the `.swiftinterface` files
-public struct SwiftInterfaceProducer {
+struct SwiftInterfaceProducer {
     
     private typealias ProjectPreparationResult = (archiveScheme: String, schemesToCompare: [String])
     private typealias DerivedDataPaths = (new: String, old: String)
@@ -18,7 +18,7 @@ public struct SwiftInterfaceProducer {
     let shell: any ShellHandling
     let logger: (any Logging)?
     
-    public init(
+    init(
         workingDirectoryPath: String,
         projectType: ProjectType,
         swiftInterfaceType: SwiftInterfaceType,
@@ -35,7 +35,7 @@ public struct SwiftInterfaceProducer {
     }
     
     /// Builds the projects and returns the `.swiftinterface` files
-    public func produceInterfaceFiles(
+    func produceInterfaceFiles(
         oldProjectDirectory: URL,
         newProjectDirectory: URL
     ) async throws -> [SwiftInterfaceFile] {

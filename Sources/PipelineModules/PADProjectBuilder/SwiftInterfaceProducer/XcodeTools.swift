@@ -6,10 +6,10 @@
 
 import Foundation
 
-import CoreModule
-import ShellModule
-import FileHandlingModule
-import LoggingModule
+import PADCore
+import PADShell
+import PADFileHandling
+import PADLogging
 
 struct XcodeToolsError: LocalizedError, CustomDebugStringConvertible {
     var errorDescription: String
@@ -18,7 +18,7 @@ struct XcodeToolsError: LocalizedError, CustomDebugStringConvertible {
     var debugDescription: String { errorDescription }
 }
 
-public struct XcodeTools {
+struct XcodeTools {
     
     internal enum Constants {
         static let derivedDataPath: String = ".build"
@@ -29,7 +29,7 @@ public struct XcodeTools {
     private let fileHandler: FileHandling
     private let logger: Logging?
     
-    public init(
+    init(
         shell: ShellHandling = Shell(),
         fileHandler: FileHandling = FileManager.default,
         logger: Logging?
@@ -39,7 +39,7 @@ public struct XcodeTools {
         self.logger = logger
     }
     
-    public func archive(
+    func archive(
         projectDirectoryPath: String,
         scheme: String,
         projectType: ProjectType

@@ -6,12 +6,12 @@
 
 import Foundation
 
-import CoreModule
-import FileHandlingModule
-import ShellModule
-import LoggingModule
+import PADCore
+import PADFileHandling
+import PADShell
+import PADLogging
 
-public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
+struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
@@ -24,7 +24,7 @@ public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
         }
     }
 
-    public init(
+    init(
         fileHandler: FileHandling = FileManager.default,
         shell: ShellHandling = Shell(),
         logger: (any Logging)?
@@ -34,7 +34,7 @@ public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
         self.shell = shell
     }
     
-    public func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> SwiftPackageFileAnalyzingResult {
+    func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> SwiftPackageFileAnalyzingResult {
         
         let oldProjectPath = oldProjectUrl.path()
         let newProjectPath = newProjectUrl.path()

@@ -1,11 +1,11 @@
 import Foundation
-import CoreModule
+import PADCore
 
 /// A change indicating an `addition` or `removal` of an element
 ///
 /// This intermediate structure helps gathering a list of additions and removals
 /// that are later consolidated to a ``Change``
-public struct IndependentSwiftInterfaceChange: Equatable {
+struct IndependentSwiftInterfaceChange: Equatable {
     
     enum ChangeType: Equatable {
         case addition(_ description: String)
@@ -25,7 +25,7 @@ public struct IndependentSwiftInterfaceChange: Equatable {
     let oldFirst: Bool
     var parentPath: String? { element.parentPath }
     
-    public static func == (lhs: IndependentSwiftInterfaceChange, rhs: IndependentSwiftInterfaceChange) -> Bool {
+    static func == (lhs: IndependentSwiftInterfaceChange, rhs: IndependentSwiftInterfaceChange) -> Bool {
         lhs.changeType == rhs.changeType &&
         lhs.element.description == rhs.element.description &&
         lhs.oldFirst == rhs.oldFirst &&

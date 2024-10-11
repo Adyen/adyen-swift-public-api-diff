@@ -7,10 +7,10 @@
 
 import Foundation
 
-import FileHandlingModule
-import LoggingModule
-import CoreModule
-import ShellModule
+import PADFileHandling
+import PADLogging
+import PADCore
+import PADShell
 
 public struct ProjectBuilder {
     

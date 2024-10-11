@@ -9,7 +9,7 @@ import Foundation
 // See: https://docs.swift.org/package-manager/PackageDescription/index.html
 // See: https://github.com/swiftlang/swift-package-manager/blob/main/Sources/PackageDescription/PackageDescriptionSerialization.swift
 
-public struct SwiftPackageDescription: Codable, Equatable {
+struct SwiftPackageDescription: Codable, Equatable {
     
     public let name: String
     public let platforms: [Platform]

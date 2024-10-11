@@ -5,9 +5,9 @@
 //
 
 import Foundation
-import FileHandlingModule
-import ShellModule
-import LoggingModule
+import PADFileHandling
+import PADShell
+import PADLogging
 
 enum SwiftPackageFileHelperError: LocalizedError {
     case packageDescriptionError(_ description: String)
@@ -26,7 +26,7 @@ enum SwiftPackageFileHelperError: LocalizedError {
     }
 }
 
-public struct SwiftPackageFileHelper {
+struct SwiftPackageFileHelper {
     
     private let fileHandler: FileHandling
     private let shell: any ShellHandling

@@ -1,6 +1,6 @@
 import Foundation
-import CoreModule
+import PADCore
 
-public protocol ProjectSetupHelping {
+protocol ProjectSetupHelping {
     func setup(_ projectSource: ProjectSource, projectType: ProjectType) async throws -> URL
 }

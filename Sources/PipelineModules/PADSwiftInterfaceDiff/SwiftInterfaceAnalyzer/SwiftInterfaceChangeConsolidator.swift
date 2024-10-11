@@ -5,10 +5,10 @@
 //
 
 import Foundation
-import CoreModule
+import PADCore
 
 /// A helper to consolidate a `removal` and `addition` to `change`
-public protocol SwiftInterfaceChangeConsolidating {
+protocol SwiftInterfaceChangeConsolidating {
     
     /// Tries to match a `removal` and `addition` to a `change`
     ///
@@ -17,9 +17,7 @@ public protocol SwiftInterfaceChangeConsolidating {
     func consolidate(_ changes: [IndependentSwiftInterfaceChange]) -> [Change]
 }
 
-public struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
-
-    public init() {}
+struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
     
     /// Tries to match a `removal` and `addition` to a `change`
     ///
@@ -34,7 +32,7 @@ public struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidatin
     /// e.g. a second `addition` `init(unrelated: String)` might be matched as a change of `init(foo: Int, bar: Int)`
     /// as they share the same comparison features but might not be an actual change but a genuine addition.
     /// This is acceptable for now but might be improved in the future (e.g. calculating a matching-percentage)
-    public func consolidate(_ changes: [IndependentSwiftInterfaceChange]) -> [Change] {
+    func consolidate(_ changes: [IndependentSwiftInterfaceChange]) -> [Change] {
 
         var independentChanges = changes
         var consolidatedChanges = [Change]()
