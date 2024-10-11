@@ -4,17 +4,18 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADSwiftInterfaceDiff
+@testable import PADCore
 import XCTest
 
 struct MockSwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     
-    var handleAnalyze: (any SwiftInterfaceElement, any SwiftInterfaceElement) -> [Change] = { _, _ in
+    var handleAnalyze: (any SwiftInterfaceElement, any SwiftInterfaceElement) -> [PADChange] = { _, _ in
         XCTFail("Unexpectedly called `\(#function)`")
         return []
     }
     
-    func analyze(old: some SwiftInterfaceElement, new: some SwiftInterfaceElement) throws -> [Change] {
+    func analyze(old: some SwiftInterfaceElement, new: some SwiftInterfaceElement) throws -> [PADChange] {
         handleAnalyze(old, new)
     }
 }

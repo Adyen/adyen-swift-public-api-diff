@@ -4,7 +4,11 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADProjectBuilder
+@testable import PADOutputGenerator
+@testable import PADProjectBuilder
+@testable import PADSwiftInterfaceDiff
+@testable import PADCore
 import XCTest
 
 class ReferencePackageTests: XCTestCase {
@@ -44,11 +48,11 @@ class ReferencePackageTests: XCTestCase {
         let expectedOutput = try expectedOutput(for: interfaceType)
         let pipelineOutput = try await runPipeline(for: interfaceType)
         
-        let markdownOutput = MarkdownOutputGenerator().generate(
+        let markdownOutput = PADMarkdownOutputGenerator().generate(
             from: pipelineOutput,
             allTargets: ["ReferencePackage"],
-            oldVersionName: ProjectSource.local(path: "old_public").description,
-            newVersionName: ProjectSource.local(path: "new_public").description,
+            oldVersionName: "old_public",
+            newVersionName: "new_public",
             warnings: []
         )
         
@@ -70,11 +74,11 @@ class ReferencePackageTests: XCTestCase {
         let expectedOutput = try expectedOutput(for: interfaceType)
         let pipelineOutput = try await runPipeline(for: interfaceType)
         
-        let markdownOutput = MarkdownOutputGenerator().generate(
+        let markdownOutput = PADMarkdownOutputGenerator().generate(
             from: pipelineOutput,
             allTargets: ["ReferencePackage"],
-            oldVersionName: ProjectSource.local(path: "old_private").description,
-            newVersionName: ProjectSource.local(path: "new_private").description,
+            oldVersionName: "old_private",
+            newVersionName: "new_private",
             warnings: []
         )
         
@@ -137,7 +141,7 @@ private extension ReferencePackageTests {
         return interfaceFilePath.path()
     }
     
-    func runPipeline(for interfaceType: InterfaceType) async throws -> [String: [Change]] {
+    func runPipeline(for interfaceType: InterfaceType) async throws -> [String: [PADChange]] {
 
         let referencePackagesRoot = try Self.referencePackagesPath()
         
@@ -154,14 +158,14 @@ private extension ReferencePackageTests {
         )
         
         let interfaceFiles = [
-            SwiftInterfaceFile(
+            PADSwiftInterfaceFile(
                 name: "ReferencePackage",
                 oldFilePath: oldPrivateSwiftInterfaceFilePath,
                 newFilePath: newPrivateSwiftInterfaceFilePath
             )
         ]
         
-        return try await SwiftInterfacePipeline(
+        return try await PADSwiftInterfaceDiff(
             fileHandler: FileManager.default,
             swiftInterfaceParser: SwiftInterfaceParser(),
             swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),

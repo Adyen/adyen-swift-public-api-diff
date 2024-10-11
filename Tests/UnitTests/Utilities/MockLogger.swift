@@ -4,10 +4,10 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADLogging
 import XCTest
 
-struct MockLogger: Logging {
+struct MockLogger: PADLogging {
     
     var handleLog: (String, String) -> Void = { _, _ in
         XCTFail("Unexpectedly called `\(#function)`")

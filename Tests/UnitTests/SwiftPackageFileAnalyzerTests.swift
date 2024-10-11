@@ -4,7 +4,8 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADProjectBuilder
+@testable import PADCore
 import XCTest
 
 class SwiftPackageFileAnalyzerTests: XCTestCase {
@@ -41,7 +42,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             newProjectUrl: URL(filePath: "NewPackage")
         )
         
-        let expectedChanges: [Change] = []
+        let expectedChanges: [PADChange] = []
         XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)
@@ -123,7 +124,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             newProjectUrl: URL(filePath: "NewPackage")
         )
         
-        let expectedChanges: [Change] = [
+        let expectedChanges: [PADChange] = [
             .init(
                 changeType: .change(
                     oldDescription: "// swift-tools-version: 2.0",
@@ -164,7 +165,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 changeType: .addition(
                     description: ".library(name: \"New Library\", targets: [\"New Target\"])"
                 ),
-                parentPath: "Package.swift / products",
+                parentPath: ".products",
                 listOfChanges: []
             ),
             .init(
@@ -172,7 +173,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                     oldDescription: ".library(name: \"Some Library\", targets: [\"Some Target\", \"Old Target\"])",
                     newDescription: ".library(name: \"Some Library\", targets: [\"Some Target\", \"New Target\"])"
                 ),
-                parentPath: "Package.swift / products",
+                parentPath: ".products",
                 listOfChanges: [
                     "Added target \"New Target\"",
                     "Removed target \"Old Target\""
@@ -182,14 +183,14 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 changeType: .removal(
                     description: ".library(name: \"Old Library\", targets: [\"Old Target\"])"
                 ),
-                parentPath: "Package.swift / products",
+                parentPath: ".products",
                 listOfChanges: []
             ),
             .init(
                 changeType: .addition(
                     description: ".binaryTarget(name: \"New Target\", path: \"new/path\")"
                 ),
-                parentPath: "Package.swift / targets",
+                parentPath: ".targets",
                 listOfChanges: []
             ),
             .init(
@@ -197,7 +198,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                     oldDescription: ".binaryTarget(name: \"Some Target\", dependencies: [.target(name: \"Some Target Dependency\"), .target(name: \"Old Target Dependency\"), .product(name: \"Some Product Dependency\", ...), .product(name: \"Old Product Dependency\", ...)], path: \"some/old/path\")",
                     newDescription: ".target(name: \"Some Target\", dependencies: [.target(name: \"Some Target Dependency\"), .target(name: \"New Target Dependency\"), .product(name: \"Some Product Dependency\", ...), .product(name: \"New Product Dependency\", ...)], path: \"some/new/path\")"
                 ),
-                parentPath: "Package.swift / targets",
+                parentPath: ".targets",
                 listOfChanges: [
                     "Added dependency .target(name: \"New Target Dependency\")",
                     "Added dependency .product(name: \"New Product Dependency\", ...)",
@@ -211,7 +212,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 changeType: .removal(
                     description: ".testTarget(name: \"Old Target\", path: \"old/path\")"
                 ),
-                parentPath: "Package.swift / targets",
+                parentPath: ".targets",
                 listOfChanges: []
             )
         ]
@@ -240,7 +241,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             newProjectUrl: URL(filePath: "NewProject")
         )
         
-        let expectedChanges: [Change] = []
+        let expectedChanges: [PADChange] = []
         XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)

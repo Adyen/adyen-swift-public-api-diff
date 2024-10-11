@@ -4,7 +4,7 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADProjectBuilder
 import XCTest
 
 class XcodeToolsTests: XCTestCase {
@@ -39,7 +39,7 @@ private extension XcodeToolsTests {
     func testArchiving(
         projectDirectoryPath: String,
         scheme: String,
-        projectType: ProjectType
+        projectType: PADProjectType
     ) async throws {
         
         let archiveResult = "ARCHIVE_RESULT"

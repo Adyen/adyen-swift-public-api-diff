@@ -4,7 +4,7 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADLogging
 import XCTest
 
 class LoggerTests: XCTestCase {
@@ -68,7 +68,7 @@ class LoggerTests: XCTestCase {
             return true
         }
         
-        let logFileLogger = LogFileLogger(fileHandler: fileHandler, outputFilePath: outputFilePath)
+        let logFileLogger = PADLogFileLogger(fileHandler: fileHandler, outputFilePath: outputFilePath)
         
         logFileLogger.log("log", from: "test")
         // Small sleep because the file manager calls are done on a detached Task and we want to guarantee the order

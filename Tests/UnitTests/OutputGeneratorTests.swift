@@ -4,7 +4,7 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADOutputGenerator
 import XCTest
 
 class OutputGeneratorTests: XCTestCase {
@@ -19,12 +19,12 @@ class OutputGeneratorTests: XCTestCase {
         **Analyzed targets:** Target_1
         """
         
-        let outputGenerator = MarkdownOutputGenerator()
+        let outputGenerator = PADMarkdownOutputGenerator()
         let output = outputGenerator.generate(
             from: [:],
             allTargets: ["Target_1"],
-            oldVersionName: ProjectSource.local(path: "old_source").description,
-            newVersionName: ProjectSource.local(path: "new_source").description,
+            oldVersionName: "old_source",
+            newVersionName: "new_source",
             warnings: []
         )
         XCTAssertEqual(output, expectedOutput)
@@ -47,13 +47,13 @@ class OutputGeneratorTests: XCTestCase {
         **Analyzed targets:** Target_1
         """
         
-        let outputGenerator = MarkdownOutputGenerator()
+        let outputGenerator = PADMarkdownOutputGenerator()
         
         let output = outputGenerator.generate(
             from: ["Target_1": [.init(changeType: .addition(description: "Some Addition"), parentPath: "")]],
             allTargets: ["Target_1"],
-            oldVersionName: ProjectSource.local(path: "old_source").description,
-            newVersionName: ProjectSource.local(path: "new_source").description,
+            oldVersionName: "old_source",
+            newVersionName: "new_source",
             warnings: []
         )
         XCTAssertEqual(output, expectedOutput)
@@ -89,7 +89,7 @@ class OutputGeneratorTests: XCTestCase {
         **Analyzed targets:** Target_1, Target_2
         """
 
-        let outputGenerator = MarkdownOutputGenerator()
+        let outputGenerator = PADMarkdownOutputGenerator()
         
         let output = outputGenerator.generate(
             from: [
@@ -103,8 +103,8 @@ class OutputGeneratorTests: XCTestCase {
                 ]
             ],
             allTargets: ["Target_1", "Target_2"],
-            oldVersionName: ProjectSource.remote(branch: "old_branch", repository: "old_repository").description,
-            newVersionName: ProjectSource.local(path: "new_source").description,
+            oldVersionName: "old_repository @ old_branch",
+            newVersionName: "new_source",
             warnings: []
         )
         XCTAssertEqual(output, expectedOutput)
