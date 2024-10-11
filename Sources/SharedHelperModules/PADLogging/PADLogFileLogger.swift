@@ -1,7 +1,7 @@
 import Foundation
-import PADFileHandling
+import FileHandlingModule
 
-public class LogFileLogger: Logging {
+public class PADLogFileLogger: PADLogging {
     
     private let fileHandler: any FileHandling
     private let outputFilePath: String
@@ -13,7 +13,14 @@ public class LogFileLogger: Logging {
         }
     }
     
-    public init(fileHandler: any FileHandling = FileManager.default, outputFilePath: String) {
+    public convenience init(outputFilePath: String) {
+        self.init(fileHandler: FileManager.default, outputFilePath: outputFilePath)
+    }
+    
+    init(
+        fileHandler: any FileHandling,
+        outputFilePath: String
+    ) {
         self.fileHandler = fileHandler
         self.outputFilePath = outputFilePath
     }

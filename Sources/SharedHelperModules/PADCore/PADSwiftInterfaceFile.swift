@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SwiftInterfaceFile {
+public struct PADSwiftInterfaceFile {
     public let name: String
     public let oldFilePath: String
     public let newFilePath: String

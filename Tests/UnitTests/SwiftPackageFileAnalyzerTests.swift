@@ -42,7 +42,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             newProjectUrl: URL(filePath: "NewPackage")
         )
         
-        let expectedChanges: [Change] = []
+        let expectedChanges: [PADChange] = []
         XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)
@@ -124,7 +124,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             newProjectUrl: URL(filePath: "NewPackage")
         )
         
-        let expectedChanges: [Change] = [
+        let expectedChanges: [PADChange] = [
             .init(
                 changeType: .change(
                     oldDescription: "// swift-tools-version: 2.0",
@@ -241,7 +241,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             newProjectUrl: URL(filePath: "NewProject")
         )
         
-        let expectedChanges: [Change] = []
+        let expectedChanges: [PADChange] = []
         XCTAssertEqual(changes.changes, expectedChanges)
         
         waitForExpectations(timeout: 1)

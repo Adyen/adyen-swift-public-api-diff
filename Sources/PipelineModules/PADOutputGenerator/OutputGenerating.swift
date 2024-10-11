@@ -7,9 +7,9 @@
 import Foundation
 import PADCore
 
-public protocol OutputGenerating {
+public protocol PADOutputGenerating {
     func generate(
-        from changesPerTarget: [String: [Change]],
+        from changesPerTarget: [String: [PADChange]],
         allTargets: [String],
         oldVersionName: String,
         newVersionName: String,

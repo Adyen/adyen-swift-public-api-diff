@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
+protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
     
     /// Name of the type
     ///
@@ -13,7 +13,7 @@ public protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
     var children: [any SwiftInterfaceElement] { get set }
 }
 
-public protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
+protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
     
     /// The name of the element used to construct the parent path for its children
     var pathComponentName: String { get }
@@ -42,7 +42,7 @@ public protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
     func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String]
 }
 
-public extension SwiftInterfaceElement {
+extension SwiftInterfaceElement {
     
     func setupParentRelationships(parent: (any SwiftInterfaceElement)? = nil) {
         self.parent = parent
@@ -94,7 +94,7 @@ public extension SwiftInterfaceElement {
     }
 }
 
-public extension SwiftInterfaceElement {
+extension SwiftInterfaceElement {
     /// Checks whether or not 2 elements can be compared based on their `printedName`, `type` and `parentPath`
     ///
     /// If the `printedName`, `type` + `parentPath` is the same we can assume that it's the same element but altered
@@ -109,7 +109,7 @@ public extension SwiftInterfaceElement {
     }
 }
 
-public extension SwiftInterfaceElement {
+extension SwiftInterfaceElement {
     
     /// Produces the complete recursive description of the element
     func recursiveDescription(indentation: Int = 0) -> String {

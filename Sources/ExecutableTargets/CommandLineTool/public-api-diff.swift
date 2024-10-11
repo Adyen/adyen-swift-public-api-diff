@@ -34,18 +34,18 @@ struct PublicApiDiff: AsyncParsableCommand {
     
     public func run() async throws {
         
-        let logLevel: LogLevel = .debug
+        let logLevel: PADLogLevel = .debug
         let projectType: PADProjectType = { // Only needed when we have to produce the .swiftinterface files
             if let scheme { return .xcodeProject(scheme: scheme) }
             return .swiftPackage
         }()
-        let swiftInterfaceType: SwiftInterfaceType = .public // Only needed when we have to produce the .swiftinterface files
+        let swiftInterfaceType: PADSwiftInterfaceType = .public // Only needed when we have to produce the .swiftinterface files
         
         let logger = Self.logger(with: logLevel, logOutputFilePath: logOutput)
         
         do {
             var warnings = [String]()
-            var changes = [String: [Change]]()
+            var changes = [String: [PADChange]]()
             
             // MARK: - Producing .swiftinterface files
             
@@ -90,7 +90,7 @@ struct PublicApiDiff: AsyncParsableCommand {
             
             // MARK: - Generate Output
             
-            let outputGenerator: any OutputGenerating = MarkdownOutputGenerator()
+            let outputGenerator: any PADOutputGenerating = PADMarkdownOutputGenerator()
             
             let generatedOutput = try outputGenerator.generate(
                 from: changes,
@@ -117,15 +117,15 @@ struct PublicApiDiff: AsyncParsableCommand {
 private extension PublicApiDiff {
     
     static func logger(
-        with logLevel: LogLevel,
+        with logLevel: PADLogLevel,
         logOutputFilePath: String?
-    ) -> any Logging {
-        var loggers = [any Logging]()
+    ) -> any PADLogging {
+        var loggers = [any PADLogging]()
         if let logOutputFilePath {
-            loggers += [LogFileLogger(outputFilePath: logOutputFilePath)]
+            loggers += [PADLogFileLogger(outputFilePath: logOutputFilePath)]
         }
-        loggers += [SystemLogger().withLogLevel(logLevel)]
+        loggers += [PADSystemLogger().withLogLevel(logLevel)]
         
-        return LoggingGroup(with: loggers)
+        return PADLoggingGroup(with: loggers)
     }
 }

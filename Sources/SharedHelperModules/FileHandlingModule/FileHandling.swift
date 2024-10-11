@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol FileHandling {
+package protocol FileHandling {
     
     var currentDirectoryPath: String { get }
     

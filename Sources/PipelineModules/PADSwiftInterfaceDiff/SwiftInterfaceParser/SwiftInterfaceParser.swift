@@ -2,10 +2,10 @@ import Foundation
 import SwiftSyntax
 import SwiftParser
 
-/**
- Documentation about DeclSyntax:
- - https://swiftpackageindex.com/swiftlang/swift-syntax/600.0.1/documentation/swiftsyntax/declsyntax
- */
+/// Parses the source content of a swift file into intermediate objects for further processing
+///
+/// See: 
+/// - [DeclSyntax](https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/declsyntax)
 class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     
     // TODO: Handle (Nice to have)
@@ -27,12 +27,12 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     }
     
     /// Designated initializer
-    required public init() {
+    required init() {
         super.init(viewMode: .sourceAccurate)
     }
     
     /// Starts a new scope which can contain zero or more nested symbols
-    public func startScope() -> SyntaxVisitorContinueKind {
+    func startScope() -> SyntaxVisitorContinueKind {
         scope.start()
         return .visitChildren
     }
@@ -41,7 +41,7 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     /// - Parameter makeSymbolWithChildrenInScope: Closure that return a new ``Symbol``
     ///
     /// Call in `visitPost(_ node:)` methods
-    public func endScopeAndAddSymbol(makeElementsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
+    func endScopeAndAddSymbol(makeElementsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
         scope.end(makeElementsWithChildrenInScope: makeElementsWithChildrenInScope)
     }
     

@@ -7,8 +7,8 @@
 import Foundation
 
 import PADCore
-import PADShell
-import PADFileHandling
+import ShellModule
+import FileHandlingModule
 import PADLogging
 
 struct XcodeToolsError: LocalizedError, CustomDebugStringConvertible {
@@ -27,12 +27,12 @@ struct XcodeTools {
     
     private let shell: ShellHandling
     private let fileHandler: FileHandling
-    private let logger: Logging?
+    private let logger: PADLogging?
     
     init(
         shell: ShellHandling = Shell(),
         fileHandler: FileHandling = FileManager.default,
-        logger: Logging?
+        logger: PADLogging?
     ) {
         self.shell = shell
         self.fileHandler = fileHandler

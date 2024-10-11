@@ -1,9 +1,10 @@
 import Foundation
 
 import PADCore
-import PADShell
-import PADFileHandling
 import PADLogging
+
+import ShellModule
+import FileHandlingModule
 
 struct ProjectSetupHelper: ProjectSetupHelping {
     
@@ -11,14 +12,14 @@ struct ProjectSetupHelper: ProjectSetupHelping {
     let shell: any ShellHandling
     let randomStringGenerator: any RandomStringGenerating
     let fileHandler: any FileHandling
-    let logger: (any Logging)?
+    let logger: (any PADLogging)?
     
     init(
         workingDirectoryPath: String,
         randomStringGenerator: any RandomStringGenerating = RandomStringGenerator(),
         shell: any ShellHandling = Shell(),
         fileHandler: any FileHandling = FileManager.default,
-        logger: (any Logging)?
+        logger: (any PADLogging)?
     ) {
         self.workingDirectoryPath = workingDirectoryPath
         self.randomStringGenerator = randomStringGenerator
@@ -58,8 +59,8 @@ struct ProjectSetupHelper: ProjectSetupHelping {
 extension ProjectSetupHelper {
     
     struct ProjectDirectories {
-        public let old: URL
-        public let new: URL
+        let old: URL
+        let new: URL
     }
     
     func setupProjects(

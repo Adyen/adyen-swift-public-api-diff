@@ -18,7 +18,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     func analyze(
         old: some SwiftInterfaceElement,
         new: some SwiftInterfaceElement
-    ) -> [Change] {
+    ) -> [PADChange] {
         
         // Very naive diff from both sides
         // There is room for improvement here but it's "performant enough" for now

@@ -1,7 +1,7 @@
 import Foundation
 
 /// The type of the .swiftinterface to parse/generate
-public enum SwiftInterfaceType {
+public enum PADSwiftInterfaceType {
     case `private`
     case `public`
     

@@ -19,9 +19,9 @@ struct SwiftPackageDescription: Codable, Equatable {
     let products: [Product]
     let dependencies: [Dependency]
     
-    public let toolsVersion: String
+    let toolsVersion: String
     
-    public var warnings = [String]()
+    var warnings = [String]()
     
     init(
         defaultLocalization: String?,
@@ -56,34 +56,34 @@ struct SwiftPackageDescription: Codable, Equatable {
 
 extension SwiftPackageDescription {
     
-    public struct Platform: Codable, Equatable, Hashable {
+    struct Platform: Codable, Equatable, Hashable {
         
-        public let name: String
-        public let version: String
+        let name: String
+        let version: String
     }
 }
 
 extension SwiftPackageDescription.Platform: CustomStringConvertible {
     
-    public var description: String {
+    var description: String {
         "\(name)(\(version))"
     }
 }
 
 extension SwiftPackageDescription {
     
-    public struct Product: Codable, Equatable, Hashable {
+    struct Product: Codable, Equatable, Hashable {
         
         // TODO: Add `rule` property
         
-        public let name: String
-        public let targets: [String]
+        let name: String
+        let targets: [String]
     }
 }
 
 extension SwiftPackageDescription.Product: CustomStringConvertible {
     
-    public var description: String {
+    var description: String {
         let targetsDescription = targets.map { "\"\($0)\"" }.joined(separator: ", ")
         return ".library(name: \"\(name)\", targets: [\(targetsDescription)])"
     }
@@ -91,18 +91,18 @@ extension SwiftPackageDescription.Product: CustomStringConvertible {
 
 extension SwiftPackageDescription {
     
-    public struct Dependency: Codable, Equatable {
+    struct Dependency: Codable, Equatable {
         
-        public let identity: String
-        public let requirement: Requirement
-        public let type: String
-        public let url: String?
+        let identity: String
+        let requirement: Requirement
+        let type: String
+        let url: String?
     }
 }
 
 extension SwiftPackageDescription.Dependency: CustomStringConvertible {
     
-    public var description: String {
+    var description: String {
         var description = ".package("
         
         var fields = [String]()
@@ -122,17 +122,17 @@ extension SwiftPackageDescription.Dependency: CustomStringConvertible {
 
 extension SwiftPackageDescription.Dependency {
     
-    public struct Requirement: Codable, Equatable {
+    struct Requirement: Codable, Equatable {
         
         // TODO: Which other requirements exist?
         
-        public let exact: [String]?
+        let exact: [String]?
     }
 }
 
 extension SwiftPackageDescription.Dependency.Requirement: CustomStringConvertible {
     
-    public var description: String {
+    var description: String {
         if let exactVersion = exact?.first {
             return "exact: \"\(exactVersion)\""
         }
@@ -143,29 +143,29 @@ extension SwiftPackageDescription.Dependency.Requirement: CustomStringConvertibl
 
 extension SwiftPackageDescription {
     
-    public struct Target: Codable, Equatable {
+    struct Target: Codable, Equatable {
         
-        public enum ModuleType: String, Codable, Equatable {
+        enum ModuleType: String, Codable, Equatable {
             case swiftTarget = "SwiftTarget"
             case binaryTarget = "BinaryTarget"
             case clangTarget = "ClangTarget"
         }
         
-        public enum TargetType: String, Codable, Equatable {
+        enum TargetType: String, Codable, Equatable {
             case library = "library"
             case binary = "binary"
             case test = "test"
         }
         
-        public let name: String
-        public let type: TargetType
-        public let path: String
-        public let moduleType: ModuleType
+        let name: String
+        let type: TargetType
+        let path: String
+        let moduleType: ModuleType
         
         /// `.product(name: ...)` dependency
-        public let productDependencies: [String]?
+        let productDependencies: [String]?
         /// `.target(name: ...) dependency
-        public let targetDependencies: [String]?
+        let targetDependencies: [String]?
         
         // Ignoring following properties for now as they are not handled in the `PackageAnalyzer`
         // and thus would produce changes that are not visible
@@ -174,7 +174,7 @@ extension SwiftPackageDescription {
         // let sources: [String]
         // let resources: [Resource]?
         
-        public init(
+        init(
             name: String,
             type: TargetType,
             path: String,
@@ -203,7 +203,7 @@ extension SwiftPackageDescription {
 
 extension SwiftPackageDescription.Target.TargetType: CustomStringConvertible {
     
-    public var description: String {
+    var description: String {
         switch self {
         case .binary: "binaryTarget"
         case .library: "target"
@@ -214,7 +214,7 @@ extension SwiftPackageDescription.Target.TargetType: CustomStringConvertible {
 
 extension SwiftPackageDescription.Target: CustomStringConvertible {
     
-    public var description: String {
+    var description: String {
         var description = ".\(type.description)(name: \"\(name)\""
         
         var dependencyDescriptions = [String]()

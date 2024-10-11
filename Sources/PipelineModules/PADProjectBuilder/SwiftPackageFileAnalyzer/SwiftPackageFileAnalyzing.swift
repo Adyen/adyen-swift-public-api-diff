@@ -2,8 +2,8 @@ import Foundation
 import PADCore
 
 struct SwiftPackageFileAnalyzingResult {
-    public let changes: [Change]
-    public let warnings: [String]
+    let changes: [PADChange]
+    let warnings: [String]
 }
 
 protocol SwiftPackageFileAnalyzing {

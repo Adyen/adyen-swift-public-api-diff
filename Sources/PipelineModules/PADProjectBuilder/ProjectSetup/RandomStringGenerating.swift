@@ -6,16 +6,16 @@
 
 import Foundation
 
-protocol RandomStringGenerating {
+package protocol RandomStringGenerating {
     
     func generateRandomString() -> String
 }
 
-struct RandomStringGenerator: RandomStringGenerating {
+package struct RandomStringGenerator: RandomStringGenerating {
     
-    public init() {}
+    package init() {}
     
-    public func generateRandomString() -> String {
+    package func generateRandomString() -> String {
         UUID().uuidString
     }
 }

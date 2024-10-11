@@ -14,7 +14,7 @@ protocol SwiftInterfaceChangeConsolidating {
     ///
     /// - Parameters:
     ///   - changes: The independent changes (`addition`/`removal`) to try to match
-    func consolidate(_ changes: [IndependentSwiftInterfaceChange]) -> [Change]
+    func consolidate(_ changes: [IndependentSwiftInterfaceChange]) -> [PADChange]
 }
 
 struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
@@ -32,10 +32,10 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
     /// e.g. a second `addition` `init(unrelated: String)` might be matched as a change of `init(foo: Int, bar: Int)`
     /// as they share the same comparison features but might not be an actual change but a genuine addition.
     /// This is acceptable for now but might be improved in the future (e.g. calculating a matching-percentage)
-    func consolidate(_ changes: [IndependentSwiftInterfaceChange]) -> [Change] {
+    func consolidate(_ changes: [IndependentSwiftInterfaceChange]) -> [PADChange] {
 
         var independentChanges = changes
-        var consolidatedChanges = [Change]()
+        var consolidatedChanges = [PADChange]()
 
         while !independentChanges.isEmpty {
             let change = independentChanges.removeFirst()
@@ -83,8 +83,8 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
 
 extension IndependentSwiftInterfaceChange {
 
-    var toConsolidatedChange: Change {
-        let changeType: Change.ChangeType = {
+    var toConsolidatedChange: PADChange {
+        let changeType: PADChange.ChangeType = {
             switch self.changeType {
             case let .addition(description):
                 .addition(description: description)

@@ -8,13 +8,13 @@ import Foundation
 import PADCore
 
 /// Allows generation of human readable output from the provided information
-public struct MarkdownOutputGenerator: OutputGenerating {
+public struct PADMarkdownOutputGenerator: PADOutputGenerating {
     
     public init() {}
     
     /// Generates human readable output from the provided information
     public func generate(
-        from changesPerTarget: [String: [Change]],
+        from changesPerTarget: [String: [PADChange]],
         allTargets: [String],
         oldVersionName: String,
         newVersionName: String,
@@ -48,9 +48,9 @@ public struct MarkdownOutputGenerator: OutputGenerating {
 
 // MARK: - Privates
 
-private extension MarkdownOutputGenerator {
+private extension PADMarkdownOutputGenerator {
     
-    static func title(changesPerTarget: [String: [Change]]) -> String {
+    static func title(changesPerTarget: [String: [PADChange]]) -> String {
         
         if changesPerTarget.keys.isEmpty {
             return "# ✅ No changes detected"
@@ -72,7 +72,7 @@ private extension MarkdownOutputGenerator {
         warnings.map { "> [!WARNING]\n> \($0)" }
     }
     
-    static func changeLines(changesPerModule: [String: [Change]]) -> [String] {
+    static func changeLines(changesPerModule: [String: [PADChange]]) -> [String] {
         var lines = [String]()
         
         changesPerModule.keys.sorted().forEach { targetName in
@@ -82,7 +82,7 @@ private extension MarkdownOutputGenerator {
                 lines.append("## `\(targetName)`")
             }
             
-            var groupedChanges = [String: [Change]]()
+            var groupedChanges = [String: [PADChange]]()
             
             changesForTarget.forEach {
                 groupedChanges[$0.parentPath ?? ""] = (groupedChanges[$0.parentPath ?? ""] ?? []) + [$0]
@@ -118,9 +118,9 @@ private extension MarkdownOutputGenerator {
     }
 }
 
-private extension MarkdownOutputGenerator {
+private extension PADMarkdownOutputGenerator {
     
-    static func changeSectionLines(title: String, changes: [Change]) -> [String] {
+    static func changeSectionLines(title: String, changes: [PADChange]) -> [String] {
         if changes.isEmpty { return [] }
 
         var lines = [title]
@@ -145,7 +145,7 @@ private extension MarkdownOutputGenerator {
         return lines
     }
     
-    static func description(for change: Change) -> String {
+    static func description(for change: PADChange) -> String {
         switch change.changeType {
         case let .addition(description):
             return description

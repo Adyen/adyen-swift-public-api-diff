@@ -7,15 +7,15 @@
 import Foundation
 
 import PADCore
-import PADFileHandling
-import PADShell
+import FileHandlingModule
+import ShellModule
 import PADLogging
 
 struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
-    private let logger: (any Logging)?
+    private let logger: (any PADLogging)?
     
     private enum Constants {
         static let packageFileName = "Package.swift"
@@ -27,7 +27,7 @@ struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     init(
         fileHandler: FileHandling = FileManager.default,
         shell: ShellHandling = Shell(),
-        logger: (any Logging)?
+        logger: (any PADLogging)?
     ) {
         self.fileHandler = fileHandler
         self.logger = logger
@@ -68,7 +68,7 @@ private extension SwiftPackageFileAnalyzer {
         
         guard old != new else { return .init(changes: [], warnings: []) }
         
-        var changes = [Change]()
+        var changes = [PADChange]()
         changes += try analyzeToolsVersion(old: old.toolsVersion, new: new.toolsVersion)
         
         changes += try analyzeDefaultLocalization(old: old.defaultLocalization, new: new.defaultLocalization)
@@ -87,7 +87,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeDefaultLocalization(
         old: String?,
         new: String?
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard old != new else { return [] }
         
         let keyName = "defaultLocalization"
@@ -122,7 +122,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeName(
         old: String,
         new: String
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard old != new else { return [] }
         
         let keyName = "name"
@@ -141,7 +141,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzePlatforms(
         old: [SwiftPackageDescription.Platform],
         new: [SwiftPackageDescription.Platform]
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard old != new else { return [] }
         
         let oldPlatformNames = Set(old.map(\.name))
@@ -190,7 +190,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeProducts(
         old: [SwiftPackageDescription.Product],
         new: [SwiftPackageDescription.Product]
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard old != new else { return [] }
         
         let oldProductNames = Set(old.map(\.name)).filter { $0 != "_AllTargets" }
@@ -200,7 +200,7 @@ private extension SwiftPackageFileAnalyzer {
         let removed = oldProductNames.subtracting(newProductNames)
         let consistent = Set(oldProductNames).intersection(Set(newProductNames))
         
-        var changes = [Change]()
+        var changes = [PADChange]()
         
         changes += added.compactMap { addition in
             guard let addedProduct = new.first(where: { $0.name == addition }) else { return nil }
@@ -236,7 +236,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeProduct(
         old oldProduct: SwiftPackageDescription.Product,
         new newProduct: SwiftPackageDescription.Product
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard oldProduct != newProduct else { return [] }
         
         let oldTargetNames = Set(oldProduct.targets)
@@ -264,7 +264,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeTargets(
         old: [SwiftPackageDescription.Target],
         new: [SwiftPackageDescription.Target]
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard old != new else { return [] }
         
         let oldTargetNames = Set(old.map(\.name))
@@ -274,7 +274,7 @@ private extension SwiftPackageFileAnalyzer {
         let removed = oldTargetNames.subtracting(newTargetNames)
         let consistent = Set(oldTargetNames).intersection(Set(newTargetNames))
         
-        var changes = [Change]()
+        var changes = [PADChange]()
         
         changes += added.compactMap { addition in
             guard let addedTarget = new.first(where: { $0.name == addition }) else { return nil }
@@ -310,7 +310,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeTarget(
         oldTarget: SwiftPackageDescription.Target,
         newTarget: SwiftPackageDescription.Target
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard oldTarget != newTarget else { return [] }
         
         // MARK: Target Dependencies
@@ -360,7 +360,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeDependencies(
         old: [SwiftPackageDescription.Dependency],
         new: [SwiftPackageDescription.Dependency]
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard old != new else { return [] }
         
         let oldDependencies = Set(old.map(\.identity))
@@ -370,7 +370,7 @@ private extension SwiftPackageFileAnalyzer {
         let removedDependencies = oldDependencies.subtracting(newDependencies)
         let consistentDependencies = oldDependencies.intersection(newDependencies)
         
-        var changes = [Change]()
+        var changes = [PADChange]()
         
         changes += addedDependencies.compactMap { addition in
             guard let addedDependency = new.first(where: { $0.identity == addition }) else { return nil }
@@ -406,7 +406,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeDependency(
         oldDependency: SwiftPackageDescription.Dependency,
         newDependency: SwiftPackageDescription.Dependency
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard oldDependency != newDependency else { return [] }
         
         return [.init(
@@ -424,7 +424,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeToolsVersion(
         old: String,
         new: String
-    ) throws -> [Change] {
+    ) throws -> [PADChange] {
         guard old != new else { return [] }
         
         return [.init(

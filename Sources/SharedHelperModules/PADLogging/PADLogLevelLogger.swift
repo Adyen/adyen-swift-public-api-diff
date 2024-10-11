@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-public enum LogLevel {
+public enum PADLogLevel {
     /// No logs
     case quiet
     /// All logs except `debug`
@@ -35,12 +35,12 @@ public enum LogLevel {
 // MARK: - LogLevelLogger
 
 /// Logger that respects a ``LogLevel``
-public struct LogLevelLogger<LoggerType: Logging>: Logging {
+public struct PADLogLevelLogger<LoggerType: PADLogging>: PADLogging {
     
-    private let logLevel: LogLevel
+    private let logLevel: PADLogLevel
     internal let wrappedLogger: LoggerType
     
-    init(with logger: LoggerType, logLevel: LogLevel) {
+    init(with logger: LoggerType, logLevel: PADLogLevel) {
         self.wrappedLogger = logger
         self.logLevel = logLevel
     }
@@ -58,8 +58,8 @@ public struct LogLevelLogger<LoggerType: Logging>: Logging {
 
 // MARK: - Logging Extension
 
-extension Logging {
-    public func withLogLevel(_ logLevel: LogLevel) -> LogLevelLogger<Self> {
+extension PADLogging {
+    public func withLogLevel(_ logLevel: PADLogLevel) -> PADLogLevelLogger<Self> {
         .init(with: self, logLevel: logLevel)
     }
 }

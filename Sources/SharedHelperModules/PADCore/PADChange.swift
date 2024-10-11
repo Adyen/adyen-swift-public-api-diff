@@ -7,7 +7,7 @@
 import Foundation
 
 /// A change indicating an `addition`, `removal` or genuine `change` of an element
-public struct Change: Equatable {
+public struct PADChange: Equatable {
     public enum ChangeType: Equatable {
         case addition(description: String)
         case removal(description: String)
@@ -30,7 +30,7 @@ public struct Change: Equatable {
     }
 }
 
-extension Change.ChangeType {
+extension PADChange.ChangeType {
 
     public var isAddition: Bool {
         switch self {
@@ -66,7 +66,7 @@ extension Change.ChangeType {
     }
 }
 
-public extension [String: [Change]] {
+public extension [String: [PADChange]] {
     
     var totalChangeCount: Int {
         var totalChangeCount = 0

@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-public struct SystemLogger: Logging {
+public struct PADSystemLogger: PADLogging {
     
     public init() {}
     
@@ -14,7 +14,7 @@ public struct SystemLogger: Logging {
     }
 }
 
-private extension SystemLogger {
+private extension PADSystemLogger {
     
     func logger(for subsystem: String) -> Logger {
         Logger(

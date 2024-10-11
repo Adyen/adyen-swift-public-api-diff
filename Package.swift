@@ -41,12 +41,9 @@ let package = Package(
         .executableTarget(
             name: "public-api-diff",
             dependencies: [
-                "PADCore",
-                "PADLogging",
-                "PADOutputGenerator",
-                "PADFileHandling",
                 "PADProjectBuilder",
                 "PADSwiftInterfaceDiff",
+                "PADOutputGenerator",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
             path: "Sources/ExecutableTargets/CommandLineTool"
@@ -59,16 +56,16 @@ let package = Package(
             path: "Sources/SharedHelperModules/PADCore"
         ),
         .target(
-            name: "PADFileHandling",
-            path: "Sources/SharedHelperModules/PADFileHandling"
+            name: "FileHandlingModule",
+            path: "Sources/SharedHelperModules/FileHandlingModule"
         ),
         .target(
-            name: "PADShell",
-            path: "Sources/SharedHelperModules/PADShell"
+            name: "ShellModule",
+            path: "Sources/SharedHelperModules/ShellModule"
         ),
         .target(
             name: "PADLogging",
-            dependencies: ["PADFileHandling"],
+            dependencies: ["FileHandlingModule"],
             path: "Sources/SharedHelperModules/PADLogging"
         ),
         
@@ -78,7 +75,7 @@ let package = Package(
             name: "PADSwiftInterfaceDiff",
             dependencies: [
                 "PADCore",
-                "PADFileHandling",
+                "FileHandlingModule",
                 "PADLogging",
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
@@ -89,9 +86,9 @@ let package = Package(
             name: "PADProjectBuilder",
             dependencies: [
                 "PADCore",
-                "PADFileHandling",
+                "FileHandlingModule",
                 "PADLogging",
-                "PADShell"
+                "ShellModule"
             ],
             path: "Sources/PipelineModules/PADProjectBuilder"
         ),

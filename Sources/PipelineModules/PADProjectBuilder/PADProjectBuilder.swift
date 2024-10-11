@@ -1,35 +1,29 @@
-//
-//  File.swift
-//  
-//
-//  Created by Alexander Guretzki on 10/10/2024.
-//
-
 import Foundation
 
-import PADFileHandling
 import PADLogging
 import PADCore
-import PADShell
+
+import ShellModule
+import FileHandlingModule
 
 public struct PADProjectBuilder {
     
     public struct Result {
-        public let packageFileChanges: [Change]
+        public let packageFileChanges: [PADChange]
         public let warnings: [String]
-        public let swiftInterfaceFiles: [SwiftInterfaceFile]
+        public let swiftInterfaceFiles: [PADSwiftInterfaceFile]
     }
     
     private let projectType: PADProjectType
-    private let swiftInterfaceType: SwiftInterfaceType
+    private let swiftInterfaceType: PADSwiftInterfaceType
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
-    private let logger: (any Logging)?
+    private let logger: (any PADLogging)?
     
     public init(
         projectType: PADProjectType,
-        swiftInterfaceType: SwiftInterfaceType,
-        logger: (any Logging)? = nil
+        swiftInterfaceType: PADSwiftInterfaceType,
+        logger: (any PADLogging)? = nil
     ) {
         self.init(
             projectType: projectType,
@@ -42,10 +36,10 @@ public struct PADProjectBuilder {
     
     init(
         projectType: PADProjectType,
-        swiftInterfaceType: SwiftInterfaceType,
+        swiftInterfaceType: PADSwiftInterfaceType,
         fileHandler: any FileHandling = FileManager.default,
         shell: any ShellHandling = Shell(),
-        logger: (any Logging)?
+        logger: (any PADLogging)?
     ) {
         self.projectType = projectType
         self.swiftInterfaceType = swiftInterfaceType
@@ -85,7 +79,7 @@ public struct PADProjectBuilder {
         // MARK: - Analyze Package.swift (optional)
         
         let warnings: [String]
-        let packageFileChanges: [Change]
+        let packageFileChanges: [PADChange]
         
         switch projectType {
         case .swiftPackage:

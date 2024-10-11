@@ -6,7 +6,7 @@
 
 import Foundation
 
-public enum FileHandlerError: LocalizedError, Equatable {
+package enum FileHandlerError: LocalizedError, Equatable {
     /// Could not encode the output string into data
     case couldNotEncodeOutput
     /// Could not persist output at the specified `outputFilePath`
@@ -32,7 +32,7 @@ public enum FileHandlerError: LocalizedError, Equatable {
 
 // MARK: - Convenience
 
-public extension FileHandling {
+package extension FileHandling {
     
     /// Creates a directory at the specified path and deletes any old directory if existing
     ///

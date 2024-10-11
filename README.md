@@ -47,7 +47,7 @@ The `ChangeConsolidator` takes 2 independent changes (`addition` & `removal`) an
 
 ### OutputGenerator
 
-Receives a dictionary of `[{SCOPE_NAME}: [Change]]` and processes them into a human readable format.
+Receives a dictionary of `[{SCOPE_NAME}: [PADChange]]` and processes them into a human readable format.
 
 # Alternatives
 - `xcrun swift-api-digester -dump-sdk` & `xcrun swift-api-digester -diagnose-sdk`

@@ -1,9 +1,10 @@
 import Foundation
 
 import PADCore
-import PADShell
-import PADFileHandling
 import PADLogging
+
+import FileHandlingModule
+import ShellModule
 
 enum GitError: LocalizedError, Equatable {
     case couldNotClone(branchOrTag: String, repository: String)
@@ -20,12 +21,12 @@ struct Git {
     
     private let shell: ShellHandling
     private let fileHandler: FileHandling
-    private let logger: Logging?
+    private let logger: PADLogging?
     
-    public init(
+    init(
         shell: ShellHandling,
         fileHandler: FileHandling,
-        logger: Logging?
+        logger: PADLogging?
     ) {
         self.shell = shell
         self.fileHandler = fileHandler
@@ -40,7 +41,7 @@ struct Git {
     ///   - targetDirectoryPath: The directory to clone into
     ///
     /// - Returns: The local directory path where to find the cloned repository
-    public func clone(_ repository: String, at branchOrTag: String, targetDirectoryPath: String) throws {
+    func clone(_ repository: String, at branchOrTag: String, targetDirectoryPath: String) throws {
         logger?.log("🐱 Cloning \(repository) @ \(branchOrTag) into \(targetDirectoryPath)", from: String(describing: Self.self))
         let command = "git clone -b \(branchOrTag) \(repository) \(targetDirectoryPath)"
         shell.execute(command)

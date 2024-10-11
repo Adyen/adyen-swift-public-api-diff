@@ -5,8 +5,8 @@
 //
 
 import Foundation
-import PADFileHandling
-import PADShell
+import FileHandlingModule
+import ShellModule
 import PADLogging
 
 enum SwiftPackageFileHelperError: LocalizedError {
@@ -30,12 +30,12 @@ struct SwiftPackageFileHelper {
     
     private let fileHandler: FileHandling
     private let shell: any ShellHandling
-    private let logger: (any Logging)?
+    private let logger: (any PADLogging)?
     
     public init(
         fileHandler: FileHandling,
         shell: any ShellHandling,
-        logger: (any Logging)?
+        logger: (any PADLogging)?
     ) {
         self.fileHandler = fileHandler
         self.shell = shell

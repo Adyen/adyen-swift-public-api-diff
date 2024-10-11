@@ -5,7 +5,7 @@
 //
 
 import Foundation
-import PADFileHandling
+import FileHandlingModule
 
 enum ProjectSourceError: LocalizedError, Equatable {
     case invalidSourceValue(value: String)
@@ -26,7 +26,11 @@ public enum PADProjectSource: Equatable, CustomStringConvertible {
     case local(path: String)
     case remote(branch: String, repository: String)
  
-    public static func from(_ rawValue: String, fileHandler: FileHandling = FileManager.default) throws -> Self {
+    public static func from(_ rawValue: String) throws -> Self {
+        try from(rawValue, fileHandler: FileManager.default)
+    }
+    
+    package static func from(_ rawValue: String, fileHandler: FileHandling) throws -> Self {
         if fileHandler.fileExists(atPath: rawValue) {
             return .local(path: rawValue)
         }

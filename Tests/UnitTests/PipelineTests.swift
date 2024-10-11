@@ -12,13 +12,13 @@ class PipelineTests: XCTestCase {
     
     func test_pipeline() async throws {
         
-        let swiftInterfaceFile = SwiftInterfaceFile(
+        let swiftInterfaceFile = PADSwiftInterfaceFile(
             name: "MODULE_NAME",
             oldFilePath: "old_file_path",
             newFilePath: "new_file_path"
         )
         
-        let expectedChanges: [Change] = [.init(changeType: .addition(description: "addition"))]
+        let expectedChanges: [PADChange] = [.init(changeType: .addition(description: "addition"))]
         var expectedHandleLoadDataCalls = ["new_file_path", "old_file_path"]
         var expectedHandleParseSourceCalls: [(source: String, moduleName: String)] = [
             ("content_for_new_file_path", "MODULE_NAME"),
@@ -30,7 +30,7 @@ class PipelineTests: XCTestCase {
         var expectedHandleLogCalls: [(message: String, subsystem: String)] = [
             ("🧑‍🔬 Analyzing MODULE_NAME", "PADSwiftInterfaceDiff")
         ]
-        let expectedPipelineOutput: [String: [Change]] = ["MODULE_NAME": expectedChanges]
+        let expectedPipelineOutput: [String: [PADChange]] = ["MODULE_NAME": expectedChanges]
         
         // Mock Setup
         

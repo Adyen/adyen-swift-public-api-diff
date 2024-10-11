@@ -19,7 +19,7 @@ class OutputGeneratorTests: XCTestCase {
         **Analyzed targets:** Target_1
         """
         
-        let outputGenerator = MarkdownOutputGenerator()
+        let outputGenerator = PADMarkdownOutputGenerator()
         let output = outputGenerator.generate(
             from: [:],
             allTargets: ["Target_1"],
@@ -47,7 +47,7 @@ class OutputGeneratorTests: XCTestCase {
         **Analyzed targets:** Target_1
         """
         
-        let outputGenerator = MarkdownOutputGenerator()
+        let outputGenerator = PADMarkdownOutputGenerator()
         
         let output = outputGenerator.generate(
             from: ["Target_1": [.init(changeType: .addition(description: "Some Addition"), parentPath: "")]],
@@ -89,7 +89,7 @@ class OutputGeneratorTests: XCTestCase {
         **Analyzed targets:** Target_1, Target_2
         """
 
-        let outputGenerator = MarkdownOutputGenerator()
+        let outputGenerator = PADMarkdownOutputGenerator()
         
         let output = outputGenerator.generate(
             from: [

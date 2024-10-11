@@ -14,10 +14,10 @@ package protocol ShellHandling {
 
 package struct Shell: ShellHandling {
     
-    public init() {}
+    package init() {}
     
     @discardableResult
-    public func execute(_ command: String) -> String {
+    package func execute(_ command: String) -> String {
         
         let task = Process()
         let pipe = Pipe()

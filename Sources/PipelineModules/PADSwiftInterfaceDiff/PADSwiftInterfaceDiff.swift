@@ -1,8 +1,8 @@
 import Foundation
 
 import PADCore
-import PADFileHandling
 import PADLogging
+import FileHandlingModule
 
 /// Takes a list of ``SwiftInterfaceFile`` and detects changes between the old and new version
 public struct PADSwiftInterfaceDiff {
@@ -10,10 +10,10 @@ public struct PADSwiftInterfaceDiff {
     let fileHandler: any FileHandling
     let swiftInterfaceParser: any SwiftInterfaceParsing
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
-    let logger: (any Logging)?
+    let logger: (any PADLogging)?
     
     public init(
-        logger: (any Logging)? = nil
+        logger: (any PADLogging)? = nil
     ) {
         self.init(
             fileHandler: FileManager.default,
@@ -27,7 +27,7 @@ public struct PADSwiftInterfaceDiff {
         fileHandler: FileHandling = FileManager.default,
         swiftInterfaceParser: any SwiftInterfaceParsing = SwiftInterfaceParser(),
         swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing = SwiftInterfaceAnalyzer(),
-        logger: (any Logging)? = nil
+        logger: (any PADLogging)? = nil
     ) {
         self.fileHandler = fileHandler
         self.swiftInterfaceParser = swiftInterfaceParser
@@ -35,9 +35,9 @@ public struct PADSwiftInterfaceDiff {
         self.logger = logger
     }
     
-    public func run(with swiftInterfaceFiles: [SwiftInterfaceFile]) async throws -> [String: [Change]] {
+    public func run(with swiftInterfaceFiles: [PADSwiftInterfaceFile]) async throws -> [String: [PADChange]] {
         
-        var changes = [String: [Change]]()
+        var changes = [String: [PADChange]]()
         
         try swiftInterfaceFiles.forEach { file in
             logger?.log("🧑‍🔬 Analyzing \(file.name)", from: String(describing: Self.self))

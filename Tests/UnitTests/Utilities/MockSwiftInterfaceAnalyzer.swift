@@ -10,12 +10,12 @@ import XCTest
 
 struct MockSwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     
-    var handleAnalyze: (any SwiftInterfaceElement, any SwiftInterfaceElement) -> [Change] = { _, _ in
+    var handleAnalyze: (any SwiftInterfaceElement, any SwiftInterfaceElement) -> [PADChange] = { _, _ in
         XCTFail("Unexpectedly called `\(#function)`")
         return []
     }
     
-    func analyze(old: some SwiftInterfaceElement, new: some SwiftInterfaceElement) throws -> [Change] {
+    func analyze(old: some SwiftInterfaceElement, new: some SwiftInterfaceElement) throws -> [PADChange] {
         handleAnalyze(old, new)
     }
 }
