@@ -28,8 +28,8 @@ struct ProjectSetupHelper: ProjectSetupHelping {
     }
     
     func setup(
-        _ projectSource: ProjectSource,
-        projectType: ProjectType
+        _ projectSource: PADProjectSource,
+        projectType: PADProjectType
     ) async throws -> URL {
         try await Task {
             let checkoutPath = workingDirectoryPath + "\(randomStringGenerator.generateRandomString())"
@@ -46,7 +46,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
         }.value
     }
     
-    func filterProjectFiles(at checkoutPath: String, for projectType: ProjectType) {
+    func filterProjectFiles(at checkoutPath: String, for projectType: PADProjectType) {
         try? fileHandler.contentsOfDirectory(atPath: checkoutPath)
             .filter { !projectType.fileIsIncluded(filePath: $0) }
             .forEach { filePath in
@@ -63,9 +63,9 @@ extension ProjectSetupHelper {
     }
     
     func setupProjects(
-        oldSource: ProjectSource,
-        newSource: ProjectSource,
-        projectType: ProjectType
+        oldSource: PADProjectSource,
+        newSource: PADProjectSource,
+        projectType: PADProjectType
     ) async throws -> ProjectDirectories {
         let projectSetupHelper = ProjectSetupHelper(
             workingDirectoryPath: workingDirectoryPath,
@@ -80,7 +80,7 @@ extension ProjectSetupHelper {
     }
 }
 
-private extension ProjectType {
+private extension PADProjectType {
     
     var excludedFileSuffixes: [String] {
         switch self {

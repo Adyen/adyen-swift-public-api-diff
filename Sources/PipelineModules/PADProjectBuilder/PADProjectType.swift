@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ProjectType {
+public enum PADProjectType {
     case swiftPackage
     case xcodeProject(scheme: String)
 }

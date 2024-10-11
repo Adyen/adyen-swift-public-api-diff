@@ -42,7 +42,7 @@ struct XcodeTools {
     func archive(
         projectDirectoryPath: String,
         scheme: String,
-        projectType: ProjectType
+        projectType: PADProjectType
     ) async throws -> String {
         var commandComponents = [
             "cd \(projectDirectoryPath);",

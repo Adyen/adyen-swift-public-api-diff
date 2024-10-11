@@ -2,5 +2,5 @@ import Foundation
 import PADCore
 
 protocol ProjectSetupHelping {
-    func setup(_ projectSource: ProjectSource, projectType: ProjectType) async throws -> URL
+    func setup(_ projectSource: PADProjectSource, projectType: PADProjectType) async throws -> URL
 }

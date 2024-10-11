@@ -20,14 +20,28 @@ public struct PADProjectBuilder {
         public let swiftInterfaceFiles: [SwiftInterfaceFile]
     }
     
-    private let projectType: ProjectType
+    private let projectType: PADProjectType
     private let swiftInterfaceType: SwiftInterfaceType
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
     private let logger: (any Logging)?
     
     public init(
-        projectType: ProjectType,
+        projectType: PADProjectType,
+        swiftInterfaceType: SwiftInterfaceType,
+        logger: (any Logging)? = nil
+    ) {
+        self.init(
+            projectType: projectType,
+            swiftInterfaceType: swiftInterfaceType,
+            fileHandler: FileManager.default,
+            shell: Shell(),
+            logger: logger
+        )
+    }
+    
+    init(
+        projectType: PADProjectType,
         swiftInterfaceType: SwiftInterfaceType,
         fileHandler: any FileHandling = FileManager.default,
         shell: any ShellHandling = Shell(),
@@ -41,8 +55,8 @@ public struct PADProjectBuilder {
     }
     
     public func build(
-        oldSource: ProjectSource,
-        newSource: ProjectSource
+        oldSource: PADProjectSource,
+        newSource: PADProjectSource
     ) async throws -> Result {
         
         let oldVersionName = oldSource.description

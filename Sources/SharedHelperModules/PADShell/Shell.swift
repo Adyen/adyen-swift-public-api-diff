@@ -6,13 +6,13 @@
 
 import Foundation
 
-public protocol ShellHandling {
+package protocol ShellHandling {
     
     @discardableResult
     func execute(_ command: String) -> String
 }
 
-public struct Shell: ShellHandling {
+package struct Shell: ShellHandling {
     
     public init() {}
     

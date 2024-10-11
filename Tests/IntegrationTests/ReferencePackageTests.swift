@@ -51,8 +51,8 @@ class ReferencePackageTests: XCTestCase {
         let markdownOutput = MarkdownOutputGenerator().generate(
             from: pipelineOutput,
             allTargets: ["ReferencePackage"],
-            oldVersionName: ProjectSource.local(path: "old_public").description,
-            newVersionName: ProjectSource.local(path: "new_public").description,
+            oldVersionName: "old_public",
+            newVersionName: "new_public",
             warnings: []
         )
         
@@ -77,8 +77,8 @@ class ReferencePackageTests: XCTestCase {
         let markdownOutput = MarkdownOutputGenerator().generate(
             from: pipelineOutput,
             allTargets: ["ReferencePackage"],
-            oldVersionName: ProjectSource.local(path: "old_private").description,
-            newVersionName: ProjectSource.local(path: "new_private").description,
+            oldVersionName: "old_private",
+            newVersionName: "new_private",
             warnings: []
         )
         

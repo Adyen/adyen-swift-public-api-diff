@@ -1,5 +1,5 @@
 import Foundation
 
-public protocol SwiftInterfaceParsing {
+protocol SwiftInterfaceParsing {
     func parse(source: String, moduleName: String) -> any SwiftInterfaceElement
 }

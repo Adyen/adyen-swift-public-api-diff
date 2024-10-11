@@ -39,7 +39,7 @@ private extension XcodeToolsTests {
     func testArchiving(
         projectDirectoryPath: String,
         scheme: String,
-        projectType: ProjectType
+        projectType: PADProjectType
     ) async throws {
         
         let archiveResult = "ARCHIVE_RESULT"

@@ -13,12 +13,12 @@ enum ProjectSourceError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case let .invalidSourceValue(value):
-            "Invalid source parameter `\(value)`. It needs to either be a local file path or a repository in the format `[BRANCH_OR_TAG]\(ProjectSource.gitSourceSeparator)[REPOSITORY_URL]"
+            "Invalid source parameter `\(value)`. It needs to either be a local file path or a repository in the format `[BRANCH_OR_TAG]\(PADProjectSource.gitSourceSeparator)[REPOSITORY_URL]"
         }
     }
 }
 
-public enum ProjectSource: Equatable, CustomStringConvertible {
+public enum PADProjectSource: Equatable, CustomStringConvertible {
     
     /// The separator used to join branch & repository
     static var gitSourceSeparator: String { "~" }
@@ -26,7 +26,7 @@ public enum ProjectSource: Equatable, CustomStringConvertible {
     case local(path: String)
     case remote(branch: String, repository: String)
  
-    public static func from(_ rawValue: String, fileHandler: FileHandling = FileManager.default) throws -> ProjectSource {
+    public static func from(_ rawValue: String, fileHandler: FileHandling = FileManager.default) throws -> Self {
         if fileHandler.fileExists(atPath: rawValue) {
             return .local(path: rawValue)
         }

@@ -35,7 +35,7 @@ struct PublicApiDiff: AsyncParsableCommand {
     public func run() async throws {
         
         let logLevel: LogLevel = .debug
-        let projectType: ProjectType = { // Only needed when we have to produce the .swiftinterface files
+        let projectType: PADProjectType = { // Only needed when we have to produce the .swiftinterface files
             if let scheme { return .xcodeProject(scheme: scheme) }
             return .swiftPackage
         }()
@@ -49,8 +49,8 @@ struct PublicApiDiff: AsyncParsableCommand {
             
             // MARK: - Producing .swiftinterface files
             
-            let oldSource: ProjectSource = try ProjectSource.from(old)
-            let newSource: ProjectSource = try ProjectSource.from(new)
+            let oldSource: PADProjectSource = try .from(old)
+            let newSource: PADProjectSource = try .from(new)
             
             let oldVersionName = oldSource.description
             let newVersionName = newSource.description

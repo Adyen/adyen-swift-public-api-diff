@@ -13,7 +13,7 @@ class ProjectSourceTests: XCTestCase {
     
     func test_remote_validSource() throws {
         let repositoryUrl = "https://github.com/Adyen/adyen-ios.git"
-        let separator = ProjectSource.gitSourceSeparator
+        let separator = PADProjectSource.gitSourceSeparator
         let branch = "develop"
         let rawProjectSourceValue = "\(branch)\(separator)\(repositoryUrl)"
         
@@ -22,7 +22,7 @@ class ProjectSourceTests: XCTestCase {
             return false
         })
         
-        let projectSource = try ProjectSource.from(
+        let projectSource = try PADProjectSource.from(
             "\(branch)\(separator)\(repositoryUrl)",
             fileHandler: mockFileHandler
         )
@@ -35,7 +35,7 @@ class ProjectSourceTests: XCTestCase {
     
     func test_remote_invalidRepoUrl() throws {
         let repositoryUrl = ""
-        let separator = ProjectSource.gitSourceSeparator
+        let separator = PADProjectSource.gitSourceSeparator
         let branch = "develop"
         let rawProjectSourceValue = "\(branch)\(separator)\(repositoryUrl)"
         
@@ -45,7 +45,7 @@ class ProjectSourceTests: XCTestCase {
         })
         
         do {
-            let source = try ProjectSource.from(
+            let source = try PADProjectSource.from(
                 rawProjectSourceValue,
                 fileHandler: mockFileHandler
             )
@@ -72,7 +72,7 @@ class ProjectSourceTests: XCTestCase {
         })
         
         do {
-            let source = try ProjectSource.from(
+            let source = try PADProjectSource.from(
                 rawProjectSourceValue,
                 fileHandler: mockFileHandler
             )
@@ -96,7 +96,7 @@ class ProjectSourceTests: XCTestCase {
             return true
         })
         
-        let projectSource = try ProjectSource.from(
+        let projectSource = try PADProjectSource.from(
             repositoryDirectoryPath,
             fileHandler: mockFileHandler
         )
@@ -114,7 +114,7 @@ class ProjectSourceTests: XCTestCase {
             return false
         })
         
-        let projectSource = try? ProjectSource.from(
+        let projectSource = try? PADProjectSource.from(
             repositoryDirectoryPath,
             fileHandler: mockFileHandler
         )

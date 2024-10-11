@@ -7,19 +7,15 @@
 import Foundation
 import PADCore
 
-public struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
+struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     
     let changeConsolidator: SwiftInterfaceChangeConsolidating
     
-    public init() {
-        self.init(changeConsolidator: SwiftInterfaceChangeConsolidator())
-    }
-    
-    init(changeConsolidator: SwiftInterfaceChangeConsolidating) {
+    init(changeConsolidator: SwiftInterfaceChangeConsolidating = SwiftInterfaceChangeConsolidator()) {
         self.changeConsolidator = changeConsolidator
     }
     
-    public func analyze(
+    func analyze(
         old: some SwiftInterfaceElement,
         new: some SwiftInterfaceElement
     ) -> [Change] {

@@ -13,6 +13,17 @@ public struct PADSwiftInterfaceDiff {
     let logger: (any Logging)?
     
     public init(
+        logger: (any Logging)? = nil
+    ) {
+        self.init(
+            fileHandler: FileManager.default,
+            swiftInterfaceParser: SwiftInterfaceParser(),
+            swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
+            logger: logger
+        )
+    }
+    
+    init(
         fileHandler: FileHandling = FileManager.default,
         swiftInterfaceParser: any SwiftInterfaceParsing = SwiftInterfaceParser(),
         swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing = SwiftInterfaceAnalyzer(),

@@ -12,7 +12,7 @@ struct SwiftInterfaceProducer {
     private typealias DerivedDataPaths = (new: String, old: String)
     
     let workingDirectoryPath: String
-    let projectType: ProjectType
+    let projectType: PADProjectType
     let swiftInterfaceType: SwiftInterfaceType
     let fileHandler: any FileHandling
     let shell: any ShellHandling
@@ -20,7 +20,7 @@ struct SwiftInterfaceProducer {
     
     init(
         workingDirectoryPath: String,
-        projectType: ProjectType,
+        projectType: PADProjectType,
         swiftInterfaceType: SwiftInterfaceType,
         fileHandler: any FileHandling,
         shell: any ShellHandling,

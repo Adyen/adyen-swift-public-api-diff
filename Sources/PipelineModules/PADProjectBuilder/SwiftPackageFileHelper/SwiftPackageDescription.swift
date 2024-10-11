@@ -11,13 +11,13 @@ import Foundation
 
 struct SwiftPackageDescription: Codable, Equatable {
     
-    public let name: String
-    public let platforms: [Platform]
-    public let defaultLocalization: String?
+    let name: String
+    let platforms: [Platform]
+    let defaultLocalization: String?
     
-    public let targets: [Target]
-    public let products: [Product]
-    public let dependencies: [Dependency]
+    let targets: [Target]
+    let products: [Product]
+    let dependencies: [Dependency]
     
     public let toolsVersion: String
     
