@@ -55,7 +55,7 @@ struct PublicApiDiff: AsyncParsableCommand {
             let oldVersionName = oldSource.description
             let newVersionName = newSource.description
             
-            let projectBuilder = ProjectBuilder(
+            let projectBuilder = PADProjectBuilder(
                 projectType: projectType,
                 swiftInterfaceType: swiftInterfaceType,
                 logger: logger

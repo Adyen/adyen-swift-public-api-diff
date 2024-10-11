@@ -12,7 +12,7 @@ import PADLogging
 import PADCore
 import PADShell
 
-public struct ProjectBuilder {
+public struct PADProjectBuilder {
     
     public struct Result {
         public let packageFileChanges: [Change]
