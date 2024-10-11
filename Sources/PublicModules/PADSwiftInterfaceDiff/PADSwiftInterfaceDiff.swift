@@ -7,6 +7,8 @@ import FileHandlingModule
 /// Takes a list of ``PADCore/PADSwiftInterfaceFile``s and detects changes between the old and new version
 public struct PADSwiftInterfaceDiff {
     
+    public typealias ModuleName = String
+    
     let fileHandler: any FileHandling
     let swiftInterfaceParser: any SwiftInterfaceParsing
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
@@ -42,7 +44,7 @@ public struct PADSwiftInterfaceDiff {
     /// Analyzes the passed ``PADCore/PADSwiftInterfaceFile``s and returns a list of changes grouped by scheme/target
     /// - Parameter swiftInterfaceFiles: The ``PADCore/PADSwiftInterfaceFile``s to analyze
     /// - Returns: A list of changes grouped by scheme/target
-    public func run(with swiftInterfaceFiles: [PADSwiftInterfaceFile]) async throws -> [String: [PADChange]] {
+    public func run(with swiftInterfaceFiles: [PADSwiftInterfaceFile]) async throws -> [ModuleName: [PADChange]] {
         
         var changes = [String: [PADChange]]()
         

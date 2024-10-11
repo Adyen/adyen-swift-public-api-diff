@@ -82,14 +82,14 @@ struct PublicApiDiff: AsyncParsableCommand {
             
             // MARK: - Analyze .swiftinterface files
             
-            let pipeline = PADSwiftInterfaceDiff(logger: logger)
+            let swiftInterfaceDiff = PADSwiftInterfaceDiff(logger: logger)
             
-            let pipelineOutput = try await pipeline.run(
+            let swiftInterfaceDifferences = try await swiftInterfaceDiff.run(
                 with: projectBuilderResult.swiftInterfaceFiles
             )
             
             // Merging pipeline output into existing changes - making sure we're not overriding any keys
-            pipelineOutput.forEach { key, value in
+            swiftInterfaceDifferences.forEach { key, value in
                 var keyToUse = key
                 if changes[key] != nil {
                     keyToUse = "\(key) (\(UUID().uuidString))"
@@ -99,7 +99,7 @@ struct PublicApiDiff: AsyncParsableCommand {
             
             // MARK: - Generate Output
             
-            let outputGenerator: any PADOutputGenerating = PADMarkdownOutputGenerator()
+            let outputGenerator: any PADOutputGenerating<String> = PADMarkdownOutputGenerator()
             
             let generatedOutput = try outputGenerator.generate(
                 from: changes,
