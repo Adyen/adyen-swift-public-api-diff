@@ -49,27 +49,7 @@ let package = Package(
             path: "Sources/ExecutableTargets/CommandLineTool"
         ),
         
-        // MARK: - Shared Helper Modules
-        
-        .target(
-            name: "PADCore",
-            path: "Sources/SharedHelperModules/PADCore"
-        ),
-        .target(
-            name: "FileHandlingModule",
-            path: "Sources/SharedHelperModules/FileHandlingModule"
-        ),
-        .target(
-            name: "ShellModule",
-            path: "Sources/SharedHelperModules/ShellModule"
-        ),
-        .target(
-            name: "PADLogging",
-            dependencies: ["FileHandlingModule"],
-            path: "Sources/SharedHelperModules/PADLogging"
-        ),
-        
-        // MARK: - Pipeline Modules
+        // MARK: - Public Modules
         
         .target(
             name: "PADSwiftInterfaceDiff",
@@ -80,7 +60,7 @@ let package = Package(
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
             ],
-            path: "Sources/PipelineModules/PADSwiftInterfaceDiff"
+            path: "Sources/PublicModules/PADSwiftInterfaceDiff"
         ),
         .target(
             name: "PADProjectBuilder",
@@ -90,12 +70,35 @@ let package = Package(
                 "PADLogging",
                 "ShellModule"
             ],
-            path: "Sources/PipelineModules/PADProjectBuilder"
+            path: "Sources/PublicModules/PADProjectBuilder"
         ),
         .target(
             name: "PADOutputGenerator",
             dependencies: ["PADCore"],
-            path: "Sources/PipelineModules/PADOutputGenerator"
+            path: "Sources/PublicModules/PADOutputGenerator"
+        ),
+        
+        // MARK: - Shared/Public
+        
+        .target(
+            name: "PADCore",
+            path: "Sources/Shared/Public/PADCore"
+        ),
+        .target(
+            name: "PADLogging",
+            dependencies: ["FileHandlingModule"],
+            path: "Sources/Shared/Public/PADLogging"
+        ),
+        
+        // MARK: - Shared/Package
+        
+        .target(
+            name: "FileHandlingModule",
+            path: "Sources/Shared/Package/FileHandlingModule"
+        ),
+        .target(
+            name: "ShellModule",
+            path: "Sources/Shared/Package/ShellModule"
         ),
         
         // MARK: - Test Targets
