@@ -4,7 +4,7 @@ import PADCore
 import PADLogging
 import FileHandlingModule
 
-/// Takes a list of ``SwiftInterfaceFile`` and detects changes between the old and new version
+/// Takes a list of ``PADSwiftInterfaceFile`` and detects changes between the old and new version
 public struct PADSwiftInterfaceDiff {
     
     let fileHandler: any FileHandling

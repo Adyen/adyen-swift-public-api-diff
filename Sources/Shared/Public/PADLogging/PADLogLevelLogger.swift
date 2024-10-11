@@ -32,9 +32,9 @@ public enum PADLogLevel {
     }
 }
 
-// MARK: - LogLevelLogger
+// MARK: - PADLogLevelLogger
 
-/// Logger that respects a ``LogLevel``
+/// Logger that respects a ``PADLogLevel``
 public struct PADLogLevelLogger<LoggerType: PADLogging>: PADLogging {
     
     private let logLevel: PADLogLevel
