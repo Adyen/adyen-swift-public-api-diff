@@ -1,4 +1,4 @@
-# ``PackageFileAnalyzer``
+# ``PADPackageFileAnalyzer``
 
 The ``PADPackageFileAnalyzer/PackageFileAnalyzer`` allows analyzing of 2 versions of a `Package.swift` file.
 

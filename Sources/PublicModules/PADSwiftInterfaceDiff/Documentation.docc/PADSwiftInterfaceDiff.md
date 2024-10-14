@@ -1,4 +1,4 @@
-# ``SwiftInterfaceDiff``
+# ``PADSwiftInterfaceDiff``
 
 The ``SwiftInterfaceDiff`` consumes a list of ``PADCore/SwiftInterfaceFile``s and detects changes between the old and new version
 
