@@ -23,3 +23,37 @@ let markdownOutput: String = try outputGenerator.generate(
     warnings: warnings
 )
 ```
+
+---
+
+Example output for ``PADOutputGenerator/MarkdownOutputGenerator``
+
+## 👀 3 public changes detected
+_Comparing `old` to `new`_
+
+---
+## SomeModule
+#### ❇️ Added
+```javascript
+public protocol NewProtocol {
+    var property: String { get }
+}
+```
+#### 🔀 Changed
+```javascript
+// From
+open class SomeClass : SomeProtocol, OldProtocol
+
+// To
+open class SomeClass : SomeProtocol, NewProtocol
+
+/**
+Changes:
+- Added `NewProtocol` conformance
+- Removed `OldProtocol` conformance
+*/
+```
+#### 😶‍🌫️ Removed
+```javascript
+public protocol OldProtocol
+```
