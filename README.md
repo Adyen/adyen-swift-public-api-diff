@@ -34,7 +34,7 @@ OPTIONS:
 # From Project to Output
 swift run public-api-diff
     project
-    --new "develop~https://github.com/Adyen/adyen-ios.git" 
+    --new "develop~https://github.com/Adyen/adyen-ios.git"
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
 ```
  
