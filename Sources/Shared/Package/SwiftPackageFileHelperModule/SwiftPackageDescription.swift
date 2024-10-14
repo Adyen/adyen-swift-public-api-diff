@@ -9,19 +9,19 @@ import Foundation
 /// The object representation of a `Package.swift` file
 ///
 /// See: [PackageDescription](https://docs.swift.org/package-manager/PackageDescription/index.html) & [PackageDescriptionSerialization](https://github.com/swiftlang/swift-package-manager/blob/main/Sources/PackageDescription/PackageDescriptionSerialization.swift)
-struct SwiftPackageDescription: Codable, Equatable {
+package struct SwiftPackageDescription: Codable, Equatable {
     
-    let name: String
-    let platforms: [Platform]
-    let defaultLocalization: String?
+    package let name: String
+    package let platforms: [Platform]
+    package let defaultLocalization: String?
     
-    let targets: [Target]
-    let products: [Product]
-    let dependencies: [Dependency]
+    package let targets: [Target]
+    package let products: [Product]
+    package let dependencies: [Dependency]
     
-    let toolsVersion: String
+    package let toolsVersion: String
     
-    var warnings = [String]()
+    package var warnings = [String]()
     
     init(
         defaultLocalization: String?,
@@ -56,53 +56,53 @@ struct SwiftPackageDescription: Codable, Equatable {
 
 extension SwiftPackageDescription {
     
-    struct Platform: Codable, Equatable, Hashable {
+    package struct Platform: Codable, Equatable, Hashable {
         
-        let name: String
-        let version: String
+        package let name: String
+        package let version: String
     }
 }
 
 extension SwiftPackageDescription.Platform: CustomStringConvertible {
     
-    var description: String {
+    package var description: String {
         "\(name)(\(version))"
     }
 }
 
-extension SwiftPackageDescription {
+package extension SwiftPackageDescription {
     
     struct Product: Codable, Equatable, Hashable {
         
         // TODO: Add `rule` property
         
-        let name: String
-        let targets: [String]
+        package let name: String
+        package let targets: [String]
     }
 }
 
 extension SwiftPackageDescription.Product: CustomStringConvertible {
     
-    var description: String {
+    package var description: String {
         let targetsDescription = targets.map { "\"\($0)\"" }.joined(separator: ", ")
         return ".library(name: \"\(name)\", targets: [\(targetsDescription)])"
     }
 }
 
-extension SwiftPackageDescription {
+package extension SwiftPackageDescription {
     
     struct Dependency: Codable, Equatable {
         
-        let identity: String
-        let requirement: Requirement
-        let type: String
-        let url: String?
+        package let identity: String
+        package let requirement: Requirement
+        package let type: String
+        package let url: String?
     }
 }
 
 extension SwiftPackageDescription.Dependency: CustomStringConvertible {
     
-    var description: String {
+    package var description: String {
         var description = ".package("
         
         var fields = [String]()
@@ -120,19 +120,19 @@ extension SwiftPackageDescription.Dependency: CustomStringConvertible {
     }
 }
 
-extension SwiftPackageDescription.Dependency {
+package extension SwiftPackageDescription.Dependency {
     
     struct Requirement: Codable, Equatable {
         
         // TODO: Which other requirements exist?
         
-        let exact: [String]?
+        package let exact: [String]?
     }
 }
 
 extension SwiftPackageDescription.Dependency.Requirement: CustomStringConvertible {
     
-    var description: String {
+    package var description: String {
         if let exactVersion = exact?.first {
             return "exact: \"\(exactVersion)\""
         }
@@ -141,31 +141,31 @@ extension SwiftPackageDescription.Dependency.Requirement: CustomStringConvertibl
     }
 }
 
-extension SwiftPackageDescription {
+package extension SwiftPackageDescription {
     
     struct Target: Codable, Equatable {
         
-        enum ModuleType: String, Codable, Equatable {
+        package enum ModuleType: String, Codable, Equatable {
             case swiftTarget = "SwiftTarget"
             case binaryTarget = "BinaryTarget"
             case clangTarget = "ClangTarget"
         }
         
-        enum TargetType: String, Codable, Equatable {
+        package enum TargetType: String, Codable, Equatable {
             case library = "library"
             case binary = "binary"
             case test = "test"
         }
         
-        let name: String
-        let type: TargetType
-        let path: String
-        let moduleType: ModuleType
+        package let name: String
+        package let type: TargetType
+        package let path: String
+        package let moduleType: ModuleType
         
         /// `.product(name: ...)` dependency
-        let productDependencies: [String]?
+        package let productDependencies: [String]?
         /// `.target(name: ...) dependency
-        let targetDependencies: [String]?
+        package let targetDependencies: [String]?
         
         // Ignoring following properties for now as they are not handled in the `PackageAnalyzer`
         // and thus would produce changes that are not visible
@@ -203,7 +203,7 @@ extension SwiftPackageDescription {
 
 extension SwiftPackageDescription.Target.TargetType: CustomStringConvertible {
     
-    var description: String {
+    package var description: String {
         switch self {
         case .binary: "binaryTarget"
         case .library: "target"
@@ -214,7 +214,7 @@ extension SwiftPackageDescription.Target.TargetType: CustomStringConvertible {
 
 extension SwiftPackageDescription.Target: CustomStringConvertible {
     
-    var description: String {
+    package var description: String {
         var description = ".\(type.description)(name: \"\(name)\""
         
         var dependencyDescriptions = [String]()
@@ -240,12 +240,12 @@ extension SwiftPackageDescription.Target: CustomStringConvertible {
     }
 }
 
-extension SwiftPackageDescription.Target {
+package extension SwiftPackageDescription.Target {
     
     struct Resource: Codable, Equatable {
         
         // TODO: Add `rule` property
         
-        let path: String
+        package let path: String
     }
 }

@@ -1,11 +1,11 @@
 import Foundation
 import PADCore
 
-struct SwiftPackageFileAnalyzingResult {
+public struct SwiftPackageFileAnalyzingResult {
     /// The changes between 2 `Package.swift` files
-    let changes: [PADChange]
+    public let changes: [PADChange]
     /// Any warnings that occured while inspecting the `Package.swift` file
-    let warnings: [String]
+    public let warnings: [String]
 }
 
 protocol SwiftPackageFileAnalyzing {

@@ -5,7 +5,11 @@
 //
 
 @testable import PADProjectBuilder
+@testable import PADPackageFileAnalyzer
 @testable import PADCore
+
+@testable import SwiftPackageFileHelperModule
+
 import XCTest
 
 class SwiftPackageFileAnalyzerTests: XCTestCase {

@@ -19,16 +19,10 @@ public struct PADProjectBuilder {
     
     /// The result returned by the build function of ``PADProjectBuilder/PADProjectBuilder``
     public struct Result {
-        /// Any changes found between the 2 versions of the `Package.swift` file
-        ///
-        /// Only applicable if the `projectType` specified is ``PADProjectType/swiftPackage``
-        public let packageFileChanges: [PADChange]
-        
-        /// Any warnings that occured while building the project or inspecting the `Package.swift`
-        public let warnings: [String]
-        
         /// The `.swiftinterface` file references found
         public let swiftInterfaceFiles: [PADSwiftInterfaceFile]
+        /// The project directories for the setup projects
+        public let projectDirectories: (old: URL, new: URL)
     }
     
     private let projectType: PADProjectType
@@ -93,31 +87,6 @@ public struct PADProjectBuilder {
             projectType: projectType
         )
         
-        // MARK: - Analyze Package.swift (optional)
-        
-        let warnings: [String]
-        let packageFileChanges: [PADChange]
-        
-        switch projectType {
-        case .swiftPackage:
-            let swiftPackageFileAnalyzer = SwiftPackageFileAnalyzer(
-                fileHandler: fileHandler,
-                shell: shell,
-                logger: logger
-            )
-            let swiftPackageAnalysis = try swiftPackageFileAnalyzer.analyze(
-                oldProjectUrl: projectDirectories.old,
-                newProjectUrl: projectDirectories.new
-            )
-            
-            warnings = swiftPackageAnalysis.warnings
-            packageFileChanges = swiftPackageAnalysis.changes
-        case .xcodeProject:
-            warnings = []
-            packageFileChanges = []
-            break // Nothing to do
-        }
-        
         // MARK: - Produce .swiftinterface files
         
         let producer = SwiftInterfaceProducer(
@@ -135,9 +104,8 @@ public struct PADProjectBuilder {
         )
         
         return .init(
-            packageFileChanges: packageFileChanges,
-            warnings: warnings,
-            swiftInterfaceFiles: swiftInterfaceFiles
+            swiftInterfaceFiles: swiftInterfaceFiles,
+            projectDirectories: projectDirectories
         )
     }
 }

@@ -1,9 +1,11 @@
 import Foundation
 
-import FileHandlingModule
-import ShellModule
 import PADLogging
 import PADCore
+
+import FileHandlingModule
+import ShellModule
+import SwiftPackageFileHelperModule
 
 /// Allows building of the old & new project and returns the `.swiftinterface` files
 struct SwiftInterfaceProducer {

@@ -5,12 +5,12 @@ The ``PADProjectBuilder/PADProjectBuilder`` builds the old & new version of a pr
 ## Usage
 
 ```swift
-let oldSource: PADProjectSource = try .from("develop~https://github.com/some/repository")
+let oldSource: PADProjectSource = try .from("develop~https://github.com/Adyen/adyen-ios.git")
 let newSource: PADProjectSource = try .from("some/local/path")
 
 let projectBuilder = PADProjectBuilder(
-    projectType: .swiftPackage,
-    swiftInterfaceType: .public
+    projectType: .swiftPackage, // .xcodeProject("scheme_name")
+    swiftInterfaceType: .public // .private
 )
 
 let projectBuilderResult: PADProjectBuilder.Result = try await projectBuilder.build(

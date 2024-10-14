@@ -5,9 +5,11 @@
 //
 
 import Foundation
+
+import PADLogging
+
 import FileHandlingModule
 import ShellModule
-import PADLogging
 
 enum SwiftPackageFileHelperError: LocalizedError {
     case packageDescriptionError(_ description: String)
@@ -26,13 +28,13 @@ enum SwiftPackageFileHelperError: LocalizedError {
     }
 }
 
-struct SwiftPackageFileHelper {
+package struct SwiftPackageFileHelper {
     
     private let fileHandler: FileHandling
     private let shell: any ShellHandling
     private let logger: (any PADLogging)?
     
-    public init(
+    package init(
         fileHandler: FileHandling,
         shell: any ShellHandling,
         logger: (any PADLogging)?
@@ -42,11 +44,11 @@ struct SwiftPackageFileHelper {
         self.logger = logger
     }
     
-    public static func packagePath(for projectDirectoryPath: String) -> String {
+    package static func packagePath(for projectDirectoryPath: String) -> String {
         projectDirectoryPath.appending("/Package.swift")
     }
     
-    public func availableTargets(
+    package func availableTargets(
         at projectDirectoryPath: String,
         moduleType: SwiftPackageDescription.Target.ModuleType? = nil,
         targetType: SwiftPackageDescription.Target.TargetType? = nil
@@ -65,12 +67,12 @@ struct SwiftPackageFileHelper {
         return Set(targets.map(\.name))
     }
     
-    public func packageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
+    package func packageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
         try generatePackageDescription(at: projectDirectoryPath)
     }
     
     /// Inserts a new library into the targets section containing all targets from the target section
-    public func preparePackageWithConsolidatedLibrary(
+    package func preparePackageWithConsolidatedLibrary(
         named consolidatedLibraryName: String,
         at projectDirectoryPath: String
     ) throws {

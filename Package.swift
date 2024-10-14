@@ -24,6 +24,7 @@ let package = Package(
             name: "PublicApiDiff",
             targets: [
                 "PADProjectBuilder",
+                "PADPackageFileAnalyzer",
                 "PADSwiftInterfaceDiff",
                 "PADOutputGenerator"
             ]
@@ -45,6 +46,7 @@ let package = Package(
                 "PADProjectBuilder",
                 "PADSwiftInterfaceDiff",
                 "PADOutputGenerator",
+                "PADPackageFileAnalyzer",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
             path: "Sources/ExecutableTargets/CommandLineTool"
@@ -64,12 +66,24 @@ let package = Package(
             path: "Sources/PublicModules/PADSwiftInterfaceDiff"
         ),
         .target(
+            name: "PADPackageFileAnalyzer",
+            dependencies: [
+                "PADCore",
+                "PADLogging",
+                "FileHandlingModule",
+                "ShellModule",
+                "SwiftPackageFileHelperModule"
+            ],
+            path: "Sources/PublicModules/PADPackageFileAnalyzer"
+        ),
+        .target(
             name: "PADProjectBuilder",
             dependencies: [
                 "PADCore",
-                "FileHandlingModule",
                 "PADLogging",
-                "ShellModule"
+                "FileHandlingModule",
+                "ShellModule",
+                "SwiftPackageFileHelperModule"
             ],
             path: "Sources/PublicModules/PADProjectBuilder"
         ),
@@ -100,6 +114,11 @@ let package = Package(
         .target(
             name: "ShellModule",
             path: "Sources/Shared/Package/ShellModule"
+        ),
+        .target(
+            name: "SwiftPackageFileHelperModule",
+            dependencies: ["FileHandlingModule", "PADLogging"],
+            path: "Sources/Shared/Package/SwiftPackageFileHelperModule"
         ),
         
         // MARK: - Test Targets

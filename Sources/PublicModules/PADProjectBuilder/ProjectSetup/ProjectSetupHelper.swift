@@ -61,17 +61,12 @@ struct ProjectSetupHelper: ProjectSetupHelping {
 
 extension ProjectSetupHelper {
     
-    struct ProjectDirectories {
-        let old: URL
-        let new: URL
-    }
-    
     /// Convenience method that calls into `setup(_:projectType:)` for the old and new source
     func setupProjects(
         oldSource: PADProjectSource,
         newSource: PADProjectSource,
         projectType: PADProjectType
-    ) async throws -> ProjectDirectories {
+    ) async throws -> (old: URL, new: URL) {
         let projectSetupHelper = ProjectSetupHelper(
             workingDirectoryPath: workingDirectoryPath,
             logger: logger
@@ -81,7 +76,7 @@ extension ProjectSetupHelper {
         async let newProjectDirectoryPath = try projectSetupHelper.setup(newSource, projectType: projectType)
         async let oldProjectDirectoryPath = try projectSetupHelper.setup(oldSource, projectType: projectType)
         
-        return try await .init(old: oldProjectDirectoryPath, new: newProjectDirectoryPath)
+        return try await (oldProjectDirectoryPath, newProjectDirectoryPath)
     }
 }
 

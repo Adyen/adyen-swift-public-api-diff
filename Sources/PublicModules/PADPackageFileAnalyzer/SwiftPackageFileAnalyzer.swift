@@ -7,12 +7,14 @@
 import Foundation
 
 import PADCore
-import FileHandlingModule
-import ShellModule
 import PADLogging
 
+import FileHandlingModule
+import ShellModule
+import SwiftPackageFileHelperModule
+
 /// Analyzes 2 versions of a `Package.swift`
-struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
+public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
@@ -25,17 +27,25 @@ struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
         }
     }
 
-    init(
+    public init(logger: (any PADLogging)? = nil) {
+        self.init(
+            fileHandler: FileManager.default,
+            shell: Shell(),
+            logger: logger
+        )
+    }
+    
+    package init(
         fileHandler: FileHandling = FileManager.default,
         shell: ShellHandling = Shell(),
-        logger: (any PADLogging)?
+        logger: (any PADLogging)? = nil
     ) {
         self.fileHandler = fileHandler
         self.logger = logger
         self.shell = shell
     }
     
-    func analyze(
+    public func analyze(
         oldProjectUrl: URL,
         newProjectUrl: URL
     ) throws -> SwiftPackageFileAnalyzingResult {

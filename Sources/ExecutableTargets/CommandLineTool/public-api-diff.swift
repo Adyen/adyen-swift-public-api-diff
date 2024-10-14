@@ -13,6 +13,7 @@ import PADLogging
 import PADSwiftInterfaceDiff
 import PADProjectBuilder
 import PADOutputGenerator
+import PADPackageFileAnalyzer
 
 /// The command line tool to analyze public api changes
 @main
@@ -54,60 +55,58 @@ struct PublicApiDiff: AsyncParsableCommand {
         
         do {
             var warnings = [String]()
-            var changes = [String: [PADChange]]()
-            
-            // MARK: - Producing .swiftinterface files
+            var swiftInterfaceChanges = [String: [PADChange]]()
+            var projectChanges = [PADChange]()
             
             let oldSource: PADProjectSource = try .from(old)
             let newSource: PADProjectSource = try .from(new)
             
-            let oldVersionName = oldSource.description
-            let newVersionName = newSource.description
+            // MARK: - Producing .swiftinterface files
             
-            let projectBuilder = PADProjectBuilder(
+            let projectBuilderResult = try await Self.buildProject(
+                oldSource: oldSource,
+                newSource: newSource,
                 projectType: projectType,
                 swiftInterfaceType: swiftInterfaceType,
                 logger: logger
             )
             
-            let projectBuilderResult = try await projectBuilder.build(
-                oldSource: oldSource,
-                newSource: newSource
+            // MARK: - Analyzing .swiftinterface files
+            
+            let swiftInterfaceFileChanges = try await Self.analyzeSwiftInterfaceFiles(
+                swiftInterfaceFiles: projectBuilderResult.swiftInterfaceFiles,
+                changes: &swiftInterfaceChanges,
+                logger: logger
             )
             
-            warnings += projectBuilderResult.warnings
-            if !projectBuilderResult.packageFileChanges.isEmpty {
-                changes["Package.swift"] = projectBuilderResult.packageFileChanges
-            }
+            // MARK: - Analyzing Package.swift
             
-            // MARK: - Analyze .swiftinterface files
-            
-            let swiftInterfaceDiff = PADSwiftInterfaceDiff(logger: logger)
-            
-            let swiftInterfaceDifferences = try await swiftInterfaceDiff.run(
-                with: projectBuilderResult.swiftInterfaceFiles
+            try Self.analyzeProject(
+                ofType: projectType,
+                projectDirectories: projectBuilderResult.projectDirectories,
+                changes: &projectChanges,
+                warnings: &warnings,
+                logger: logger
             )
             
-            // Merging pipeline output into existing changes - making sure we're not overriding any keys
-            swiftInterfaceDifferences.forEach { key, value in
-                var keyToUse = key
-                if changes[key] != nil {
-                    keyToUse = "\(key) (\(UUID().uuidString))"
-                }
-                changes[keyToUse] = value
+            // MARK: - Merging Changes
+            
+            var changes = swiftInterfaceChanges
+            if !projectChanges.isEmpty {
+                changes["Package.swift"] = projectChanges
             }
             
             // MARK: - Generate Output
             
-            let outputGenerator: any PADOutputGenerating<String> = PADMarkdownOutputGenerator()
-            
-            let generatedOutput = try outputGenerator.generate(
-                from: changes,
+            let generatedOutput = try Self.generateOutput(
+                for: changes,
+                warnings: warnings,
                 allTargets: projectBuilderResult.swiftInterfaceFiles.map(\.name).sorted(),
-                oldVersionName: oldVersionName,
-                newVersionName: newVersionName,
-                warnings: warnings
+                oldVersionName: oldSource.description,
+                newVersionName: newSource.description
             )
+            
+            // MARK: -
             
             if let output {
                 try FileManager.default.write(generatedOutput, to: output)
@@ -136,5 +135,83 @@ private extension PublicApiDiff {
         loggers += [PADSystemLogger().withLogLevel(logLevel)]
         
         return PADLoggingGroup(with: loggers)
+    }
+    
+    static func buildProject(
+        oldSource: PADProjectSource,
+        newSource: PADProjectSource,
+        projectType: PADProjectType,
+        swiftInterfaceType: PADSwiftInterfaceType,
+        logger: any PADLogging
+    ) async throws -> PADProjectBuilder.Result {
+        
+        let projectBuilder = PADProjectBuilder(
+            projectType: projectType,
+            swiftInterfaceType: swiftInterfaceType,
+            logger: logger
+        )
+        
+        return try await projectBuilder.build(
+            oldSource: oldSource,
+            newSource: newSource
+        )
+    }
+    
+    static func analyzeProject(
+        ofType projectType: PADProjectType,
+        projectDirectories: (old: URL, new: URL),
+        changes: inout [PADChange],
+        warnings: inout [String],
+        logger: any PADLogging
+    ) throws {
+        var packageFileChanges = [PADChange]()
+        
+        switch projectType {
+        case .swiftPackage:
+            let swiftPackageFileAnalyzer = SwiftPackageFileAnalyzer(
+                logger: logger
+            )
+            let swiftPackageAnalysis = try swiftPackageFileAnalyzer.analyze(
+                oldProjectUrl: projectDirectories.old,
+                newProjectUrl: projectDirectories.new
+            )
+            
+            warnings = swiftPackageAnalysis.warnings
+            changes = swiftPackageAnalysis.changes
+        case .xcodeProject:
+            warnings = []
+            changes = []
+            break // Nothing to do
+        }
+    }
+    
+    static func analyzeSwiftInterfaceFiles(
+        swiftInterfaceFiles: [PADSwiftInterfaceFile],
+        changes: inout [String: [PADChange]],
+        logger: any PADLogging
+    ) async throws -> [String: [PADChange]] {
+        let swiftInterfaceDiff = PADSwiftInterfaceDiff(logger: logger)
+        
+        return try await swiftInterfaceDiff.run(
+            with: swiftInterfaceFiles
+        )
+    }
+    
+    static func generateOutput(
+        for changes: [String: [PADChange]],
+        warnings: [String],
+        allTargets: [String],
+        oldVersionName: String,
+        newVersionName: String
+    ) throws -> String {
+        let outputGenerator: any PADOutputGenerating<String> = PADMarkdownOutputGenerator()
+        
+        return try outputGenerator.generate(
+            from: changes,
+            allTargets: allTargets,
+            oldVersionName: oldVersionName,
+            newVersionName: newVersionName,
+            warnings: warnings
+        )
     }
 }
