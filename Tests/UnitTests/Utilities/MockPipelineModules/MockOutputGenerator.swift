@@ -8,12 +8,12 @@
 @testable import PADCore
 import XCTest
 
-struct MockOutputGenerator: PADOutputGenerating {
+struct MockOutputGenerator: OutputGenerating {
 
-    var onGenerate: ([String: [PADChange]], [String], String, String, [String]) throws -> String
+    var onGenerate: ([String: [Change]], [String], String, String, [String]) throws -> String
     
     func generate(
-        from changesPerTarget: [String: [PADChange]],
+        from changesPerTarget: [String: [Change]],
         allTargets: [String],
         oldVersionName: String,
         newVersionName: String,

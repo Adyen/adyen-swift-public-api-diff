@@ -12,13 +12,13 @@ class PipelineTests: XCTestCase {
     
     func test_pipeline() async throws {
         
-        let swiftInterfaceFile = PADSwiftInterfaceFile(
+        let swiftInterfaceFile = SwiftInterfaceFile(
             name: "MODULE_NAME",
             oldFilePath: "old_file_path",
             newFilePath: "new_file_path"
         )
         
-        let expectedChanges: [PADChange] = [.init(changeType: .addition(description: "addition"))]
+        let expectedChanges: [Change] = [.init(changeType: .addition(description: "addition"))]
         var expectedHandleLoadDataCalls = ["new_file_path", "old_file_path"]
         var expectedHandleParseSourceCalls: [(source: String, moduleName: String)] = [
             ("content_for_new_file_path", "MODULE_NAME"),
@@ -28,9 +28,9 @@ class PipelineTests: XCTestCase {
             (.init(moduleName: "MODULE_NAME", elements: []), .init(moduleName: "MODULE_NAME", elements: []))
         ]
         var expectedHandleLogCalls: [(message: String, subsystem: String)] = [
-            ("🧑‍🔬 Analyzing MODULE_NAME", "PADSwiftInterfaceDiff")
+            ("🧑‍🔬 Analyzing MODULE_NAME", "SwiftInterfaceDiff")
         ]
-        let expectedPipelineOutput: [String: [PADChange]] = ["MODULE_NAME": expectedChanges]
+        let expectedPipelineOutput: [String: [Change]] = ["MODULE_NAME": expectedChanges]
         
         // Mock Setup
         
@@ -66,7 +66,7 @@ class PipelineTests: XCTestCase {
         
         // Pipeline run
         
-        let pipeline = PADSwiftInterfaceDiff(
+        let pipeline = SwiftInterfaceDiff(
             fileHandler: fileHandler,
             swiftInterfaceParser: swiftInterfaceParser,
             swiftInterfaceAnalyzer: swiftInterfaceAnalyzer,

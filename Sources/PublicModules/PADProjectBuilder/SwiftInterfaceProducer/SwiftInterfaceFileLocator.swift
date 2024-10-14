@@ -9,12 +9,12 @@ struct SwiftInterfaceFileLocator {
     
     let fileHandler: any FileHandling
     let shell: any ShellHandling
-    let logger: (any PADLogging)?
+    let logger: (any Logging)?
     
     init(
         fileHandler: any FileHandling = FileManager.default,
         shell: any ShellHandling = Shell(),
-        logger: (any PADLogging)?
+        logger: (any Logging)?
     ) {
         self.fileHandler = fileHandler
         self.shell = shell
@@ -29,7 +29,7 @@ struct SwiftInterfaceFileLocator {
     ///   - type: The swift interface type (.public, .private) to look for
     /// - Returns: The file url to the found `.swiftinterface`
     /// - Throws: An error if no `.swiftinterface` file can be found for the given scheme + derived data path
-    func locate(for scheme: String, derivedDataPath: String, type: PADSwiftInterfaceType) throws -> URL {
+    func locate(for scheme: String, derivedDataPath: String, type: SwiftInterfaceType) throws -> URL {
         let schemeSwiftModuleName = "\(scheme).swiftmodule"
         
         let swiftModulePathsForScheme = shell.execute("cd '\(derivedDataPath)'; find . -type d -name '\(schemeSwiftModuleName)'")

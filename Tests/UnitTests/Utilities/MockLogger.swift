@@ -7,7 +7,7 @@
 @testable import PADLogging
 import XCTest
 
-struct MockLogger: PADLogging {
+struct MockLogger: Logging {
     
     var handleLog: (String, String) -> Void = { _, _ in
         XCTFail("Unexpectedly called `\(#function)`")

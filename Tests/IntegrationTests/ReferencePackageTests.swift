@@ -6,7 +6,6 @@
 
 @testable import PADProjectBuilder
 @testable import PADOutputGenerator
-@testable import PADProjectBuilder
 @testable import PADSwiftInterfaceDiff
 @testable import PADCore
 import XCTest
@@ -48,7 +47,7 @@ class ReferencePackageTests: XCTestCase {
         let expectedOutput = try expectedOutput(for: interfaceType)
         let pipelineOutput = try await runPipeline(for: interfaceType)
         
-        let markdownOutput = PADMarkdownOutputGenerator().generate(
+        let markdownOutput = MarkdownOutputGenerator().generate(
             from: pipelineOutput,
             allTargets: ["ReferencePackage"],
             oldVersionName: "old_public",
@@ -74,7 +73,7 @@ class ReferencePackageTests: XCTestCase {
         let expectedOutput = try expectedOutput(for: interfaceType)
         let pipelineOutput = try await runPipeline(for: interfaceType)
         
-        let markdownOutput = PADMarkdownOutputGenerator().generate(
+        let markdownOutput = MarkdownOutputGenerator().generate(
             from: pipelineOutput,
             allTargets: ["ReferencePackage"],
             oldVersionName: "old_private",
@@ -141,7 +140,7 @@ private extension ReferencePackageTests {
         return interfaceFilePath.path()
     }
     
-    func runPipeline(for interfaceType: InterfaceType) async throws -> [String: [PADChange]] {
+    func runPipeline(for interfaceType: InterfaceType) async throws -> [String: [Change]] {
 
         let referencePackagesRoot = try Self.referencePackagesPath()
         
@@ -158,14 +157,14 @@ private extension ReferencePackageTests {
         )
         
         let interfaceFiles = [
-            PADSwiftInterfaceFile(
+            SwiftInterfaceFile(
                 name: "ReferencePackage",
                 oldFilePath: oldPrivateSwiftInterfaceFilePath,
                 newFilePath: newPrivateSwiftInterfaceFilePath
             )
         ]
         
-        return try await PADSwiftInterfaceDiff(
+        return try await SwiftInterfaceDiff(
             fileHandler: FileManager.default,
             swiftInterfaceParser: SwiftInterfaceParser(),
             swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),

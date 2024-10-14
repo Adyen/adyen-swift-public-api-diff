@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 
 /// A log level specifying the granularity of the emitted logs
-public enum PADLogLevel {
+public enum LogLevel {
     /// No logs
     case quiet
     /// All logs except `debug`
@@ -33,15 +33,15 @@ public enum PADLogLevel {
     }
 }
 
-// MARK: - PADLogLevelLogger
+// MARK: - LogLevelLogger
 
-/// Logger that respects a ``PADLogLevel``
-public struct PADLogLevelLogger<LoggerType: PADLogging>: PADLogging {
+/// Logger that respects a ``LogLevel``
+public struct LogLevelLogger<LoggerType: Logging>: Logging {
     
-    private let logLevel: PADLogLevel
+    private let logLevel: LogLevel
     internal let wrappedLogger: LoggerType
     
-    init(with logger: LoggerType, logLevel: PADLogLevel) {
+    init(with logger: LoggerType, logLevel: LogLevel) {
         self.wrappedLogger = logger
         self.logLevel = logLevel
     }
@@ -59,9 +59,9 @@ public struct PADLogLevelLogger<LoggerType: PADLogging>: PADLogging {
 
 // MARK: - Logging Extension
 
-extension PADLogging {
-    /// Wraps a logger into a ``PADLogLevelLogger`` to make them respect the ``PADLogLevel``
-    public func withLogLevel(_ logLevel: PADLogLevel) -> PADLogLevelLogger<Self> {
+extension Logging {
+    /// Wraps a logger into a ``LogLevelLogger`` to make them respect the ``LogLevel``
+    public func withLogLevel(_ logLevel: LogLevel) -> LogLevelLogger<Self> {
         .init(with: self, logLevel: logLevel)
     }
 }

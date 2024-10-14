@@ -18,7 +18,7 @@ public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
-    private let logger: (any PADLogging)?
+    private let logger: (any Logging)?
     
     private enum Constants {
         static let packageFileName = "Package.swift"
@@ -27,7 +27,7 @@ public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
         }
     }
 
-    public init(logger: (any PADLogging)? = nil) {
+    public init(logger: (any Logging)? = nil) {
         self.init(
             fileHandler: FileManager.default,
             shell: Shell(),
@@ -38,7 +38,7 @@ public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     package init(
         fileHandler: FileHandling = FileManager.default,
         shell: ShellHandling = Shell(),
-        logger: (any PADLogging)? = nil
+        logger: (any Logging)? = nil
     ) {
         self.fileHandler = fileHandler
         self.logger = logger
@@ -83,7 +83,7 @@ private extension SwiftPackageFileAnalyzer {
         
         guard old != new else { return .init(changes: [], warnings: []) }
         
-        var changes = [PADChange]()
+        var changes = [Change]()
         changes += try analyzeToolsVersion(old: old.toolsVersion, new: new.toolsVersion)
         
         changes += try analyzeDefaultLocalization(old: old.defaultLocalization, new: new.defaultLocalization)
@@ -102,7 +102,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeDefaultLocalization(
         old: String?,
         new: String?
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard old != new else { return [] }
         
         let keyName = "defaultLocalization"
@@ -137,7 +137,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeName(
         old: String,
         new: String
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard old != new else { return [] }
         
         let keyName = "name"
@@ -156,7 +156,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzePlatforms(
         old: [SwiftPackageDescription.Platform],
         new: [SwiftPackageDescription.Platform]
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard old != new else { return [] }
         
         let oldPlatformNames = Set(old.map(\.name))
@@ -205,7 +205,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeProducts(
         old: [SwiftPackageDescription.Product],
         new: [SwiftPackageDescription.Product]
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard old != new else { return [] }
         
         let oldProductNames = Set(old.map(\.name)).filter { $0 != "_AllTargets" }
@@ -215,7 +215,7 @@ private extension SwiftPackageFileAnalyzer {
         let removed = oldProductNames.subtracting(newProductNames)
         let consistent = Set(oldProductNames).intersection(Set(newProductNames))
         
-        var changes = [PADChange]()
+        var changes = [Change]()
         
         changes += added.compactMap { addition in
             guard let addedProduct = new.first(where: { $0.name == addition }) else { return nil }
@@ -251,7 +251,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeProduct(
         old oldProduct: SwiftPackageDescription.Product,
         new newProduct: SwiftPackageDescription.Product
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard oldProduct != newProduct else { return [] }
         
         let oldTargetNames = Set(oldProduct.targets)
@@ -279,7 +279,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeTargets(
         old: [SwiftPackageDescription.Target],
         new: [SwiftPackageDescription.Target]
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard old != new else { return [] }
         
         let oldTargetNames = Set(old.map(\.name))
@@ -289,7 +289,7 @@ private extension SwiftPackageFileAnalyzer {
         let removed = oldTargetNames.subtracting(newTargetNames)
         let consistent = Set(oldTargetNames).intersection(Set(newTargetNames))
         
-        var changes = [PADChange]()
+        var changes = [Change]()
         
         changes += added.compactMap { addition in
             guard let addedTarget = new.first(where: { $0.name == addition }) else { return nil }
@@ -325,7 +325,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeTarget(
         oldTarget: SwiftPackageDescription.Target,
         newTarget: SwiftPackageDescription.Target
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard oldTarget != newTarget else { return [] }
         
         // MARK: Target Dependencies
@@ -375,7 +375,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeDependencies(
         old: [SwiftPackageDescription.Dependency],
         new: [SwiftPackageDescription.Dependency]
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard old != new else { return [] }
         
         let oldDependencies = Set(old.map(\.identity))
@@ -385,7 +385,7 @@ private extension SwiftPackageFileAnalyzer {
         let removedDependencies = oldDependencies.subtracting(newDependencies)
         let consistentDependencies = oldDependencies.intersection(newDependencies)
         
-        var changes = [PADChange]()
+        var changes = [Change]()
         
         changes += addedDependencies.compactMap { addition in
             guard let addedDependency = new.first(where: { $0.identity == addition }) else { return nil }
@@ -421,7 +421,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeDependency(
         oldDependency: SwiftPackageDescription.Dependency,
         newDependency: SwiftPackageDescription.Dependency
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard oldDependency != newDependency else { return [] }
         
         return [.init(
@@ -439,7 +439,7 @@ private extension SwiftPackageFileAnalyzer {
     private func analyzeToolsVersion(
         old: String,
         new: String
-    ) throws -> [PADChange] {
+    ) throws -> [Change] {
         guard old != new else { return [] }
         
         return [.init(

@@ -1,11 +1,11 @@
 import Foundation
 
 /// A group of loggers
-public struct PADLoggingGroup: PADLogging {
+public struct LoggingGroup: Logging {
     
-    let logger: [any PADLogging]
+    let logger: [any Logging]
     
-    public init(with logger: [any PADLogging]) {
+    public init(with logger: [any Logging]) {
         self.logger = logger
     }
     

@@ -13,7 +13,7 @@ class ProjectSourceTests: XCTestCase {
     
     func test_remote_validSource() throws {
         let repositoryUrl = "https://github.com/Adyen/adyen-ios.git"
-        let separator = PADProjectSource.gitSourceSeparator
+        let separator = ProjectSource.gitSourceSeparator
         let branch = "develop"
         let rawProjectSourceValue = "\(branch)\(separator)\(repositoryUrl)"
         
@@ -22,7 +22,7 @@ class ProjectSourceTests: XCTestCase {
             return false
         })
         
-        let projectSource = try PADProjectSource.from(
+        let projectSource = try ProjectSource.from(
             "\(branch)\(separator)\(repositoryUrl)",
             fileHandler: mockFileHandler
         )
@@ -35,7 +35,7 @@ class ProjectSourceTests: XCTestCase {
     
     func test_remote_invalidRepoUrl() throws {
         let repositoryUrl = ""
-        let separator = PADProjectSource.gitSourceSeparator
+        let separator = ProjectSource.gitSourceSeparator
         let branch = "develop"
         let rawProjectSourceValue = "\(branch)\(separator)\(repositoryUrl)"
         
@@ -45,17 +45,17 @@ class ProjectSourceTests: XCTestCase {
         })
         
         do {
-            let source = try PADProjectSource.from(
+            let source = try ProjectSource.from(
                 rawProjectSourceValue,
                 fileHandler: mockFileHandler
             )
             XCTAssertNil(source) // Guard to make sure that we catch if it succeeds
         } catch {
-            let projectSourceError = try XCTUnwrap(error as? PADProjectSource.Error)
+            let projectSourceError = try XCTUnwrap(error as? ProjectSource.Error)
             
             XCTAssertEqual(
                 projectSourceError,
-                PADProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
+                ProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
             )
         }
     }
@@ -72,17 +72,17 @@ class ProjectSourceTests: XCTestCase {
         })
         
         do {
-            let source = try PADProjectSource.from(
+            let source = try ProjectSource.from(
                 rawProjectSourceValue,
                 fileHandler: mockFileHandler
             )
             XCTAssertNil(source) // Guard to make sure that we catch if it succeeds
         } catch {
-            let projectSourceError = try XCTUnwrap(error as? PADProjectSource.Error)
+            let projectSourceError = try XCTUnwrap(error as? ProjectSource.Error)
             
             XCTAssertEqual(
                 projectSourceError,
-                PADProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
+                ProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
             )
         }
     }
@@ -96,7 +96,7 @@ class ProjectSourceTests: XCTestCase {
             return true
         })
         
-        let projectSource = try PADProjectSource.from(
+        let projectSource = try ProjectSource.from(
             repositoryDirectoryPath,
             fileHandler: mockFileHandler
         )
@@ -114,7 +114,7 @@ class ProjectSourceTests: XCTestCase {
             return false
         })
         
-        let projectSource = try? PADProjectSource.from(
+        let projectSource = try? ProjectSource.from(
             repositoryDirectoryPath,
             fileHandler: mockFileHandler
         )

@@ -1,19 +1,19 @@
-# ``PADProjectBuilder``
+# ``ProjectBuilder``
 
-The ``PADProjectBuilder/PADProjectBuilder`` builds the old & new version of a project and outputs a list of ``PADCore/PADSwiftInterfaceFile``s as well as changes that happened to the project files including any warnings if applicable.
+The ``ProjectBuilder/ProjectBuilder`` builds the old & new version of a project and outputs a list of ``PADCore/SwiftInterfaceFile``s as well as changes that happened to the project files including any warnings if applicable.
 
 ## Usage
 
 ```swift
-let oldSource: PADProjectSource = try .from("develop~https://github.com/Adyen/adyen-ios.git")
-let newSource: PADProjectSource = try .from("some/local/path")
+let oldSource: ProjectSource = try .from("develop~https://github.com/Adyen/adyen-ios.git")
+let newSource: ProjectSource = try .from("some/local/path")
 
-let projectBuilder = PADProjectBuilder(
+let projectBuilder = ProjectBuilder(
     projectType: .swiftPackage, // .xcodeProject("scheme_name")
     swiftInterfaceType: .public // .private
 )
 
-let projectBuilderResult: PADProjectBuilder.Result = try await projectBuilder.build(
+let projectBuilderResult: ProjectBuilder.Result = try await projectBuilder.build(
     oldSource: oldSource,
     newSource: newSource
 )

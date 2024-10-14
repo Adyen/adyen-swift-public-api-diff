@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 
 /// A logger that outputs logs to the console
-public struct PADSystemLogger: PADLogging {
+public struct SystemLogger: Logging {
     
     public init() {}
     
@@ -15,7 +15,7 @@ public struct PADSystemLogger: PADLogging {
     }
 }
 
-private extension PADSystemLogger {
+private extension SystemLogger {
     
     func logger(for subsystem: String) -> Logger {
         Logger(

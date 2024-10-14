@@ -32,12 +32,12 @@ package struct SwiftPackageFileHelper {
     
     private let fileHandler: FileHandling
     private let shell: any ShellHandling
-    private let logger: (any PADLogging)?
+    private let logger: (any Logging)?
     
     package init(
         fileHandler: FileHandling,
         shell: any ShellHandling,
-        logger: (any PADLogging)?
+        logger: (any Logging)?
     ) {
         self.fileHandler = fileHandler
         self.shell = shell

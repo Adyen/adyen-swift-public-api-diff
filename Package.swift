@@ -58,8 +58,8 @@ let package = Package(
             name: "PADSwiftInterfaceDiff",
             dependencies: [
                 "PADCore",
-                "FileHandlingModule",
                 "PADLogging",
+                "FileHandlingModule",
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
             ],
@@ -117,7 +117,7 @@ let package = Package(
         ),
         .target(
             name: "SwiftPackageFileHelperModule",
-            dependencies: ["FileHandlingModule", "PADLogging"],
+            dependencies: ["FileHandlingModule", "ShellModule", "PADLogging"],
             path: "Sources/Shared/Package/SwiftPackageFileHelperModule"
         ),
         

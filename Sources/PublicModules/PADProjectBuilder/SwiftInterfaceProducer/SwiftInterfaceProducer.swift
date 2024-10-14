@@ -14,19 +14,19 @@ struct SwiftInterfaceProducer {
     private typealias DerivedDataPaths = (new: String, old: String)
     
     let workingDirectoryPath: String
-    let projectType: PADProjectType
-    let swiftInterfaceType: PADSwiftInterfaceType
+    let projectType: ProjectType
+    let swiftInterfaceType: SwiftInterfaceType
     let fileHandler: any FileHandling
     let shell: any ShellHandling
-    let logger: (any PADLogging)?
+    let logger: (any Logging)?
     
     init(
         workingDirectoryPath: String,
-        projectType: PADProjectType,
-        swiftInterfaceType: PADSwiftInterfaceType,
+        projectType: ProjectType,
+        swiftInterfaceType: SwiftInterfaceType,
         fileHandler: any FileHandling,
         shell: any ShellHandling,
-        logger: (any PADLogging)?
+        logger: (any Logging)?
     ) {
         self.workingDirectoryPath = workingDirectoryPath
         self.projectType = projectType
@@ -40,7 +40,7 @@ struct SwiftInterfaceProducer {
     func produceInterfaceFiles(
         oldProjectDirectory: URL,
         newProjectDirectory: URL
-    ) async throws -> [PADSwiftInterfaceFile] {
+    ) async throws -> [SwiftInterfaceFile] {
      
         let newProjectDirectoryPath = newProjectDirectory.path()
         let oldProjectDirectoryPath = oldProjectDirectory.path()
@@ -153,7 +153,7 @@ extension SwiftInterfaceProducer {
         newDerivedDataPath: String,
         oldDerivedDataPath: String,
         schemes schemesToCompare: [String]
-    ) throws -> [PADSwiftInterfaceFile] {
+    ) throws -> [SwiftInterfaceFile] {
         logger?.log("🔎 Locating interface files for \(schemesToCompare.joined(separator: ", "))", from: String(describing: Self.self))
         
         let interfaceFileLocator = SwiftInterfaceFileLocator(fileHandler: fileHandler, shell: shell, logger: logger)

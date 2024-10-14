@@ -4,21 +4,21 @@ import PADCore
 import PADLogging
 import FileHandlingModule
 
-/// Takes a list of ``PADCore/PADSwiftInterfaceFile``s and detects changes between the old and new version
-public struct PADSwiftInterfaceDiff {
+/// Takes a list of ``PADCore/SwiftInterfaceFile``s and detects changes between the old and new version
+public struct SwiftInterfaceDiff {
     
     public typealias ModuleName = String
     
     let fileHandler: any FileHandling
     let swiftInterfaceParser: any SwiftInterfaceParsing
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
-    let logger: (any PADLogging)?
+    let logger: (any Logging)?
     
     
-    /// Creates a new instance of ``PADSwiftInterfaceDiff``
+    /// Creates a new instance of ``SwiftInterfaceDiff``
     /// - Parameter logger: The (optional) logger
     public init(
-        logger: (any PADLogging)? = nil
+        logger: (any Logging)? = nil
     ) {
         self.init(
             fileHandler: FileManager.default,
@@ -32,7 +32,7 @@ public struct PADSwiftInterfaceDiff {
         fileHandler: FileHandling = FileManager.default,
         swiftInterfaceParser: any SwiftInterfaceParsing = SwiftInterfaceParser(),
         swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing = SwiftInterfaceAnalyzer(),
-        logger: (any PADLogging)? = nil
+        logger: (any Logging)? = nil
     ) {
         self.fileHandler = fileHandler
         self.swiftInterfaceParser = swiftInterfaceParser
@@ -41,12 +41,12 @@ public struct PADSwiftInterfaceDiff {
     }
     
     
-    /// Analyzes the passed ``PADCore/PADSwiftInterfaceFile``s and returns a list of changes grouped by scheme/target
-    /// - Parameter swiftInterfaceFiles: The ``PADCore/PADSwiftInterfaceFile``s to analyze
+    /// Analyzes the passed ``PADCore/SwiftInterfaceFile``s and returns a list of changes grouped by scheme/target
+    /// - Parameter swiftInterfaceFiles: The ``PADCore/SwiftInterfaceFile``s to analyze
     /// - Returns: A list of changes grouped by scheme/target
-    public func run(with swiftInterfaceFiles: [PADSwiftInterfaceFile]) async throws -> [ModuleName: [PADChange]] {
+    public func run(with swiftInterfaceFiles: [SwiftInterfaceFile]) async throws -> [ModuleName: [Change]] {
         
-        var changes = [String: [PADChange]]()
+        var changes = [String: [Change]]()
         
         try swiftInterfaceFiles.forEach { file in
             logger?.log("🧑‍🔬 Analyzing \(file.name)", from: String(describing: Self.self))

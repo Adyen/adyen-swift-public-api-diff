@@ -3,7 +3,7 @@ import PADCore
 
 public struct SwiftPackageFileAnalyzingResult {
     /// The changes between 2 `Package.swift` files
-    public let changes: [PADChange]
+    public let changes: [Change]
     /// Any warnings that occured while inspecting the `Package.swift` file
     public let warnings: [String]
 }

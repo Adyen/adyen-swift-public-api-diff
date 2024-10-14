@@ -1,7 +1,7 @@
 import Foundation
 
 /// Specifying the logger interface
-public protocol PADLogging {
+public protocol Logging {
     /// Logs a message marked as `log`
     func log(_ message: String, from subsystem: String)
     /// Logs a message marked as `debug`

@@ -28,12 +28,12 @@ struct XcodeTools {
     
     private let shell: ShellHandling
     private let fileHandler: FileHandling
-    private let logger: PADLogging?
+    private let logger: Logging?
     
     init(
         shell: ShellHandling = Shell(),
         fileHandler: FileHandling = FileManager.default,
-        logger: PADLogging?
+        logger: Logging?
     ) {
         self.shell = shell
         self.fileHandler = fileHandler
@@ -49,7 +49,7 @@ struct XcodeTools {
     func archive(
         projectDirectoryPath: String,
         scheme: String,
-        projectType: PADProjectType
+        projectType: ProjectType
     ) async throws -> String {
         var commandComponents = [
             "cd \(projectDirectoryPath);",

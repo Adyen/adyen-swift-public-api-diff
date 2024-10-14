@@ -1,7 +1,7 @@
 import Foundation
 
 /// A representation of 2 versions of a `.swiftinterface` file
-public struct PADSwiftInterfaceFile {
+public struct SwiftInterfaceFile {
     /// The name of the target/scheme that is represented in the `.swiftinterface` file
     public let name: String
     /// The file path to the old/reference `.swiftinterface`
@@ -9,7 +9,7 @@ public struct PADSwiftInterfaceFile {
     /// The file path to the new/updated `.swiftinterface`
     public let newFilePath: String
     
-    /// Creates a new instance of a ``PADSwiftInterfaceFile``
+    /// Creates a new instance of a ``SwiftInterfaceFile``
     public init(
         name: String,
         oldFilePath: String,

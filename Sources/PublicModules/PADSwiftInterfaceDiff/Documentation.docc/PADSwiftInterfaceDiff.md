@@ -1,15 +1,15 @@
-# ``PADSwiftInterfaceDiff``
+# ``SwiftInterfaceDiff``
 
-The ``PADSwiftInterfaceDiff`` consumes a list of ``PADCore/PADSwiftInterfaceFile``s and detects changes between the old and new version
+The ``SwiftInterfaceDiff`` consumes a list of ``PADCore/SwiftInterfaceFile``s and detects changes between the old and new version
 
 ## Usage
 
 ```swift
-let swiftInterfaceFiles: [PADSwiftInterfaceFile] = ...
+let swiftInterfaceFiles: [SwiftInterfaceFile] = ...
 
-let swiftInterfaceDiff = PADSwiftInterfaceDiff()
+let swiftInterfaceDiff = SwiftInterfaceDiff()
 
-let changes: [String: [PADChange]] = try await swiftInterfaceDiff.run(
+let changes: [String: [Change]] = try await swiftInterfaceDiff.run(
     with: swiftInterfaceFiles
 )
 ```

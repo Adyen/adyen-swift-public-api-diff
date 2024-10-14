@@ -15,14 +15,14 @@ struct ProjectSetupHelper: ProjectSetupHelping {
     let shell: any ShellHandling
     let randomStringGenerator: any RandomStringGenerating
     let fileHandler: any FileHandling
-    let logger: (any PADLogging)?
+    let logger: (any Logging)?
     
     init(
         workingDirectoryPath: String,
         randomStringGenerator: any RandomStringGenerating = RandomStringGenerator(),
         shell: any ShellHandling = Shell(),
         fileHandler: any FileHandling = FileManager.default,
-        logger: (any PADLogging)?
+        logger: (any Logging)?
     ) {
         self.workingDirectoryPath = workingDirectoryPath
         self.randomStringGenerator = randomStringGenerator
@@ -32,8 +32,8 @@ struct ProjectSetupHelper: ProjectSetupHelping {
     }
     
     func setup(
-        _ projectSource: PADProjectSource,
-        projectType: PADProjectType
+        _ projectSource: ProjectSource,
+        projectType: ProjectType
     ) async throws -> URL {
         try await Task {
             let checkoutPath = workingDirectoryPath + "\(randomStringGenerator.generateRandomString())"
@@ -50,7 +50,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
         }.value
     }
     
-    func filterProjectFiles(at checkoutPath: String, for projectType: PADProjectType) {
+    func filterProjectFiles(at checkoutPath: String, for projectType: ProjectType) {
         try? fileHandler.contentsOfDirectory(atPath: checkoutPath)
             .filter { !projectType.fileIsIncluded(filePath: $0) }
             .forEach { filePath in
@@ -63,9 +63,9 @@ extension ProjectSetupHelper {
     
     /// Convenience method that calls into `setup(_:projectType:)` for the old and new source
     func setupProjects(
-        oldSource: PADProjectSource,
-        newSource: PADProjectSource,
-        projectType: PADProjectType
+        oldSource: ProjectSource,
+        newSource: ProjectSource,
+        projectType: ProjectType
     ) async throws -> (old: URL, new: URL) {
         let projectSetupHelper = ProjectSetupHelper(
             workingDirectoryPath: workingDirectoryPath,
@@ -80,7 +80,7 @@ extension ProjectSetupHelper {
     }
 }
 
-private extension PADProjectType {
+private extension ProjectType {
     
     var excludedFileSuffixes: [String] {
         switch self {

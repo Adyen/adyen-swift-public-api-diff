@@ -21,12 +21,12 @@ internal struct Git {
     
     private let shell: ShellHandling
     private let fileHandler: FileHandling
-    private let logger: PADLogging?
+    private let logger: Logging?
     
     init(
         shell: ShellHandling,
         fileHandler: FileHandling,
-        logger: PADLogging?
+        logger: Logging?
     ) {
         self.shell = shell
         self.fileHandler = fileHandler

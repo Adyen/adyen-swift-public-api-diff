@@ -2,7 +2,7 @@ import Foundation
 import FileHandlingModule
 
 /// Logs into a log file at a specified output path
-public class PADLogFileLogger: PADLogging {
+public class LogFileLogger: Logging {
     
     private let fileHandler: any FileHandling
     private let outputFilePath: String

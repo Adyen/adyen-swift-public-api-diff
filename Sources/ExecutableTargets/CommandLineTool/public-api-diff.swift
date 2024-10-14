@@ -44,22 +44,22 @@ struct PublicApiDiff: AsyncParsableCommand {
     /// Entry point of the command line tool
     public func run() async throws {
         
-        let logLevel: PADLogLevel = .debug
-        let projectType: PADProjectType = { // Only needed when we have to produce the .swiftinterface files
+        let logLevel: LogLevel = .debug
+        let projectType: ProjectType = { // Only needed when we have to produce the .swiftinterface files
             if let scheme { return .xcodeProject(scheme: scheme) }
             return .swiftPackage
         }()
-        let swiftInterfaceType: PADSwiftInterfaceType = .public // Only needed when we have to produce the .swiftinterface files
+        let swiftInterfaceType: SwiftInterfaceType = .public // Only needed when we have to produce the .swiftinterface files
         
         let logger = Self.logger(with: logLevel, logOutputFilePath: logOutput)
         
         do {
             var warnings = [String]()
-            var swiftInterfaceChanges = [String: [PADChange]]()
-            var projectChanges = [PADChange]()
+            var swiftInterfaceChanges = [String: [Change]]()
+            var projectChanges = [Change]()
             
-            let oldSource: PADProjectSource = try .from(old)
-            let newSource: PADProjectSource = try .from(new)
+            let oldSource: ProjectSource = try .from(old)
+            let newSource: ProjectSource = try .from(new)
             
             // MARK: - Producing .swiftinterface files
             
@@ -125,27 +125,27 @@ struct PublicApiDiff: AsyncParsableCommand {
 private extension PublicApiDiff {
     
     static func logger(
-        with logLevel: PADLogLevel,
+        with logLevel: LogLevel,
         logOutputFilePath: String?
-    ) -> any PADLogging {
-        var loggers = [any PADLogging]()
+    ) -> any Logging {
+        var loggers = [any Logging]()
         if let logOutputFilePath {
-            loggers += [PADLogFileLogger(outputFilePath: logOutputFilePath)]
+            loggers += [LogFileLogger(outputFilePath: logOutputFilePath)]
         }
-        loggers += [PADSystemLogger().withLogLevel(logLevel)]
+        loggers += [SystemLogger().withLogLevel(logLevel)]
         
-        return PADLoggingGroup(with: loggers)
+        return LoggingGroup(with: loggers)
     }
     
     static func buildProject(
-        oldSource: PADProjectSource,
-        newSource: PADProjectSource,
-        projectType: PADProjectType,
-        swiftInterfaceType: PADSwiftInterfaceType,
-        logger: any PADLogging
-    ) async throws -> PADProjectBuilder.Result {
+        oldSource: ProjectSource,
+        newSource: ProjectSource,
+        projectType: ProjectType,
+        swiftInterfaceType: SwiftInterfaceType,
+        logger: any Logging
+    ) async throws -> ProjectBuilder.Result {
         
-        let projectBuilder = PADProjectBuilder(
+        let projectBuilder = ProjectBuilder(
             projectType: projectType,
             swiftInterfaceType: swiftInterfaceType,
             logger: logger
@@ -158,13 +158,13 @@ private extension PublicApiDiff {
     }
     
     static func analyzeProject(
-        ofType projectType: PADProjectType,
+        ofType projectType: ProjectType,
         projectDirectories: (old: URL, new: URL),
-        changes: inout [PADChange],
+        changes: inout [Change],
         warnings: inout [String],
-        logger: any PADLogging
+        logger: any Logging
     ) throws {
-        var packageFileChanges = [PADChange]()
+        var packageFileChanges = [Change]()
         
         switch projectType {
         case .swiftPackage:
@@ -186,11 +186,11 @@ private extension PublicApiDiff {
     }
     
     static func analyzeSwiftInterfaceFiles(
-        swiftInterfaceFiles: [PADSwiftInterfaceFile],
-        changes: inout [String: [PADChange]],
-        logger: any PADLogging
-    ) async throws -> [String: [PADChange]] {
-        let swiftInterfaceDiff = PADSwiftInterfaceDiff(logger: logger)
+        swiftInterfaceFiles: [SwiftInterfaceFile],
+        changes: inout [String: [Change]],
+        logger: any Logging
+    ) async throws -> [String: [Change]] {
+        let swiftInterfaceDiff = SwiftInterfaceDiff(logger: logger)
         
         return try await swiftInterfaceDiff.run(
             with: swiftInterfaceFiles
@@ -198,13 +198,13 @@ private extension PublicApiDiff {
     }
     
     static func generateOutput(
-        for changes: [String: [PADChange]],
+        for changes: [String: [Change]],
         warnings: [String],
         allTargets: [String],
         oldVersionName: String,
         newVersionName: String
     ) throws -> String {
-        let outputGenerator: any PADOutputGenerating<String> = PADMarkdownOutputGenerator()
+        let outputGenerator: any OutputGenerating<String> = MarkdownOutputGenerator()
         
         return try outputGenerator.generate(
             from: changes,

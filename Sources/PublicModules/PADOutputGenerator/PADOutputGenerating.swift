@@ -8,7 +8,7 @@ import Foundation
 import PADCore
 
 /// Interface definition for an output generator
-public protocol PADOutputGenerating<OutputType> {
+public protocol OutputGenerating<OutputType> {
     
     associatedtype OutputType
     
@@ -21,7 +21,7 @@ public protocol PADOutputGenerating<OutputType> {
     ///   - warnings: A list of warnings produced in previous steps
     /// - Returns: An output of type ``OutputType``
     func generate(
-        from changesPerTarget: [String: [PADChange]],
+        from changesPerTarget: [String: [Change]],
         allTargets: [String],
         oldVersionName: String,
         newVersionName: String,

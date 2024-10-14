@@ -68,7 +68,7 @@ class LoggerTests: XCTestCase {
             return true
         }
         
-        let logFileLogger = PADLogFileLogger(fileHandler: fileHandler, outputFilePath: outputFilePath)
+        let logFileLogger = LogFileLogger(fileHandler: fileHandler, outputFilePath: outputFilePath)
         
         logFileLogger.log("log", from: "test")
         // Small sleep because the file manager calls are done on a detached Task and we want to guarantee the order

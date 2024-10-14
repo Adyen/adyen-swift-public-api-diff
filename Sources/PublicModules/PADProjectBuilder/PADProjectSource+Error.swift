@@ -7,14 +7,14 @@
 
 import Foundation
 
-internal extension PADProjectSource {
+internal extension ProjectSource {
     enum Error: LocalizedError, Equatable {
         case invalidSourceValue(value: String)
         
         var errorDescription: String? {
             switch self {
             case let .invalidSourceValue(value):
-                "Invalid source parameter `\(value)`. It needs to either be a local file path or a repository in the format `[BRANCH_OR_TAG]\(PADProjectSource.gitSourceSeparator)[REPOSITORY_URL]"
+                "Invalid source parameter `\(value)`. It needs to either be a local file path or a repository in the format `[BRANCH_OR_TAG]\(ProjectSource.gitSourceSeparator)[REPOSITORY_URL]"
             }
         }
     }

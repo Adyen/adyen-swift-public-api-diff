@@ -6,35 +6,35 @@ import PADCore
 import ShellModule
 import FileHandlingModule
 
-/// The ``PADProjectBuilder/PADProjectBuilder`` builds the old & new project and outputs a list
-/// of ``PADCore/PADSwiftInterfaceFile``s as well as changes that happened to the
+/// The ``PADProjectBuilder/ProjectBuilder`` builds the old & new project and outputs a list
+/// of ``PADCore/SwiftInterfaceFile``s as well as changes that happened to the
 /// project files including any warnings if applicable.
 ///
 /// Following tasks are performed:
 /// - Fetch remote projects (if applicable)
 /// - Archiving projects
-/// - Inspecting `Package.swift` for any changes between versions (if applicable / if ``PADProjectType/swiftPackage``)
-/// - Returning a ``PADProjectBuilder/PADProjectBuilder/Result`` containing package file changes, warnings + the found ``PADCore/PADSwiftInterfaceFile``s
-public struct PADProjectBuilder {
+/// - Inspecting `Package.swift` for any changes between versions (if applicable / if ``ProjectType/swiftPackage``)
+/// - Returning a ``PADProjectBuilder/ProjectBuilder/Result`` containing package file changes, warnings + the found ``PADCore/SwiftInterfaceFile``s
+public struct ProjectBuilder {
     
-    /// The result returned by the build function of ``PADProjectBuilder/PADProjectBuilder``
+    /// The result returned by the build function of ``PADProjectBuilder/ProjectBuilder``
     public struct Result {
         /// The `.swiftinterface` file references found
-        public let swiftInterfaceFiles: [PADSwiftInterfaceFile]
+        public let swiftInterfaceFiles: [SwiftInterfaceFile]
         /// The project directories for the setup projects
         public let projectDirectories: (old: URL, new: URL)
     }
     
-    private let projectType: PADProjectType
-    private let swiftInterfaceType: PADSwiftInterfaceType
+    private let projectType: ProjectType
+    private let swiftInterfaceType: SwiftInterfaceType
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
-    private let logger: (any PADLogging)?
+    private let logger: (any Logging)?
     
     public init(
-        projectType: PADProjectType,
-        swiftInterfaceType: PADSwiftInterfaceType,
-        logger: (any PADLogging)? = nil
+        projectType: ProjectType,
+        swiftInterfaceType: SwiftInterfaceType,
+        logger: (any Logging)? = nil
     ) {
         self.init(
             projectType: projectType,
@@ -46,11 +46,11 @@ public struct PADProjectBuilder {
     }
     
     init(
-        projectType: PADProjectType,
-        swiftInterfaceType: PADSwiftInterfaceType,
+        projectType: ProjectType,
+        swiftInterfaceType: SwiftInterfaceType,
         fileHandler: any FileHandling = FileManager.default,
         shell: any ShellHandling = Shell(),
-        logger: (any PADLogging)?
+        logger: (any Logging)?
     ) {
         self.projectType = projectType
         self.swiftInterfaceType = swiftInterfaceType
@@ -60,8 +60,8 @@ public struct PADProjectBuilder {
     }
     
     public func build(
-        oldSource: PADProjectSource,
-        newSource: PADProjectSource
+        oldSource: ProjectSource,
+        newSource: ProjectSource
     ) async throws -> Result {
         
         let oldVersionName = oldSource.description

@@ -8,7 +8,7 @@ import Foundation
 import FileHandlingModule
 
 /// The source type of the project (local/remote)
-public enum PADProjectSource: Equatable, CustomStringConvertible {
+public enum ProjectSource: Equatable, CustomStringConvertible {
     
     /// The separator used to join branch & repository
     static var gitSourceSeparator: String { "~" }
@@ -18,11 +18,11 @@ public enum PADProjectSource: Equatable, CustomStringConvertible {
     /// Representing a `branch` of a **git** `repository`
     case git(branch: String, repository: String)
  
-    /// Creates a ``PADProjectSource`` from a rawValue
+    /// Creates a ``ProjectSource`` from a rawValue
     /// - Parameters:
-    ///   - rawValue: The rawValue presentation of a ``PADProjectSource``
-    /// - Returns: A valid ``PADProjectSource``
-    /// - Throws: An error if the `rawValue` does not match a ``PADProjectSource`` representation
+    ///   - rawValue: The rawValue presentation of a ``ProjectSource``
+    /// - Returns: A valid ``ProjectSource``
+    /// - Throws: An error if the `rawValue` does not match a ``ProjectSource`` representation
     public static func from(_ rawValue: String) throws -> Self {
         try from(rawValue, fileHandler: FileManager.default)
     }
