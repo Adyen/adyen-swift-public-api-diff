@@ -55,7 +55,6 @@ struct PublicApiDiff: AsyncParsableCommand {
         
         do {
             var warnings = [String]()
-            var swiftInterfaceChanges = [String: [Change]]()
             var projectChanges = [Change]()
             
             let oldSource: ProjectSource = try .from(old)
@@ -73,9 +72,8 @@ struct PublicApiDiff: AsyncParsableCommand {
             
             // MARK: - Analyzing .swiftinterface files
             
-            let swiftInterfaceFileChanges = try await Self.analyzeSwiftInterfaceFiles(
+            let swiftInterfaceChanges = try await Self.analyzeSwiftInterfaceFiles(
                 swiftInterfaceFiles: projectBuilderResult.swiftInterfaceFiles,
-                changes: &swiftInterfaceChanges,
                 logger: logger
             )
             
@@ -164,8 +162,6 @@ private extension PublicApiDiff {
         warnings: inout [String],
         logger: any Logging
     ) throws {
-        var packageFileChanges = [Change]()
-        
         switch projectType {
         case .swiftPackage:
             let swiftPackageFileAnalyzer = SwiftPackageFileAnalyzer(
@@ -187,7 +183,6 @@ private extension PublicApiDiff {
     
     static func analyzeSwiftInterfaceFiles(
         swiftInterfaceFiles: [SwiftInterfaceFile],
-        changes: inout [String: [Change]],
         logger: any Logging
     ) async throws -> [String: [Change]] {
         let swiftInterfaceDiff = SwiftInterfaceDiff(logger: logger)

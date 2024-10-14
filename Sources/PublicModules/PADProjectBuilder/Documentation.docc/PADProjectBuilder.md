@@ -1,6 +1,6 @@
 # ``ProjectBuilder``
 
-The ``ProjectBuilder/ProjectBuilder`` builds the old & new version of a project and outputs a list of ``PADCore/SwiftInterfaceFile``s as well as changes that happened to the project files including any warnings if applicable.
+The ``PADProjectBuilder/ProjectBuilder`` builds the old & new version of a project and outputs a list of ``PADCore/SwiftInterfaceFile``s as well as changes that happened to the project files including any warnings if applicable.
 
 ## Usage
 
