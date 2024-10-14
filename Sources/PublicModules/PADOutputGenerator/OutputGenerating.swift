@@ -22,9 +22,9 @@ public protocol OutputGenerating<OutputType> {
     /// - Returns: An output of type ``OutputType``
     func generate(
         from changesPerTarget: [String: [Change]],
-        allTargets: [String],
-        oldVersionName: String,
-        newVersionName: String,
+        allTargets: [String]?,
+        oldVersionName: String?,
+        newVersionName: String?,
         warnings: [String]
     ) throws -> OutputType
 }

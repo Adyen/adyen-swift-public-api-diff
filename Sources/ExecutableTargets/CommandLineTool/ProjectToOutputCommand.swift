@@ -1,9 +1,3 @@
-//
-// Copyright (c) 2024 Adyen N.V.
-//
-// This file is open source and available under the MIT license. See the LICENSE file for more info.
-//
-
 import ArgumentParser
 import Foundation
 
@@ -15,9 +9,10 @@ import PADProjectBuilder
 import PADOutputGenerator
 import PADPackageFileAnalyzer
 
-/// The command line tool to analyze public api changes
-@main
-struct PublicApiDiff: AsyncParsableCommand {
+/// Command that analyzes the differences between an old and new project and produces a human readable output
+struct ProjectToOutputCommand: AsyncParsableCommand {
+    
+    static var configuration: CommandConfiguration = .init(commandName: "project")
     
     /// The representation of the new/updated project source
     @Option(help: "Specify the updated version to compare to")
@@ -27,31 +22,37 @@ struct PublicApiDiff: AsyncParsableCommand {
     @Option(help: "Specify the old version to compare to")
     public var old: String
     
+    /// The (optional) scheme to build
+    ///
+    /// Needed when comparing 2 xcode projects
+    @Option(help: "[Optional] Which scheme to build (Needed when comparing 2 xcode projects)")
+    public var scheme: String?
+    
+    @Option(help: "[Optional] Specify the type of .swiftinterface you want to compare (public/private)")
+    public var swiftInterfaceType: SwiftInterfaceType = .public
+    
     /// The (optional) output file path
     ///
     /// If not defined the output will be printed to the console
-    @Option(help: "Where to output the result (File path)")
+    @Option(help: "[Optional] Where to output the result (File path)")
     public var output: String?
     
     /// The (optional) path to the log output file
-    @Option(help: "Where to output the logs (File path)")
+    @Option(help: "[Optional] Where to output the logs (File path)")
     public var logOutput: String?
     
-    /// The (optional) scheme to build (Needed when comparing 2 xcode projects)
-    @Option(help: "Which scheme to build (Needed when comparing 2 xcode projects)")
-    public var scheme: String?
+    @Option(help: "[Optional] The log level to use during execution")
+    public var logLevel: LogLevel = .default
     
     /// Entry point of the command line tool
     public func run() async throws {
         
-        let logLevel: LogLevel = .debug
-        let projectType: ProjectType = { // Only needed when we have to produce the .swiftinterface files
+        let projectType: ProjectType = {
             if let scheme { return .xcodeProject(scheme: scheme) }
             return .swiftPackage
         }()
-        let swiftInterfaceType: SwiftInterfaceType = .public // Only needed when we have to produce the .swiftinterface files
         
-        let logger = Self.logger(with: logLevel, logOutputFilePath: logOutput)
+        let logger = PublicApiDiff.logger(with: logLevel, logOutputFilePath: logOutput)
         
         do {
             var warnings = [String]()
@@ -120,20 +121,9 @@ struct PublicApiDiff: AsyncParsableCommand {
     }
 }
 
-private extension PublicApiDiff {
-    
-    static func logger(
-        with logLevel: LogLevel,
-        logOutputFilePath: String?
-    ) -> any Logging {
-        var loggers = [any Logging]()
-        if let logOutputFilePath {
-            loggers += [LogFileLogger(outputFilePath: logOutputFilePath)]
-        }
-        loggers += [SystemLogger().withLogLevel(logLevel)]
-        
-        return LoggingGroup(with: loggers)
-    }
+// MARK: - Privates
+
+private extension ProjectToOutputCommand {
     
     static func buildProject(
         oldSource: ProjectSource,
