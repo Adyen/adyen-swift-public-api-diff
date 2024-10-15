@@ -15,9 +15,9 @@ public struct MarkdownOutputGenerator: OutputGenerating {
     /// Generates human readable output from the provided information
     public func generate(
         from changesPerTarget: [String: [Change]],
-        allTargets: [String],
-        oldVersionName: String,
-        newVersionName: String,
+        allTargets: [String]?,
+        oldVersionName: String?,
+        newVersionName: String?,
         warnings: [String]
     ) -> String {
         
@@ -26,9 +26,13 @@ public struct MarkdownOutputGenerator: OutputGenerating {
         
         var lines = [
             Self.title(changesPerTarget: changesPerTarget),
-            Self.repoInfo(oldVersionName: oldVersionName, newVersionName: newVersionName),
-            separator
         ]
+        
+        if let oldVersionName, let newVersionName {
+            lines += [Self.repoInfo(oldVersionName: oldVersionName, newVersionName: newVersionName)]
+        }
+        
+        lines += [separator]
         
         if !warnings.isEmpty {
             lines += Self.warningInfo(for: warnings) + [separator]
@@ -38,9 +42,11 @@ public struct MarkdownOutputGenerator: OutputGenerating {
             lines += changes + [separator]
         }
         
-        lines += [
-            Self.analyzedModulesInfo(allTargets: allTargets)
-        ]
+        if let allTargets {
+            lines += [
+                Self.analyzedModulesInfo(allTargets: allTargets)
+            ]
+        }
         
         return lines.joined(separator: "\n")
     }

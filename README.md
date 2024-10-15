@@ -1,45 +1,93 @@
- [![🧪 Run Tests](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml)
+[![🧪 Run Tests](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml)
 
- # Swift Public API diff
+# Swift Public API diff
 
- This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
+This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
 
- It makes use of `.swiftinterface` files that get produced during the archiving of a swift project and parses them using [`swift-syntax`](https://github.com/swiftlang/swift-syntax).
+It makes use of `.swiftinterface` files that get produced during the archiving of a swift project and parses them using [`swift-syntax`](https://github.com/swiftlang/swift-syntax).
 
- ## Usage
-
- ```
- USAGE: public-api-diff --new <new> --old <old> [--output <output>] [--log-output <log-output>] [--scheme <scheme>]
-
- OPTIONS:
-   --new <new>             Specify the updated version to compare to
-   --old <old>             Specify the old version to compare to
-   --output <output>       Where to output the result (File path)
-   --log-output <log-output>
-                           Where to output the logs (File path)
-   --scheme <scheme>       Which scheme to build (Needed when comparing 2 xcode projects)
-   -h, --help              Show help information.
- ```
-
-### Run as debug build
+## Usage
+ 
+### From Project to Output
+ 
 ```
-swift run public-api-diff 
-    --new "some/local/path" 
-    --old "develop~https://github.com/some/repository" 
-    --output "path/to/output.md"
+USAGE: public-api-diff project --new <new> --old <old> [--scheme <scheme>] [--swift-interface-type <swift-interface-type>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
+
+OPTIONS:
+  --new <new>             Specify the updated version to compare to
+  --old <old>             Specify the old version to compare to
+  --scheme <scheme>       [Optional] Which scheme to build (Needed when
+                          comparing 2 xcode projects)
+  --swift-interface-type <swift-interface-type>
+                          [Optional] Specify the type of .swiftinterface you
+                          want to compare (public/private) (default: public)
+  --output <output>       [Optional] Where to output the result (File path)
+  --log-output <log-output>
+                          [Optional] Where to output the logs (File path)
+  --log-level <log-level> [Optional] The log level to use during execution
+                          (default: default)
+  -h, --help              Show help information.
+ ```
+ 
+#### Run as debug build
+```
+# From Project to Output
+swift run public-api-diff
+    project
+    --new "develop~https://github.com/Adyen/adyen-ios.git"
+    --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
+```
+ 
+### From `.swiftinterface` to Output
+ 
+```
+USAGE: public-api-diff swift-interface --new <new> --old <old> [--target-name <target-name>] [--old-version-name <old-version-name>] [--new-version-name <new-version-name>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
+
+OPTIONS:
+  --new <new>             Specify the updated .swiftinterface file to compare to
+  --old <old>             Specify the old .swiftinterface file to compare to
+  --target-name <target-name>
+                          [Optional] The name of your target/module to show in
+                          the output
+  --old-version-name <old-version-name>
+                          [Optional] The name of your old version (e.g. v1.0 /
+                          main) to show in the output
+  --new-version-name <new-version-name>
+                          [Optional] The name of your new version (e.g. v2.0 /
+                          develop) to show in the output
+  --output <output>       [Optional] Where to output the result (File path)
+  --log-output <log-output>
+                          [Optional] Where to output the logs (File path)
+  --log-level <log-level> [Optional] The log level to use during execution
+                          (default: default)
+  -h, --help              Show help information.
 ```
 
-### How to create a release build
+#### Run as debug build
+```
+# From Project to Output
+swift run public-api-diff
+    swift-interface
+    --new "new/path/to/project.swiftinterface" 
+    --old "old/path/to/project.swiftinterface"
+```
+
+## How to create a release build
 ```
 swift build --configuration release
 ```
 
-### Run release build
+## Run release build
 ```
 ./public-api-diff
-    --new "some/local/path" 
-    --old "develop~https://github.com/some/repository" 
-    --output "path/to/output.md"
+    project
+    --new "develop~https://github.com/Adyen/adyen-ios.git" 
+    --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
+    
+./public-api-diff
+    swift-interface
+    --new "new/path/to/project.swiftinterface" 
+    --old "old/path/to/project.swiftinterface"
 ```
 
 # Alternatives
