@@ -4,14 +4,15 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADPackageFileAnalyzer
+
 import XCTest
 
-struct MockProjectAnalyzer: ProjectAnalyzing {
+struct MockSwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     
-    var onAnalyze: (URL, URL) throws -> ProjectAnalyzerResult
+    var onAnalyze: (URL, URL) throws -> SwiftPackageFileAnalyzingResult
     
-    func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> ProjectAnalyzerResult {
+    func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> SwiftPackageFileAnalyzingResult {
         try onAnalyze(oldProjectUrl, newProjectUrl)
     }
 }

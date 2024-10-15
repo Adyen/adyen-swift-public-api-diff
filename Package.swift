@@ -8,29 +8,131 @@ let package = Package(
     platforms: [
         .macOS(.v13)
     ],
+    products: [
+        .executable(
+            name: "public-api-diff",
+            targets: ["public-api-diff"]
+        ),
+        .library(
+            name: "SwiftInterfaceDiff",
+            targets: [
+                "PADSwiftInterfaceDiff",
+                "PADOutputGenerator"
+            ]
+        ),
+        .library(
+            name: "PublicApiDiff",
+            targets: [
+                "PADProjectBuilder",
+                "PADPackageFileAnalyzer",
+                "PADSwiftInterfaceDiff",
+                "PADOutputGenerator"
+            ]
+        )
+    ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.6")
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.6"),
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
+        
+        // MARK: - Executable Targets
+        
         .executableTarget(
             name: "public-api-diff",
             dependencies: [
+                "PADProjectBuilder",
+                "PADSwiftInterfaceDiff",
+                "PADOutputGenerator",
+                "PADPackageFileAnalyzer",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
-            path: "Sources"
+            path: "Sources/ExecutableTargets/CommandLineTool"
         ),
+        
+        // MARK: - Public Modules
+        
+        .target(
+            name: "PADSwiftInterfaceDiff",
+            dependencies: [
+                "PADCore",
+                "PADLogging",
+                "FileHandlingModule",
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+            ],
+            path: "Sources/PublicModules/PADSwiftInterfaceDiff"
+        ),
+        .target(
+            name: "PADPackageFileAnalyzer",
+            dependencies: [
+                "PADCore",
+                "PADLogging",
+                "FileHandlingModule",
+                "ShellModule",
+                "SwiftPackageFileHelperModule"
+            ],
+            path: "Sources/PublicModules/PADPackageFileAnalyzer"
+        ),
+        .target(
+            name: "PADProjectBuilder",
+            dependencies: [
+                "PADCore",
+                "PADLogging",
+                "FileHandlingModule",
+                "ShellModule",
+                "SwiftPackageFileHelperModule"
+            ],
+            path: "Sources/PublicModules/PADProjectBuilder"
+        ),
+        .target(
+            name: "PADOutputGenerator",
+            dependencies: ["PADCore"],
+            path: "Sources/PublicModules/PADOutputGenerator"
+        ),
+        
+        // MARK: - Shared/Public
+        
+        .target(
+            name: "PADCore",
+            path: "Sources/Shared/Public/PADCore"
+        ),
+        .target(
+            name: "PADLogging",
+            dependencies: ["FileHandlingModule"],
+            path: "Sources/Shared/Public/PADLogging"
+        ),
+        
+        // MARK: - Shared/Package
+        
+        .target(
+            name: "FileHandlingModule",
+            path: "Sources/Shared/Package/FileHandlingModule"
+        ),
+        .target(
+            name: "ShellModule",
+            path: "Sources/Shared/Package/ShellModule"
+        ),
+        .target(
+            name: "SwiftPackageFileHelperModule",
+            dependencies: ["FileHandlingModule", "ShellModule", "PADLogging"],
+            path: "Sources/Shared/Package/SwiftPackageFileHelperModule"
+        ),
+        
+        // MARK: - Test Targets
+        
         .testTarget(
             name: "UnitTests",
-            dependencies: ["public-api-diff"],
+            dependencies: [
+                "public-api-diff"
+            ],
             resources: [
                 // Copy Tests/ExampleTests/Resources directories as-is.
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
-                .copy("Resources/dummy.abi.json"),
-                .copy("Resources/dummi-abi-flat-definition.md")
+                .copy("Resources/expected-reference-changes.md")
             ]
         ),
         .testTarget(
@@ -40,7 +142,8 @@ let package = Package(
                 // Copy Tests/ExampleTests/Resources directories as-is.
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
-                .copy("Resources/expected-reference-changes.md")
+                .copy("Resources/expected-reference-changes-swift-interface-private.md"),
+                .copy("Resources/expected-reference-changes-swift-interface-public.md")
             ]
         )
     ]

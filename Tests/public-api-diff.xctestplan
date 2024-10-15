@@ -1,0 +1,63 @@
+{
+  "configurations" : [
+    {
+      "id" : "9DDDA981-B384-431F-8F11-E82A5CD39CBA",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "--new 5.10.0~https:\/\/github.com\/Adyen\/adyen-ios"
+      },
+      {
+        "argument" : "--old 5.0.0~https:\/\/github.com\/Adyen\/adyen-ios"
+      },
+      {
+        "argument" : "--new main~https:\/\/github.com\/Adyen\/adyen-pos-mobile-ios",
+        "enabled" : false
+      },
+      {
+        "argument" : "--old v2.0.0~https:\/\/github.com\/Adyen\/adyen-pos-mobile-ios",
+        "enabled" : false
+      },
+      {
+        "argument" : "--new \/Users\/alexandergu\/Code\/adyen-3ds2-ios_new",
+        "enabled" : false
+      },
+      {
+        "argument" : "--old \/Users\/alexandergu\/Code\/adyen-3ds2-ios",
+        "enabled" : false
+      },
+      {
+        "argument" : "--scheme Adyen3DS2_Swift",
+        "enabled" : false
+      }
+    ],
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:",
+      "identifier" : "public-api-diff",
+      "name" : "public-api-diff"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "IntegrationTests",
+        "name" : "IntegrationTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "UnitTests",
+        "name" : "UnitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

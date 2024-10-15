@@ -4,141 +4,83 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADSwiftInterfaceDiff
+@testable import PADCore
 import XCTest
 
 class PipelineTests: XCTestCase {
     
     func test_pipeline() async throws {
         
-        let projectBuilderExpectation = expectation(description: "ProjectBuilder is called twice")
-        projectBuilderExpectation.expectedFulfillmentCount = 2
-        
-        let abiGeneratorExpectation = expectation(description: "ABIGenerator is called twice")
-        abiGeneratorExpectation.expectedFulfillmentCount = 2
-        
-        let projectAnalyzerExpectation = expectation(description: "ProjectAnalyzer is called once")
-        
-        let dumpGeneratorExpectation = expectation(description: "SDKDumpGenerator is called twice")
-        dumpGeneratorExpectation.expectedFulfillmentCount = 2
-        
-        let dumpAnalyzerExpectation = expectation(description: "SDKDumpAnalyzer is called once")
-        
-        let oldProjectSource = ProjectSource.local(path: "old")
-        let newProjectSource = ProjectSource.local(path: "new")
-        
-        var expectedSteps: [Any] = [
-            URL(filePath: oldProjectSource.description),
-            URL(filePath: newProjectSource.description),
-            
-            URL(filePath: oldProjectSource.description),
-            "old",
-            
-            URL(filePath: newProjectSource.description),
-            "new",
-            
-            URL(filePath: oldProjectSource.description),
-            URL(filePath: newProjectSource.description),
-            
-            SDKDump(root: .init(kind: .var, name: "Name", printedName: URL(filePath: oldProjectSource.description).absoluteString)),
-            SDKDump(root: .init(kind: .var, name: "Name", printedName: URL(filePath: newProjectSource.description).absoluteString)),
-            
-            [
-                "": [Change(changeType: .addition(description: "A Library was added"), parentName: "Parent")],
-                "Target": [Change(changeType: .addition(description: "Something was added"), parentName: "Parent")]
-            ],
-            ["Target"],
-            oldProjectSource,
-            newProjectSource,
-            
-            "Output"
-        ]
-        
-        let pipeline = Pipeline(
-            newProjectSource: newProjectSource,
-            oldProjectSource: oldProjectSource,
-            scheme: nil,
-            projectBuilder: MockProjectBuilder(onBuild: { source, scheme in
-                projectBuilderExpectation.fulfill()
-                
-                XCTAssertNil(scheme)
-                
-                return URL(filePath: source.description)
-            }),
-            abiGenerator: MockABIGenerator(onGenerate: { url, scheme, description in
-                XCTAssertEqual(url, expectedSteps.first as? URL)
-                expectedSteps.removeFirst()
-                XCTAssertNil(scheme)
-                
-                XCTAssertEqual(description, expectedSteps.first as? String)
-                expectedSteps.removeFirst()
-                
-                abiGeneratorExpectation.fulfill()
-                
-                return [.init(targetName: "Target", abiJsonFileUrl: url)]
-            }),
-            projectAnalyzer: MockProjectAnalyzer(onAnalyze: { old, new in
-                XCTAssertEqual(old, expectedSteps.first as? URL)
-                expectedSteps.removeFirst()
-                XCTAssertEqual(new, expectedSteps.first as? URL)
-                expectedSteps.removeFirst()
-                projectAnalyzerExpectation.fulfill()
-                
-                return .init(
-                    changes: [.init(
-                        changeType: .addition(
-                            description: "A Library was added"
-                        ),
-                        parentName: "Parent"
-                    )],
-                    warnings: []
-                )
-            }),
-            sdkDumpGenerator: MockSDKDumpGenerator(onGenerate: { url in
-                XCTAssertEqual(url, expectedSteps.first as? URL)
-                expectedSteps.removeFirst()
-                dumpGeneratorExpectation.fulfill()
-                
-                return .init(root: .init(kind: .var, name: "Name", printedName: url.absoluteString))
-            }),
-            sdkDumpAnalyzer: MockSDKDumpAnalyzer(onAnalyze: { old, new in
-                XCTAssertEqual(old, expectedSteps.first as? SDKDump)
-                expectedSteps.removeFirst()
-                XCTAssertEqual(new, expectedSteps.first as? SDKDump)
-                expectedSteps.removeFirst()
-                dumpAnalyzerExpectation.fulfill()
-                
-                return [.init(changeType: .addition(description: "Something was added"), parentName: "Parent")]
-            }),
-            outputGenerator: MockOutputGenerator(onGenerate: { changes, allTargets, old, new, warnings in
-                XCTAssertEqual(changes, expectedSteps.first as? [String: [Change]])
-                expectedSteps.removeFirst()
-                XCTAssertEqual(allTargets, expectedSteps.first as? [String])
-                expectedSteps.removeFirst()
-                XCTAssertEqual(old, expectedSteps.first as? ProjectSource)
-                expectedSteps.removeFirst()
-                XCTAssertEqual(new, expectedSteps.first as? ProjectSource)
-                expectedSteps.removeFirst()
-                XCTAssertTrue(warnings.isEmpty)
-                
-                return "Output"
-            }),
-            logger: MockLogger(logLevel: .debug)
+        let swiftInterfaceFile = SwiftInterfaceFile(
+            name: "MODULE_NAME",
+            oldFilePath: "old_file_path",
+            newFilePath: "new_file_path"
         )
         
-        let pipelineOutput = try await pipeline.run()
+        let expectedChanges: [Change] = [.init(changeType: .addition(description: "addition"))]
+        var expectedHandleLoadDataCalls = ["new_file_path", "old_file_path"]
+        var expectedHandleParseSourceCalls: [(source: String, moduleName: String)] = [
+            ("content_for_new_file_path", "MODULE_NAME"),
+            ("content_for_old_file_path", "MODULE_NAME")
+        ]
+        var expectedHandleAnalyzeCalls: [(old: SwiftInterfaceParser.Root, new: SwiftInterfaceParser.Root)] = [
+            (.init(moduleName: "MODULE_NAME", elements: []), .init(moduleName: "MODULE_NAME", elements: []))
+        ]
+        var expectedHandleLogCalls: [(message: String, subsystem: String)] = [
+            ("🧑‍🔬 Analyzing MODULE_NAME", "SwiftInterfaceDiff")
+        ]
+        let expectedPipelineOutput: [String: [Change]] = ["MODULE_NAME": expectedChanges]
         
-        await fulfillment(of: [
-            projectBuilderExpectation,
-            abiGeneratorExpectation,
-            projectAnalyzerExpectation,
-            dumpGeneratorExpectation,
-            dumpAnalyzerExpectation
-        ])
+        // Mock Setup
         
-        XCTAssertEqual(pipelineOutput, expectedSteps.first as? String)
-        expectedSteps.removeFirst()
+        var fileHandler = MockFileHandler()
+        fileHandler.handleLoadData = { path in
+            let expectedInput = expectedHandleLoadDataCalls.removeFirst()
+            XCTAssertEqual(path, expectedInput)
+            return try XCTUnwrap(String("content_for_\(path)").data(using: .utf8))
+        }
         
-        XCTAssertEqual(expectedSteps.count, 0)
+        var swiftInterfaceParser = MockSwiftInterfaceParser()
+        swiftInterfaceParser.handleParseSource = { source, moduleName in
+            let expectedInput = expectedHandleParseSourceCalls.removeFirst()
+            XCTAssertEqual(expectedInput.source, source)
+            XCTAssertEqual(expectedInput.moduleName, moduleName)
+            return SwiftInterfaceParser.Root(moduleName: moduleName, elements: [])
+        }
+        
+        var swiftInterfaceAnalyzer = MockSwiftInterfaceAnalyzer()
+        swiftInterfaceAnalyzer.handleAnalyze = { old, new in
+            let expectedInput = expectedHandleAnalyzeCalls.removeFirst()
+            XCTAssertEqual(old.recursiveDescription(), expectedInput.old.recursiveDescription())
+            XCTAssertEqual(new.recursiveDescription(), expectedInput.new.recursiveDescription())
+            return expectedChanges
+        }
+        
+        var logger = MockLogger()
+        logger.handleLog = { message, subsystem in
+            let expectedInput = expectedHandleLogCalls.removeFirst()
+            XCTAssertEqual(message, expectedInput.message)
+            XCTAssertEqual(subsystem, expectedInput.subsystem)
+        }
+        
+        // Pipeline run
+        
+        let pipeline = SwiftInterfaceDiff(
+            fileHandler: fileHandler,
+            swiftInterfaceParser: swiftInterfaceParser,
+            swiftInterfaceAnalyzer: swiftInterfaceAnalyzer,
+            logger: logger
+        )
+        
+        let pipelineOutput = try await pipeline.run(with: [swiftInterfaceFile])
+        
+        // Validation
+        
+        XCTAssertEqual(pipelineOutput, expectedPipelineOutput)
+        XCTAssertTrue(expectedHandleLoadDataCalls.isEmpty)
+        XCTAssertTrue(expectedHandleParseSourceCalls.isEmpty)
+        XCTAssertTrue(expectedHandleLogCalls.isEmpty)
+        XCTAssertTrue(expectedHandleAnalyzeCalls.isEmpty)
     }
 }

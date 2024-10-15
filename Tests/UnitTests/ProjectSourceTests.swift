@@ -4,7 +4,7 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADProjectBuilder
 import XCTest
 
 class ProjectSourceTests: XCTestCase {
@@ -29,7 +29,7 @@ class ProjectSourceTests: XCTestCase {
         
         XCTAssertEqual(
             projectSource,
-            .remote(branch: branch, repository: repositoryUrl)
+            .git(branch: branch, repository: repositoryUrl)
         )
     }
     
@@ -51,11 +51,11 @@ class ProjectSourceTests: XCTestCase {
             )
             XCTAssertNil(source) // Guard to make sure that we catch if it succeeds
         } catch {
-            let projectSourceError = try XCTUnwrap(error as? ProjectSourceError)
+            let projectSourceError = try XCTUnwrap(error as? ProjectSource.Error)
             
             XCTAssertEqual(
                 projectSourceError,
-                ProjectSourceError.invalidSourceValue(value: rawProjectSourceValue)
+                ProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
             )
         }
     }
@@ -78,11 +78,11 @@ class ProjectSourceTests: XCTestCase {
             )
             XCTAssertNil(source) // Guard to make sure that we catch if it succeeds
         } catch {
-            let projectSourceError = try XCTUnwrap(error as? ProjectSourceError)
+            let projectSourceError = try XCTUnwrap(error as? ProjectSource.Error)
             
             XCTAssertEqual(
                 projectSourceError,
-                ProjectSourceError.invalidSourceValue(value: rawProjectSourceValue)
+                ProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
             )
         }
     }

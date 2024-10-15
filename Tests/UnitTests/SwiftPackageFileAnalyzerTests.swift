@@ -4,7 +4,12 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADProjectBuilder
+@testable import PADPackageFileAnalyzer
+@testable import PADCore
+
+@testable import SwiftPackageFileHelperModule
+
 import XCTest
 
 class SwiftPackageFileAnalyzerTests: XCTestCase {
@@ -30,11 +35,10 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             return String(data: encodedPackageDescription, encoding: .utf8)!
         }
         
-        let xcodeTools = XcodeTools(shell: shell)
-        
         let projectAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
-            xcodeTools: xcodeTools
+            shell: shell,
+            logger: nil
         )
         
         let changes = try projectAnalyzer.analyze(
@@ -113,11 +117,10 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             return String(data: encodedPackageDescription, encoding: .utf8)!
         }
         
-        let xcodeTools = XcodeTools(shell: shell)
-        
         let projectAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
-            xcodeTools: xcodeTools
+            shell: shell,
+            logger: nil
         )
         
         let changes = try projectAnalyzer.analyze(
@@ -131,7 +134,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                     oldDescription: "// swift-tools-version: 2.0",
                     newDescription: "// swift-tools-version: 1.0"
                 ),
-                parentName: "Package.swift",
+                parentPath: "Package.swift",
                 listOfChanges: []
             ),
             .init(
@@ -139,7 +142,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                     oldDescription: "defaultLocalization: \"nl-nl\"",
                     newDescription: "defaultLocalization: \"en-us\""
                 ),
-                parentName: "Package.swift",
+                parentPath: "Package.swift",
                 listOfChanges: []
             ),
             .init(
@@ -147,7 +150,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                     oldDescription: "name: \"Old Name\"",
                     newDescription: "name: \"New Name\""
                 ),
-                parentName: "Package.swift",
+                parentPath: "Package.swift",
                 listOfChanges: []
             ),
             .init(
@@ -155,7 +158,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                     oldDescription: "platforms: [iOS(12.0), macOS(10.0)]",
                     newDescription: "platforms: [iOS(15.0), visionOS(1.0)]"
                 ),
-                parentName: "Package.swift",
+                parentPath: "Package.swift",
                 listOfChanges: [
                     "Added visionOS(1.0)",
                     "Changed from iOS(12.0) to iOS(15.0)",
@@ -166,7 +169,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 changeType: .addition(
                     description: ".library(name: \"New Library\", targets: [\"New Target\"])"
                 ),
-                parentName: "Package.swift / products",
+                parentPath: ".products",
                 listOfChanges: []
             ),
             .init(
@@ -174,7 +177,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                     oldDescription: ".library(name: \"Some Library\", targets: [\"Some Target\", \"Old Target\"])",
                     newDescription: ".library(name: \"Some Library\", targets: [\"Some Target\", \"New Target\"])"
                 ),
-                parentName: "Package.swift / products",
+                parentPath: ".products",
                 listOfChanges: [
                     "Added target \"New Target\"",
                     "Removed target \"Old Target\""
@@ -184,14 +187,14 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 changeType: .removal(
                     description: ".library(name: \"Old Library\", targets: [\"Old Target\"])"
                 ),
-                parentName: "Package.swift / products",
+                parentPath: ".products",
                 listOfChanges: []
             ),
             .init(
                 changeType: .addition(
                     description: ".binaryTarget(name: \"New Target\", path: \"new/path\")"
                 ),
-                parentName: "Package.swift / targets",
+                parentPath: ".targets",
                 listOfChanges: []
             ),
             .init(
@@ -199,7 +202,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                     oldDescription: ".binaryTarget(name: \"Some Target\", dependencies: [.target(name: \"Some Target Dependency\"), .target(name: \"Old Target Dependency\"), .product(name: \"Some Product Dependency\", ...), .product(name: \"Old Product Dependency\", ...)], path: \"some/old/path\")",
                     newDescription: ".target(name: \"Some Target\", dependencies: [.target(name: \"Some Target Dependency\"), .target(name: \"New Target Dependency\"), .product(name: \"Some Product Dependency\", ...), .product(name: \"New Product Dependency\", ...)], path: \"some/new/path\")"
                 ),
-                parentName: "Package.swift / targets",
+                parentPath: ".targets",
                 listOfChanges: [
                     "Added dependency .target(name: \"New Target Dependency\")",
                     "Added dependency .product(name: \"New Product Dependency\", ...)",
@@ -213,7 +216,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 changeType: .removal(
                     description: ".testTarget(name: \"Old Target\", path: \"old/path\")"
                 ),
-                parentName: "Package.swift / targets",
+                parentPath: ".targets",
                 listOfChanges: []
             )
         ]
@@ -232,7 +235,10 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             handleFileExpectation.fulfill()
             return false // Package.swift file does not exist
         }
-        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler)
+        let projectAnalyzer = SwiftPackageFileAnalyzer(
+            fileHandler: fileHandler,
+            logger: nil
+        )
         
         let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldProject"),

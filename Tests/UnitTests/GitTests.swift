@@ -4,7 +4,7 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADProjectBuilder
 import XCTest
 
 class GitTests: XCTestCase {
@@ -21,7 +21,7 @@ class GitTests: XCTestCase {
         }
         
         let mockFileHandler = MockFileHandler(handleFileExists: { _ in true })
-        var mockLogger = MockLogger(logLevel: .default)
+        var mockLogger = MockLogger()
         mockLogger.handleLog = { message, subsystem in
             XCTAssertEqual(message, "🐱 Cloning repository @ branch into targetDirectoryPath")
             XCTAssertEqual(subsystem, "Git")
@@ -43,7 +43,7 @@ class GitTests: XCTestCase {
         }
         
         let mockFileHandler = MockFileHandler(handleFileExists: { _ in false })
-        var mockLogger = MockLogger(logLevel: .default)
+        var mockLogger = MockLogger()
         mockLogger.handleLog = { message, subsystem in
             XCTAssertEqual(message, "🐱 Cloning repository @ branch into targetDirectoryPath")
             XCTAssertEqual(subsystem, "Git")

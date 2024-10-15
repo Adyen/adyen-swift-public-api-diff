@@ -4,51 +4,89 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import public_api_diff
+@testable import PADProjectBuilder
+@testable import PADOutputGenerator
+@testable import PADSwiftInterfaceDiff
+@testable import PADCore
 import XCTest
 
 class ReferencePackageTests: XCTestCase {
     
-    func test_defaultPipeline() async throws {
+    override func setUp() async throws {
         
-        // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
-        guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
-            XCTFail("Cannot find root directory")
-            return
-        }
-        
-        let referencePackagesRoot = URL(filePath: String(projectRoot)).appending(path: "ReferencePackages")
-        
+        let referencePackagesRoot = try Self.referencePackagesPath()
         let oldReferencePackageDirectory = referencePackagesRoot.appending(path: "ReferencePackage")
         let newReferencePackageDirectory = referencePackagesRoot.appending(path: "UpdatedPackage")
         
-        let expectedOutput: String = try {
-            let expectedOutputFilePath = try XCTUnwrap(Bundle.module.path(forResource: "expected-reference-changes", ofType: "md"))
-            let expectedOutputData = try XCTUnwrap(FileManager.default.contents(atPath: expectedOutputFilePath))
-            return try XCTUnwrap(String(data: expectedOutputData, encoding: .utf8))
-        }()
+        if
+            FileManager.default.fileExists(atPath: oldReferencePackageDirectory.appending(path: XcodeTools.Constants.derivedDataPath).path()),
+            FileManager.default.fileExists(atPath: newReferencePackageDirectory.appending(path: XcodeTools.Constants.derivedDataPath).path()) {
+            return // Nothing to build
+        }
         
-        let fileHandler: FileHandling = FileManager.default
-        let logger: any Logging = PipelineLogger(logLevel: .debug)
+        let xcodeTools = XcodeTools(logger: nil)
         
-        let currentDirectory = fileHandler.currentDirectoryPath
-        let workingDirectoryPath = currentDirectory.appending("/tmp-public-api-diff")
+        _ = try await xcodeTools.archive(projectDirectoryPath: oldReferencePackageDirectory.path(), scheme: "ReferencePackage", projectType: .swiftPackage)
+        _ = try await xcodeTools.archive(projectDirectoryPath: newReferencePackageDirectory.path(), scheme: "ReferencePackage", projectType: .swiftPackage)
+    }
+    
+    override static func tearDown() {
         
-        let pipelineOutput = try await Pipeline.run(
-            newSource: .local(path: newReferencePackageDirectory.path()),
-            oldSource: .local(path: oldReferencePackageDirectory.path()),
-            scheme: nil,
-            workingDirectoryPath: workingDirectoryPath,
-            fileHandler: fileHandler,
-            logger: logger
+        guard let referencePackagesRoot = try? Self.referencePackagesPath() else { return }
+        let oldReferencePackageDirectory = referencePackagesRoot.appending(path: "ReferencePackage").appending(path: XcodeTools.Constants.derivedDataPath)
+        let newReferencePackageDirectory = referencePackagesRoot.appending(path: "UpdatedPackage").appending(path: XcodeTools.Constants.derivedDataPath)
+        
+        try? FileManager.default.removeItem(at: oldReferencePackageDirectory)
+        try? FileManager.default.removeItem(at: newReferencePackageDirectory)
+    }
+    
+    func test_swiftInterface_public() async throws {
+        
+        let interfaceType: InterfaceType = .public
+        
+        let expectedOutput = try expectedOutput(for: interfaceType)
+        let pipelineOutput = try await runPipeline(for: interfaceType)
+        
+        let markdownOutput = MarkdownOutputGenerator().generate(
+            from: pipelineOutput,
+            allTargets: ["ReferencePackage"],
+            oldVersionName: "old_public",
+            newVersionName: "new_public",
+            warnings: []
         )
         
         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
-        let pipelineOutputLines = sanitizeOutput(pipelineOutput).components(separatedBy: "\n")
+        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
         
         for i in 0..<expectedLines.count  {
-            if expectedLines[i] != pipelineOutputLines[i] {
-                XCTAssertEqual(expectedLines[i], pipelineOutputLines[i])
+            if expectedLines[i] != markdownOutputLines[i] {
+                XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
+                return
+            }
+        }
+    }
+    
+    func test_swiftInterface_private() async throws {
+        
+        let interfaceType: InterfaceType = .private
+        
+        let expectedOutput = try expectedOutput(for: interfaceType)
+        let pipelineOutput = try await runPipeline(for: interfaceType)
+        
+        let markdownOutput = MarkdownOutputGenerator().generate(
+            from: pipelineOutput,
+            allTargets: ["ReferencePackage"],
+            oldVersionName: "old_private",
+            newVersionName: "new_private",
+            warnings: []
+        )
+        
+        let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
+        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
+        
+        for i in 0..<expectedLines.count {
+            if expectedLines[i] != markdownOutputLines[i] {
+                XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
                 return
             }
         }
@@ -56,6 +94,83 @@ class ReferencePackageTests: XCTestCase {
 }
 
 private extension ReferencePackageTests {
+    
+    static func referencePackagesPath() throws -> URL {
+        // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
+        guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {
+            struct CannotFindRootDirectoryError: Error {}
+            throw CannotFindRootDirectoryError()
+        }
+        
+        return URL(filePath: String(projectRoot)).appending(path: "ReferencePackages")
+    }
+    
+    enum InterfaceType {
+        case `public`
+        case `private`
+        
+        var expectedOutputFileName: String {
+            switch self {
+            case .public:
+                "expected-reference-changes-swift-interface-public"
+            case .private:
+                "expected-reference-changes-swift-interface-private"
+            }
+        }
+        
+        var interfaceFilePath: String {
+            switch self {
+            case .public:
+                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.swiftinterface"
+            case .private:
+                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.private.swiftinterface"
+            }
+        }
+    }
+    
+    func expectedOutput(for source: InterfaceType) throws -> String {
+        let expectedOutputFilePath = try XCTUnwrap(Bundle.module.path(forResource: source.expectedOutputFileName, ofType: "md"))
+        let expectedOutputData = try XCTUnwrap(FileManager.default.contents(atPath: expectedOutputFilePath))
+        return try XCTUnwrap(String(data: expectedOutputData, encoding: .utf8))
+    }
+    
+    func swiftInterfaceFilePath(for referencePackagesRoot: URL, packageName: String, interfaceType: InterfaceType) throws -> String {
+        let oldReferencePackageDirectory = referencePackagesRoot.appending(path: packageName)
+        let interfaceFilePath = try XCTUnwrap(oldReferencePackageDirectory.appending(path: interfaceType.interfaceFilePath))
+        return interfaceFilePath.path()
+    }
+    
+    func runPipeline(for interfaceType: InterfaceType) async throws -> [String: [Change]] {
+
+        let referencePackagesRoot = try Self.referencePackagesPath()
+        
+        let oldPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
+            for: referencePackagesRoot,
+            packageName: "ReferencePackage",
+            interfaceType: interfaceType
+        )
+        
+        let newPrivateSwiftInterfaceFilePath = try swiftInterfaceFilePath(
+            for: referencePackagesRoot,
+            packageName: "UpdatedPackage",
+            interfaceType: interfaceType
+        )
+        
+        let interfaceFiles = [
+            SwiftInterfaceFile(
+                name: "ReferencePackage",
+                oldFilePath: oldPrivateSwiftInterfaceFilePath,
+                newFilePath: newPrivateSwiftInterfaceFilePath
+            )
+        ]
+        
+        return try await SwiftInterfaceDiff(
+            fileHandler: FileManager.default,
+            swiftInterfaceParser: SwiftInterfaceParser(),
+            swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
+            logger: nil
+        ).run(with: interfaceFiles)
+    }
     
     /// Removes the 2nd line that contains local file paths + empty newline at the end of the content if it exists
     func sanitizeOutput(_ output: String) -> String {

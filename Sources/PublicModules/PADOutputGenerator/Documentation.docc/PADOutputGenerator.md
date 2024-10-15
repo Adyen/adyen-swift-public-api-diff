@@ -1,0 +1,59 @@
+# ``PADOutputGenerator``
+
+Allows generation of human readable output from the provided information
+
+## Usage
+
+```swift
+// Generated in previous steps
+let warnings: [String] = ...
+let changes: [String: [Change]] = ...
+let oldVersionName: String = ...
+let newVersionName: String = ...
+let allTargets: [String] = ...
+let swiftInterfaceFiles: [SwiftInterfaceFile] = ...
+
+let outputGenerator: any OutputGenerating = MarkdownOutputGenerator()
+
+let markdownOutput: String = try outputGenerator.generate(
+    from: changes,
+    allTargets: allTargets,
+    oldVersionName: oldVersionName,
+    newVersionName: newVersionName,
+    warnings: warnings
+)
+```
+
+---
+
+Example output for ``PADOutputGenerator/MarkdownOutputGenerator``
+
+## 👀 3 public changes detected
+_Comparing `old` to `new`_
+
+---
+## SomeModule
+#### ❇️ Added
+```javascript
+public protocol NewProtocol {
+    var property: String { get }
+}
+```
+#### 🔀 Changed
+```javascript
+// From
+open class SomeClass : SomeProtocol, OldProtocol
+
+// To
+open class SomeClass : SomeProtocol, NewProtocol
+
+/**
+Changes:
+- Added `NewProtocol` conformance
+- Removed `OldProtocol` conformance
+*/
+```
+#### 😶‍🌫️ Removed
+```javascript
+public protocol OldProtocol
+```

@@ -1,44 +1,52 @@
-# Swift Public API diff
+ [![🧪 Run Tests](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml)
 
-This tool allows comparing 2 versions of a swift package project and lists all changes in a human readable way.
+ # Swift Public API diff
 
-It makes use of `xcrun swift-api-digester -dump-sdk` to create a dump of the public api of your swift package and then runs it through a custom parser to process them.
+ This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
 
-Alternatively you could use `xcrun swift-api-digester -diagnose-sdk` and pass the abi dumps into it.
+ It makes use of `.swiftinterface` files that get produced during the archiving of a swift project and parses them using [`swift-syntax`](https://github.com/swiftlang/swift-syntax).
 
-## How it works
+ ## Usage
 
-![image](https://github.com/user-attachments/assets/cc04d21a-06f6-42bc-8e73-4aef7af21d7a)
+ ```
+ USAGE: public-api-diff --new <new> --old <old> [--output <output>] [--log-output <log-output>] [--scheme <scheme>]
 
+ OPTIONS:
+   --new <new>             Specify the updated version to compare to
+   --old <old>             Specify the old version to compare to
+   --output <output>       Where to output the result (File path)
+   --log-output <log-output>
+                           Where to output the logs (File path)
+   --scheme <scheme>       Which scheme to build (Needed when comparing 2 xcode projects)
+   -h, --help              Show help information.
+ ```
 
-### Project Builder
+### Run as debug build
+```
+swift run public-api-diff 
+    --new "some/local/path" 
+    --old "develop~https://github.com/some/repository" 
+    --output "path/to/output.md"
+```
 
-Builds the swift package project which is required for the next step to run the `xcrun swift-api-digester -dump-sdk`
+### How to create a release build
+```
+swift build --configuration release
+```
 
-### ABIGenerator
+### Run release build
+```
+./public-api-diff
+    --new "some/local/path" 
+    --old "develop~https://github.com/some/repository" 
+    --output "path/to/output.md"
+```
 
-Makes use of `xcrun swift-api-digester -dump-sdk` to "dump" the public interface into an abi.json file.
+# Alternatives
+- **swift-api-digester**
+  - `xcrun swift-api-digester -dump-sdk`
+  - `xcrun swift-api-digester -diagnose-sdk`
 
-### SDKDumpGenerator
-
-Parses the abi.json files into an `SDKDump` object
-
-### SDKDumpAnalyzer
-
-Analyzes 2 `SDKDump` objects and detects `addition`s & `removal`s.
-
-### ChangeConsolidator
-
-The `ChangeConsolidator` takes 2 independent changes (`addition` & `removal`) and tries to match them based on the name, declKind and parent.
-
-| Match |
-| --- |
-| ![image](https://github.com/user-attachments/assets/f057c160-f85d-45af-b08f-203b89e43b41) |
-
-| No Match | Potentially false positive |
-| --- | --- |
-| ![image](https://github.com/user-attachments/assets/5ae3b624-b32a-41cc-9026-8ba0117cec57) | ![image](https://github.com/user-attachments/assets/a7e60605-fc1c-49ef-a203-d6a5466a6fda) |
-
-### OutputGenerator
-
-Receives a list of `Change`s and processes them into a human readable format.
+# Inspiration
+ - https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
+   - For parsing swift files using [swift-syntax](https://github.com/swiftlang/swift-syntax)'s [`SyntaxVisitor`](https://github.com/swiftlang/swift-syntax/blob/main/Sources/SwiftSyntax/generated/SyntaxVisitor.swift)
