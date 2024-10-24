@@ -44,20 +44,23 @@ struct SwiftInterfaceFileLocator {
         
         let swiftModuleContent = try fileHandler.contentsOfDirectory(atPath: completeSwiftModulePath)
         
+        let swiftInterfaceExtension = ".swiftinterface"
+        let privateSwiftInterfaceExtension = ".private.swiftinterface"
+        
         let swiftInterfacePaths: [String]
         switch type {
         case .private:
-            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".private.swiftinterface") }
+            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(privateSwiftInterfaceExtension) }
         case .public:
-            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".swiftinterface") && !$0.hasSuffix(".private.swiftinterface") }
+            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(swiftInterfaceExtension) && !$0.hasSuffix(privateSwiftInterfaceExtension) }
         }
         
         guard let swiftInterfacePath = swiftInterfacePaths.first else {
             switch type {
             case .private:
-                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).private.swiftinterface'")
+                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme)\(privateSwiftInterfaceExtension)'")
             case .public:
-                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).swiftinterface'")
+                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme)\(swiftInterfaceExtension)'")
             }
         }
         

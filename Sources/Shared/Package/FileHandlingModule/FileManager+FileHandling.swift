@@ -7,13 +7,11 @@
 import Foundation
 
 extension FileManager: FileHandling {
-    
-    /// Creates a directory at the specified path
+
     package func createDirectory(atPath path: String) throws {
         try createDirectory(atPath: path, withIntermediateDirectories: true)
     }
     
-    /// Creates a file at the specified path with the provided content
     package func createFile(atPath path: String, contents data: Data) -> Bool {
         createFile(atPath: path, contents: data, attributes: nil)
     }
@@ -24,5 +22,22 @@ extension FileManager: FileHandling {
         }
         
         return data
+    }
+    
+    package func fileIsDirectory(atPath path: String) -> Bool {
+        var isDirectory: ObjCBool = false
+        guard fileExists(atPath: path, isDirectory: &isDirectory) else { return false }
+        return isDirectory.boolValue
+    }
+    
+    package func fileSize(atPath path: String) -> Int {
+        guard
+            let attributes = try? attributesOfItem(atPath: path),
+            let fileSizeInBytes = attributes[FileAttributeKey.size] as? Int
+        else {
+            return 0
+        }
+        
+        return fileSizeInBytes
     }
 }

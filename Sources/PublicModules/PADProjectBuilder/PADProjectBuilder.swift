@@ -23,6 +23,14 @@ public struct ProjectBuilder {
         public let swiftInterfaceFiles: [SwiftInterfaceFile]
         /// The project directories for the setup projects
         public let projectDirectories: (old: URL, new: URL)
+        
+        package init(
+            swiftInterfaceFiles: [SwiftInterfaceFile],
+            projectDirectories: (old: URL, new: URL)
+        ) {
+            self.swiftInterfaceFiles = swiftInterfaceFiles
+            self.projectDirectories = projectDirectories
+        }
     }
     
     private let projectType: ProjectType
@@ -59,15 +67,51 @@ public struct ProjectBuilder {
         self.logger = logger
     }
     
+    public func build(source: ProjectSource) async throws -> (swiftInterfaceFiles: [SwiftInterfaceFile], projectDirectory: URL) {
+        
+        let currentDirectory = fileHandler.currentDirectoryPath
+        let workingDirectoryPath = currentDirectory.appending("/tmp-public-api-diff")
+        
+        // MARK: - Setup projects
+        
+        let projectSetupHelper = ProjectSetupHelper(
+            workingDirectoryPath: workingDirectoryPath,
+            shell: shell,
+            fileHandler: fileHandler,
+            logger: logger
+        )
+        
+        let projectDirectory = try await projectSetupHelper.setup(
+            source,
+            projectType: projectType
+        )
+        
+        // MARK: - Produce .swiftinterface files
+        
+        let producer = SwiftInterfaceProducer(
+            workingDirectoryPath: workingDirectoryPath,
+            projectType: projectType,
+            swiftInterfaceType: swiftInterfaceType,
+            fileHandler: fileHandler,
+            shell: shell,
+            logger: logger
+        )
+        
+        let swiftInterfaceFiles = try await producer.produceInterfaceFiles(
+            oldProjectDirectory: projectDirectory,
+            newProjectDirectory: projectDirectory
+        )
+        
+        return (
+            swiftInterfaceFiles: swiftInterfaceFiles,
+            projectDirectory: projectDirectory
+        )
+    }
+    
     public func build(
         oldSource: ProjectSource,
         newSource: ProjectSource
     ) async throws -> Result {
-        
-        let oldVersionName = oldSource.description
-        let newVersionName = newSource.description
-        
-        logger?.log("Comparing `\(newVersionName)` to `\(oldVersionName)`", from: "Main")
         
         let currentDirectory = fileHandler.currentDirectoryPath
         let workingDirectoryPath = currentDirectory.appending("/tmp-public-api-diff")

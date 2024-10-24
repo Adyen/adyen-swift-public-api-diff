@@ -17,7 +17,7 @@ class ReferencePackageTests: XCTestCase {
         let referencePackagesRoot = try Self.referencePackagesPath()
         let oldReferencePackageDirectory = referencePackagesRoot.appending(path: "ReferencePackage")
         let newReferencePackageDirectory = referencePackagesRoot.appending(path: "UpdatedPackage")
-        
+
         if
             FileManager.default.fileExists(atPath: oldReferencePackageDirectory.appending(path: XcodeTools.Constants.derivedDataPath).path()),
             FileManager.default.fileExists(atPath: newReferencePackageDirectory.appending(path: XcodeTools.Constants.derivedDataPath).path()) {
@@ -182,3 +182,5 @@ private extension ReferencePackageTests {
         return lines.joined(separator: "\n")
     }
 }
+
+

@@ -3,11 +3,13 @@ import Foundation
 
 import PADCore
 import PADLogging
-
 import PADSwiftInterfaceDiff
 import PADProjectBuilder
 import PADOutputGenerator
 import PADPackageFileAnalyzer
+import PADProjectStatistics
+
+import SwiftPackageFileHelperModule
 
 /// Command that analyzes the differences between an old and new project and produces a human readable output
 struct ProjectToOutputCommand: AsyncParsableCommand {
@@ -61,6 +63,11 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
             let oldSource: ProjectSource = try .from(old)
             let newSource: ProjectSource = try .from(new)
             
+            let oldVersionName = oldSource.description
+            let newVersionName = newSource.description
+            
+            logger.log("Comparing `\(newVersionName)` to `\(oldVersionName)`", from: String(describing: Self.self))
+            
             // MARK: - Producing .swiftinterface files
             
             let projectBuilderResult = try await Self.buildProject(
@@ -95,12 +102,66 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
                 changes["Package.swift"] = projectChanges
             }
             
+            // MARK: - Aggregating Project Statistics
+            
+            let statisticsAggregator = ProjectStatisticsAggregator(logger: logger)
+            
+            let oldStatistics = try statisticsAggregator.aggregate(projectDirectory: projectBuilderResult.projectDirectories.old)
+            let newStatistics = try statisticsAggregator.aggregate(projectDirectory: projectBuilderResult.projectDirectories.new)
+            
+            let projectSizeChanges = ProjectStatisticsAnalyzer.analyze(old: oldStatistics, new: newStatistics)
+            if !projectSizeChanges.isEmpty {
+                changes["Project Size Changes"] = projectSizeChanges
+            }
+            
+            let swiftPackageFileHelper = SwiftPackageFileHelper(logger: logger)
+            
+            let oldPackageDescription = try swiftPackageFileHelper.packageDescription(at: projectBuilderResult.projectDirectories.old.path())
+            let oldSizes = ProjectStatisticsAnalyzer.analyzeSizes(
+                projectStatistics: oldStatistics,
+                swiftPackageDescription: oldPackageDescription
+            )
+            
+            print("OLD Sizes:")
+            oldSizes.productSizes.forEach { sizeAnalysis in
+                print("  \(sizeAnalysis.productName) [\(sizeAnalysis.totalSize.bytesFormattedAsMB)]")
+                sizeAnalysis.targetSizes.forEach { key, value in
+                    print("  - \(key): \(value.bytesFormattedAsKB)")
+                }
+                sizeAnalysis.dependencySizes.forEach { key, value in
+                    print("  - \(key): \(value.bytesFormattedAsKB)")
+                }
+                print("")
+            }
+            
+            let newPackageDescription = try swiftPackageFileHelper.packageDescription(at: projectBuilderResult.projectDirectories.new.path())
+            let newSizes = ProjectStatisticsAnalyzer.analyzeSizes(
+                projectStatistics: newStatistics,
+                swiftPackageDescription: newPackageDescription
+            )
+            
+            // TODO: For some reason the sizes are always different on every fresh build
+            
+            print("NEW Sizes:")
+            newSizes.productSizes.forEach { sizeAnalysis in
+                print("  \(sizeAnalysis.productName) [\(sizeAnalysis.totalSize.bytesFormattedAsMB)]")
+                sizeAnalysis.targetSizes.forEach { key, value in
+                    print("  - \(key): \(value.bytesFormattedAsKB)")
+                }
+                sizeAnalysis.dependencySizes.forEach { key, value in
+                    print("  - \(key): \(value.bytesFormattedAsKB)")
+                }
+                print("")
+            }
+            
             // MARK: - Generate Output
+            
+            let allTargets = projectBuilderResult.swiftInterfaceFiles.map(\.name).sorted()
             
             let generatedOutput = try Self.generateOutput(
                 for: changes,
                 warnings: warnings,
-                allTargets: projectBuilderResult.swiftInterfaceFiles.map(\.name).sorted(),
+                allTargets: allTargets,
                 oldVersionName: oldSource.description,
                 newVersionName: newSource.description
             )

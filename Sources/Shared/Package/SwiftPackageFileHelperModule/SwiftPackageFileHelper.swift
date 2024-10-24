@@ -35,8 +35,8 @@ package struct SwiftPackageFileHelper {
     private let logger: (any Logging)?
     
     package init(
-        fileHandler: FileHandling,
-        shell: any ShellHandling,
+        fileHandler: FileHandling = FileManager.default,
+        shell: any ShellHandling = Shell(),
         logger: (any Logging)?
     ) {
         self.fileHandler = fileHandler
