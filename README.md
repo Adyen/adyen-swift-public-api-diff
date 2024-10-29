@@ -4,11 +4,19 @@
 
 This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
 
-It makes use of `.swiftinterface` files that get produced during the archiving of a swift project and parses them using [`swift-syntax`](https://github.com/swiftlang/swift-syntax).
+It makes use of `.swiftinterface` files that get produced during the archiving of a swift project and parses them using [`swift-syntax`](https://github.com/swiftlang/swift-syntax).  
+
+## Contributing
+We strongly encourage you to contribute to our repository. Find out more in our [contribution guidelines](https://github.com/Adyen/.github/blob/master/CONTRIBUTING.md)
+
+## Requirements
+- **Xcode** >= 16.0 (incl. Xcode command line tools)
+- **Swift** >= 5.9
 
 ## Usage
  
 ### From Project to Output
+This method requires an iOS 17.5 Simulator to be installed
 
 ```
 swift run public-api-diff
@@ -112,12 +120,13 @@ OPTIONS:
 ```
 </details>
 
-## How to create a release build
+## Release Build
+### Create
 ```
 swift build --configuration release
 ```
 
-## Run release build
+### Run
 ```
 ./public-api-diff
     project
@@ -136,11 +145,17 @@ swift build --configuration release
     --old "old/path/to/project.framework"
 ```
 
-# Alternatives
+## Alternatives
 - **swift-api-digester**
   - `xcrun swift-api-digester -dump-sdk`
   - `xcrun swift-api-digester -diagnose-sdk`
 
-# Inspiration
+## Inspiration
  - https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
    - For parsing swift files using [swift-syntax](https://github.com/swiftlang/swift-syntax)'s [`SyntaxVisitor`](https://github.com/swiftlang/swift-syntax/blob/main/Sources/SwiftSyntax/generated/SyntaxVisitor.swift)
+
+## Support
+If you have a feature request, or spotted a bug or a technical problem, create a GitHub issue.
+
+## License    
+MIT license. For more information, see the LICENSE file.
