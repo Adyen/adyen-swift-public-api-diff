@@ -1,6 +1,6 @@
 import ArgumentParser
 
-import PADProjectBuilder
+import PADSwiftInterfaceFileLocator
 import PADLogging
 
 extension SwiftInterfaceType: ExpressibleByArgument {

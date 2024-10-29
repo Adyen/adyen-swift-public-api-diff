@@ -22,7 +22,8 @@ struct PublicApiDiff: AsyncParsableCommand {
         commandName: "public-api-diff",
         subcommands: [
             ProjectToOutputCommand.self,
-            SwiftInterfaceToOutputCommand.self
+            SwiftInterfaceToOutputCommand.self,
+            FrameworkToOutputCommand.self
         ]
     )
     
