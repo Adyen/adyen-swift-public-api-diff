@@ -2,6 +2,7 @@ import Foundation
 
 import PADLogging
 import PADCore
+import PADSwiftInterfaceFileLocator
 
 import FileHandlingModule
 import ShellModule

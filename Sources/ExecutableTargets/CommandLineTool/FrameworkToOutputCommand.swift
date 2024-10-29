@@ -5,26 +5,29 @@ import PADCore
 import PADLogging
 
 import PADSwiftInterfaceDiff
-import PADProjectBuilder
+import PADSwiftInterfaceFileLocator
 import PADOutputGenerator
 import PADPackageFileAnalyzer
 
-/// Command that analyzes the differences between an old and new `.swiftinterface` file and produces a human readable output
-struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
+/// Command that analyzes the differences between an old and new project and produces a human readable output
+struct FrameworkToOutputCommand: AsyncParsableCommand {
     
-    static var configuration: CommandConfiguration = .init(commandName: "swift-interface")
+    static var configuration: CommandConfiguration = .init(commandName: "framework")
     
-    /// The path to the new/updated .swiftinterface file
-    @Option(help: "Specify the updated .swiftinterface file to compare to")
+    /// The path to the new/updated xcframework
+    @Option(help: "Specify the updated .framework to compare to")
     public var new: String
     
-    /// The path to the old/reference .swiftinterface file
-    @Option(help: "Specify the old .swiftinterface file to compare to")
+    /// The path to the old/reference xcframework
+    @Option(help: "Specify the old .framework to compare to")
     public var old: String
     
     /// The name of the target/module to show in the output
-    @Option(help: "[Optional] The name of your target/module to show in the output")
-    public var targetName: String?
+    @Option(help: "The name of your target/module to show in the output")
+    public var targetName: String
+    
+    @Option(help: "[Optional] Specify the type of .swiftinterface you want to compare (public/private)")
+    public var swiftInterfaceType: SwiftInterfaceType = .public
     
     @Option(help: "[Optional] The name of your old version (e.g. v1.0 / main) to show in the output")
     public var oldVersionName: String?
@@ -51,10 +54,20 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
         let logger = PublicApiDiff.logger(with: logLevel, logOutputFilePath: logOutput)
         
         do {
+            // MARK: - Locating .swiftinterface files
+            
+            let swiftInterfaceFiles = try Self.locateSwiftInterfaceFiles(
+                targetName: targetName,
+                oldPath: old,
+                newPath: new,
+                swiftInterfaceType: swiftInterfaceType,
+                logger: logger
+            )
+            
             // MARK: - Analyzing .swiftinterface files
             
             let swiftInterfaceChanges = try await Self.analyzeSwiftInterfaceFiles(
-                swiftInterfaceFiles: [.init(name: targetName ?? "", oldFilePath: old, newFilePath: new)],
+                swiftInterfaceFiles: swiftInterfaceFiles,
                 logger: logger
             )
             
@@ -63,7 +76,7 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
             let generatedOutput = try Self.generateOutput(
                 for: swiftInterfaceChanges,
                 warnings: [],
-                allTargets: targetName.map { [$0] },
+                allTargets: [targetName],
                 oldVersionName: oldVersionName,
                 newVersionName: newVersionName
             )
@@ -84,7 +97,36 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
     }
 }
 
-private extension SwiftInterfaceToOutputCommand {
+// MARK: - Privates
+
+private extension FrameworkToOutputCommand {
+    
+    static func locateSwiftInterfaceFiles(
+        targetName: String,
+        oldPath: String,
+        newPath: String,
+        swiftInterfaceType: SwiftInterfaceType,
+        logger: any Logging
+    ) throws -> [SwiftInterfaceFile] {
+        let locator = SwiftInterfaceFileLocator(logger: logger)
+        
+        let oldSwiftInterfaceFileUrl = try locator.locate(
+            for: targetName,
+            derivedDataPath: oldPath,
+            type: swiftInterfaceType
+        )
+        let newSwiftInterfaceFileUrl = try locator.locate(
+            for: targetName,
+            derivedDataPath: newPath,
+            type: swiftInterfaceType
+        )
+        
+        return [.init(
+            name: targetName,
+            oldFilePath: oldSwiftInterfaceFileUrl.path(),
+            newFilePath: newSwiftInterfaceFileUrl.path()
+        )]
+    }
     
     static func analyzeSwiftInterfaceFiles(
         swiftInterfaceFiles: [SwiftInterfaceFile],
