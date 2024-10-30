@@ -38,10 +38,10 @@ public protocol SimpleProtocol
 #### 🔀 Changed
 ```javascript
 // From
-@_hasMissingDesignatedInitializers public actor CustomActor
+public actor CustomActor
 
 // To
-@_hasMissingDesignatedInitializers public actor CustomActor: ReferencePackage.SimpleProtocol
+public actor CustomActor: ReferencePackage.SimpleProtocol
 
 /**
 Changes:
