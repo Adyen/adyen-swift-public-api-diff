@@ -38,18 +38,6 @@ public protocol SimpleProtocol
 #### 🔀 Changed
 ```javascript
 // From
-public actor CustomActor
-
-// To
-public actor CustomActor: ReferencePackage.SimpleProtocol
-
-/**
-Changes:
-- Added inheritance `ReferencePackage.SimpleProtocol`
-*/
-```
-```javascript
-// From
 @_spi(SystemProgrammingInterface) open class OpenSpiConformingClass: ReferencePackage.CustomProtocol
 
 // To
@@ -59,6 +47,18 @@ Changes:
 Changes:
 - Added generic parameter description `<T>`
 - Added generic where clause `where T : Swift.Strideable`
+*/
+```
+```javascript
+// From
+public actor CustomActor
+
+// To
+public actor CustomActor: ReferencePackage.SimpleProtocol
+
+/**
+Changes:
+- Added inheritance `ReferencePackage.SimpleProtocol`
 */
 ```
 ```javascript
