@@ -46,7 +46,8 @@ internal struct Git {
         let command = "git clone -b \(branchOrTag) \(repository) \(targetDirectoryPath)"
         shell.execute(command)
         
-        guard fileHandler.fileExists(atPath: targetDirectoryPath) else {
+        let directoryContents = try fileHandler.contentsOfDirectory(atPath: targetDirectoryPath)
+        guard !directoryContents.isEmpty else {
             throw GitError.couldNotClone(branchOrTag: branchOrTag, repository: repository)
         }
     }
