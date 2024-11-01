@@ -119,7 +119,7 @@ extension SwiftInterfaceProducer {
         newProjectDirectoryPath: String,
         oldProjectDirectoryPath: String,
         scheme: String
-    ) async throws -> DerivedDataPaths { // TODO: Typed return type
+    ) async throws -> DerivedDataPaths {
         
         // We don't run them in parallel to not conflict with resolving dependencies concurrently
         
