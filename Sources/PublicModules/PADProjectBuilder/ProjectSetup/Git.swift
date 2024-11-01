@@ -12,7 +12,7 @@ internal enum GitError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case let .couldNotClone(branchOrTag, repository):
-            "Could not clone \(repository) @ \(branchOrTag) - Please check the provided information"
+            "Could not clone \(repository) @ \(branchOrTag) - Please check the debug logs for more information"
         }
     }
 }
@@ -48,8 +48,8 @@ internal struct Git {
         let shellOutput = shell.execute(command)
         logger?.debug(shellOutput, from: String(describing: Self.self))
         
-        let directoryContents = try fileHandler.contentsOfDirectory(atPath: targetDirectoryPath)
-        guard !directoryContents.isEmpty else {
+        let directoryContents = try? fileHandler.contentsOfDirectory(atPath: targetDirectoryPath)
+        guard let directoryContents, !directoryContents.isEmpty else {
             throw GitError.couldNotClone(branchOrTag: branchOrTag, repository: repository)
         }
     }
