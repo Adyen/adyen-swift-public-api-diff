@@ -46,7 +46,7 @@ jobs:
             OLD="${{ env.target }}~${{ env.githubRepo }}"
         fi
         
-        swift run public-api-diff project --new "$NEW" --old "$OLD" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        swift run public-api-diff project --new "$NEW" --old "$OLD" --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
       env:
