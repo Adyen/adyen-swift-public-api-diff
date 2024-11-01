@@ -102,8 +102,8 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
                 for: changes,
                 warnings: warnings,
                 allTargets: projectBuilderResult.swiftInterfaceFiles.map(\.name).sorted(),
-                oldVersionName: oldSource.description,
-                newVersionName: newSource.description
+                oldVersionName: oldSource.title,
+                newVersionName: newSource.title
             )
             
             // MARK: -
