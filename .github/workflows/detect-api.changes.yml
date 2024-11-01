@@ -36,6 +36,7 @@ jobs:
     - name: 🔍 Detect Changes
       run: |
         PROJECT_FOLDER=$PWD
+        echo $PROJECT_FOLDER
         
         NEW="${{ env.source }}~${{ env.githubRepo }}"
         if [[ '${{ github.head_ref || env.noTargetBranch }}' == 'release/*' ]]
