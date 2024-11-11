@@ -1,4 +1,5 @@
 import Foundation
+import PADCore
 
 extension SwiftInterfaceInitializer {
     
@@ -35,6 +36,8 @@ extension SwiftInterfaceInitializer {
 }
 
 class SwiftInterfaceInitializer: SwiftInterfaceElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .`init` }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

@@ -53,7 +53,7 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
         do {
             // MARK: - Analyzing .swiftinterface files
             
-            let swiftInterfaceChanges = try await Self.analyzeSwiftInterfaceFiles(
+            let swiftInterfaceAnalysis = try await Self.analyzeSwiftInterfaceFiles(
                 swiftInterfaceFiles: [.init(name: targetName ?? "", oldFilePath: old, newFilePath: new)],
                 logger: logger
             )
@@ -61,7 +61,8 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
             // MARK: - Generate Output
             
             let generatedOutput = try Self.generateOutput(
-                for: swiftInterfaceChanges,
+                for: swiftInterfaceAnalysis.changes,
+                metrics: swiftInterfaceAnalysis.metrics,
                 warnings: [],
                 allTargets: targetName.map { [$0] },
                 oldVersionName: oldVersionName,
@@ -89,7 +90,7 @@ private extension SwiftInterfaceToOutputCommand {
     static func analyzeSwiftInterfaceFiles(
         swiftInterfaceFiles: [SwiftInterfaceFile],
         logger: any Logging
-    ) async throws -> [String: [Change]] {
+    ) async throws -> SwiftInterfaceDiff.Result {
         let swiftInterfaceDiff = SwiftInterfaceDiff(logger: logger)
         
         return try await swiftInterfaceDiff.run(
@@ -99,6 +100,7 @@ private extension SwiftInterfaceToOutputCommand {
     
     static func generateOutput(
         for changes: [String: [Change]],
+        metrics: [String: SwiftInterfaceMetricsDiff],
         warnings: [String],
         allTargets: [String]?,
         oldVersionName: String?,
@@ -108,6 +110,7 @@ private extension SwiftInterfaceToOutputCommand {
         
         return try outputGenerator.generate(
             from: changes,
+            metrics: metrics,
             allTargets: allTargets,
             oldVersionName: oldVersionName,
             newVersionName: newVersionName,

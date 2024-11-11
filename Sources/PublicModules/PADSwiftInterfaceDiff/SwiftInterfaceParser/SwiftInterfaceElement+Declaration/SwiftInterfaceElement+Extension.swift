@@ -1,6 +1,9 @@
 import Foundation
+import PADCore
 
 class SwiftInterfaceExtension: SwiftInterfaceElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .extension }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

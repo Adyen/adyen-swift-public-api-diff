@@ -15,6 +15,7 @@ public struct MarkdownOutputGenerator: OutputGenerating {
     /// Generates human readable output from the provided information
     public func generate(
         from changesPerTarget: [String: [Change]],
+        metrics: [String: SwiftInterfaceMetricsDiff],
         allTargets: [String]?,
         oldVersionName: String?,
         newVersionName: String?,
@@ -36,6 +37,10 @@ public struct MarkdownOutputGenerator: OutputGenerating {
         
         if !warnings.isEmpty {
             lines += Self.warningInfo(for: warnings) + [separator]
+        }
+        
+        if !metrics.isEmpty {
+            lines += Self.metricsInfo(for: metrics) + [separator]
         }
         
         if !changes.isEmpty {
@@ -76,6 +81,41 @@ private extension MarkdownOutputGenerator {
     
     static func warningInfo(for warnings: [String]) -> [String] {
         warnings.map { "> [!WARNING]\n> \($0)" }
+    }
+    
+    static func metricsInfo(for metrics: [String: SwiftInterfaceMetricsDiff]) -> [String] {
+        
+        var typeRows = [String]()
+        let modules = metrics.keys.sorted()
+        
+        typeRows.append("| type | \(modules.joined(separator: " | ")) | total |")
+        typeRows.append("| --- | \(Array.init(repeating: " --- ", count: modules.count).joined(separator: " | ")) | --- |")
+        
+        SwiftInterfaceElementDeclType.allCases.forEach { type in
+            if type == .root { return }
+            
+            var typeRowElements = [type.rawValue]
+            var sum = 0
+            
+            modules.forEach { moduleName in
+                guard let moduleMetrics = metrics[moduleName] else {
+                    typeRowElements.append("-")
+                    return
+                }
+                
+                let newCount = moduleMetrics.new.occurencesOfType[type] ?? 0
+                let oldCount = moduleMetrics.old.occurencesOfType[type] ?? 0
+                let change = newCount - oldCount
+                let changeLabel = change > 0 ? "(+\(change))" : change < 0 ? "(-\(change))" : ""
+                typeRowElements.append("\(newCount) \(changeLabel)")
+                
+                sum += newCount
+            }
+            
+            typeRows.append("| \(typeRowElements.joined(separator: " | ")) | **\(sum)** |")
+        }
+        
+        return typeRows
     }
     
     static func changeLines(changesPerModule: [String: [Change]]) -> [String] {

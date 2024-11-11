@@ -1,9 +1,12 @@
 import Foundation
+import PADCore
 
 extension SwiftInterfaceParser {
     
     /// The root element returned as the result of parsing the interface
     class Root: SwiftInterfaceElement {
+        
+        static var declType: SwiftInterfaceElementDeclType { .root }
         
         var parent: (any SwiftInterfaceElement)? = nil
         

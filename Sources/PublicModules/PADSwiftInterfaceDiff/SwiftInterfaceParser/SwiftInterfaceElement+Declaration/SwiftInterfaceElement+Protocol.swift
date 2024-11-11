@@ -1,6 +1,9 @@
 import Foundation
+import PADCore
 
 class SwiftInterfaceProtocol: SwiftInterfaceExtendableElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .protocol }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

@@ -1,4 +1,5 @@
 import Foundation
+import PADCore
 
 extension SwiftInterfaceSubscript {
     
@@ -35,6 +36,8 @@ extension SwiftInterfaceSubscript {
 }
 
 class SwiftInterfaceSubscript: SwiftInterfaceElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .subscript }
     
     let name: String = "subscript"
     

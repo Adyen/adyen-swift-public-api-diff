@@ -1,4 +1,5 @@
 import Foundation
+import PADCore
 
 extension SwiftInterfaceFunction {
     
@@ -35,6 +36,8 @@ extension SwiftInterfaceFunction {
 }
 
 class SwiftInterfaceFunction: SwiftInterfaceElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .func }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

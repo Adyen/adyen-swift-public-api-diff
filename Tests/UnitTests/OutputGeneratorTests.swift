@@ -22,6 +22,7 @@ class OutputGeneratorTests: XCTestCase {
         let outputGenerator = MarkdownOutputGenerator()
         let output = outputGenerator.generate(
             from: [:],
+            metrics: [:],
             allTargets: ["Target_1"],
             oldVersionName: "old_source",
             newVersionName: "new_source",
@@ -51,6 +52,7 @@ class OutputGeneratorTests: XCTestCase {
         
         let output = outputGenerator.generate(
             from: ["Target_1": [.init(changeType: .addition(description: "Some Addition"), parentPath: "")]],
+            metrics: [:],
             allTargets: ["Target_1"],
             oldVersionName: "old_source",
             newVersionName: "new_source",
@@ -102,6 +104,7 @@ class OutputGeneratorTests: XCTestCase {
                     .init(changeType: .removal(description: "Another Removal"), parentPath: "")
                 ]
             ],
+            metrics: [:],
             allTargets: ["Target_1", "Target_2"],
             oldVersionName: "old_repository @ old_branch",
             newVersionName: "new_source",

@@ -1,6 +1,9 @@
 import Foundation
+import PADCore
 
 class SwiftInterfaceEnum: SwiftInterfaceExtendableElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .enum }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

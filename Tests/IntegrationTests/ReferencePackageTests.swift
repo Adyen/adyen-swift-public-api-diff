@@ -48,7 +48,8 @@ class ReferencePackageTests: XCTestCase {
         let pipelineOutput = try await runPipeline(for: interfaceType)
         
         let markdownOutput = MarkdownOutputGenerator().generate(
-            from: pipelineOutput,
+            from: pipelineOutput.changes,
+            metrics: pipelineOutput.metrics,
             allTargets: ["ReferencePackage"],
             oldVersionName: "old_public",
             newVersionName: "new_public",
@@ -74,7 +75,8 @@ class ReferencePackageTests: XCTestCase {
         let pipelineOutput = try await runPipeline(for: interfaceType)
         
         let markdownOutput = MarkdownOutputGenerator().generate(
-            from: pipelineOutput,
+            from: pipelineOutput.changes,
+            metrics: pipelineOutput.metrics,
             allTargets: ["ReferencePackage"],
             oldVersionName: "old_private",
             newVersionName: "new_private",
@@ -140,7 +142,7 @@ private extension ReferencePackageTests {
         return interfaceFilePath.path()
     }
     
-    func runPipeline(for interfaceType: InterfaceType) async throws -> [String: [Change]] {
+    func runPipeline(for interfaceType: InterfaceType) async throws -> SwiftInterfaceDiff.Result {
 
         let referencePackagesRoot = try Self.referencePackagesPath()
         

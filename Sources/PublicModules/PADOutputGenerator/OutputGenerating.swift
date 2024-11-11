@@ -22,6 +22,7 @@ public protocol OutputGenerating<OutputType> {
     /// - Returns: An output of type ``OutputType``
     func generate(
         from changesPerTarget: [String: [Change]],
+        metrics: [String: SwiftInterfaceMetricsDiff],
         allTargets: [String]?,
         oldVersionName: String?,
         newVersionName: String?,

@@ -1,6 +1,9 @@
 import Foundation
+import PADCore
 
 class SwiftInterfaceStruct: SwiftInterfaceExtendableElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .struct }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

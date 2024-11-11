@@ -74,7 +74,7 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
             
             // MARK: - Analyzing .swiftinterface files
             
-            let swiftInterfaceChanges = try await Self.analyzeSwiftInterfaceFiles(
+            let swiftInterfaceAnalysis = try await Self.analyzeSwiftInterfaceFiles(
                 swiftInterfaceFiles: projectBuilderResult.swiftInterfaceFiles,
                 logger: logger
             )
@@ -91,7 +91,7 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
             
             // MARK: - Merging Changes
             
-            var changes = swiftInterfaceChanges
+            var changes = swiftInterfaceAnalysis.changes
             if !projectChanges.isEmpty {
                 changes["Package.swift"] = projectChanges
             }
@@ -100,6 +100,7 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
             
             let generatedOutput = try Self.generateOutput(
                 for: changes,
+                metrics: swiftInterfaceAnalysis.metrics,
                 warnings: warnings,
                 allTargets: projectBuilderResult.swiftInterfaceFiles.map(\.name).sorted(),
                 oldVersionName: oldSource.title,
@@ -175,7 +176,7 @@ private extension ProjectToOutputCommand {
     static func analyzeSwiftInterfaceFiles(
         swiftInterfaceFiles: [SwiftInterfaceFile],
         logger: any Logging
-    ) async throws -> [String: [Change]] {
+    ) async throws -> SwiftInterfaceDiff.Result {
         let swiftInterfaceDiff = SwiftInterfaceDiff(logger: logger)
         
         return try await swiftInterfaceDiff.run(
@@ -185,6 +186,7 @@ private extension ProjectToOutputCommand {
     
     static func generateOutput(
         for changes: [String: [Change]],
+        metrics: [String: SwiftInterfaceMetricsDiff],
         warnings: [String],
         allTargets: [String],
         oldVersionName: String,
@@ -194,6 +196,7 @@ private extension ProjectToOutputCommand {
         
         return try outputGenerator.generate(
             from: changes,
+            metrics: metrics,
             allTargets: allTargets,
             oldVersionName: oldVersionName,
             newVersionName: newVersionName,

@@ -1,6 +1,9 @@
 import Foundation
+import PADCore
 
 class SwiftInterfaceAssociatedType: SwiftInterfaceElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .associatedtype }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

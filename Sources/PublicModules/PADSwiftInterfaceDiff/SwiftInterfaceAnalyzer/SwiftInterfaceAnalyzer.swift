@@ -18,7 +18,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     func analyze(
         old: some SwiftInterfaceElement,
         new: some SwiftInterfaceElement
-    ) -> [Change] {
+    ) -> SwiftInterfaceAnalysis {
         
         // Very naive diff from both sides
         // There is room for improvement here but it's "performant enough" for now
@@ -35,8 +35,17 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             isRoot: true
         )
         
-        // Matching removals/additions to changes when applicable
-        return changeConsolidator.consolidate(individualChanges)
+        let newMetrics = metrics(for: new)
+        let oldMetrics = metrics(for: old)
+        
+        return .init(
+            changes: changeConsolidator.consolidate(individualChanges), // Matching removals/additions to changes when applicable
+            metrics: SwiftInterfaceMetricsDiff(old: oldMetrics, new: newMetrics)
+        )
+    }
+    
+    func metrics(for swiftInterface: some SwiftInterfaceElement) -> SwiftInterfaceMetrics {
+        return swiftInterface.metrics()
     }
     
     private static func recursiveCompare(

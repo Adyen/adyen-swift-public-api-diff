@@ -1,6 +1,9 @@
 import Foundation
+import PADCore
 
 class SwiftInterfaceActor: SwiftInterfaceExtendableElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .actor }
     
     var pathComponentName: String { name }
     

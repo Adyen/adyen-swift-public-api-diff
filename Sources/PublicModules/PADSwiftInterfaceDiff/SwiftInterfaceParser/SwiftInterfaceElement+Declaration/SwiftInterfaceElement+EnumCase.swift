@@ -1,4 +1,5 @@
 import Foundation
+import PADCore
 
 extension SwiftInterfaceEnumCase {
     
@@ -34,6 +35,8 @@ extension SwiftInterfaceEnumCase {
 }
 
 class SwiftInterfaceEnumCase: SwiftInterfaceElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .enumCase }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]

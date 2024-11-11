@@ -1,4 +1,5 @@
 import Foundation
+import PADCore
 
 protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
     
@@ -14,6 +15,8 @@ protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
 }
 
 protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
+    
+    static var declType: SwiftInterfaceElementDeclType { get }
     
     /// The name of the element used to construct the parent path for its children
     var pathComponentName: String { get }

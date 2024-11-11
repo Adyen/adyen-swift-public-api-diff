@@ -9,6 +9,11 @@ public struct SwiftInterfaceDiff {
     
     public typealias ModuleName = String
     
+    public struct Result {
+        public let changes: [ModuleName: [Change]]
+        public let metrics: [ModuleName: SwiftInterfaceMetricsDiff]
+    }
+    
     let fileHandler: any FileHandling
     let swiftInterfaceParser: any SwiftInterfaceParsing
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
@@ -44,9 +49,10 @@ public struct SwiftInterfaceDiff {
     /// Analyzes the passed ``PADCore/SwiftInterfaceFile``s and returns a list of changes grouped by scheme/target
     /// - Parameter swiftInterfaceFiles: The ``PADCore/SwiftInterfaceFile``s to analyze
     /// - Returns: A list of changes grouped by scheme/target
-    public func run(with swiftInterfaceFiles: [SwiftInterfaceFile]) async throws -> [ModuleName: [Change]] {
+    public func run(with swiftInterfaceFiles: [SwiftInterfaceFile]) async throws -> Result {
         
-        var changes = [String: [Change]]()
+        var changes = [ModuleName: [Change]]()
+        var metrics = [ModuleName: SwiftInterfaceMetricsDiff]()
         
         try swiftInterfaceFiles.forEach { file in
             logger?.log("🧑‍🔬 Analyzing \(file.name)", from: String(describing: Self.self))
@@ -55,16 +61,15 @@ public struct SwiftInterfaceDiff {
             let newParsed = swiftInterfaceParser.parse(source: newContent, moduleName: file.name)
             let oldParsed = swiftInterfaceParser.parse(source: oldContent, moduleName: file.name)
             
-            let moduleChanges = try swiftInterfaceAnalyzer.analyze(
+            let analysis = try swiftInterfaceAnalyzer.analyze(
                 old: oldParsed,
                 new: newParsed
             )
             
-            if !moduleChanges.isEmpty {
-                changes[file.name] = moduleChanges
-            }
+            changes[file.name] = analysis.changes
+            metrics[file.name] = analysis.metrics
         }
         
-        return changes
+        return .init(changes: changes, metrics: metrics)
     }
 }

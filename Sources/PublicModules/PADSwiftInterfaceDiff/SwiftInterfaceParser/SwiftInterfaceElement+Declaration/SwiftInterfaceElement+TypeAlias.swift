@@ -1,6 +1,9 @@
 import Foundation
+import PADCore
 
 class SwiftInterfaceTypeAlias: SwiftInterfaceElement {
+    
+    static var declType: SwiftInterfaceElementDeclType { .typealias }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
