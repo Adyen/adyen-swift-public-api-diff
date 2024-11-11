@@ -5,15 +5,15 @@ import ShellModule
 import PADLogging
 
 /// A helper to locate `.swiftinterface` files
-struct SwiftInterfaceFileLocator {
+public struct SwiftInterfaceFileLocator {
     
     let fileHandler: any FileHandling
     let shell: any ShellHandling
     let logger: (any Logging)?
     
-    init(
-        fileHandler: any FileHandling = FileManager.default,
-        shell: any ShellHandling = Shell(),
+    package init(
+        fileHandler: any FileHandling,
+        shell: any ShellHandling,
         logger: (any Logging)?
     ) {
         self.fileHandler = fileHandler
@@ -21,6 +21,15 @@ struct SwiftInterfaceFileLocator {
         self.logger = logger
     }
     
+    public init(
+        logger: (any Logging)? = nil
+    ) {
+        self.init(
+            fileHandler: FileManager.default,
+            shell: Shell(),
+            logger: logger
+        )
+    }
     
     /// Tries to locate a `.swiftinterface` files in the derivedData folder for a specific scheme
     /// - Parameters:
@@ -29,7 +38,7 @@ struct SwiftInterfaceFileLocator {
     ///   - type: The swift interface type (.public, .private) to look for
     /// - Returns: The file url to the found `.swiftinterface`
     /// - Throws: An error if no `.swiftinterface` file can be found for the given scheme + derived data path
-    func locate(for scheme: String, derivedDataPath: String, type: SwiftInterfaceType) throws -> URL {
+    public func locate(for scheme: String, derivedDataPath: String, type: SwiftInterfaceType) throws -> URL {
         let schemeSwiftModuleName = "\(scheme).swiftmodule"
         
         let swiftModulePathsForScheme = shell.execute("cd '\(derivedDataPath)'; find . -type d -name '\(schemeSwiftModuleName)'")

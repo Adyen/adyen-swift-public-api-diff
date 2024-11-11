@@ -3,6 +3,8 @@ import Foundation
 
 import PADCore
 import PADLogging
+import PADSwiftInterfaceFileLocator
+
 import PADSwiftInterfaceDiff
 import PADProjectBuilder
 import PADOutputGenerator

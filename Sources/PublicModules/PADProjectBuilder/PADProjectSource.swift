@@ -48,4 +48,13 @@ public enum ProjectSource: Equatable, CustomStringConvertible {
             return "\(repository) @ \(branch)"
         }
     }
+    
+    public var title: String {
+        switch self {
+        case let .local(path):
+            return path
+        case let .git(branch, _):
+            return "\(branch)"
+        }
+    }
 }

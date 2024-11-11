@@ -48,6 +48,7 @@ let package = Package(
                 "PADOutputGenerator",
                 "PADPackageFileAnalyzer",
                 "PADProjectStatistics",
+                "PADSwiftInterfaceFileLocator",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
             path: "Sources/ExecutableTargets/CommandLineTool"
@@ -82,6 +83,7 @@ let package = Package(
             dependencies: [
                 "PADCore",
                 "PADLogging",
+                "PADSwiftInterfaceFileLocator",
                 "FileHandlingModule",
                 "ShellModule",
                 "SwiftPackageFileHelperModule"
@@ -109,6 +111,11 @@ let package = Package(
             name: "PADProjectStatistics",
             dependencies: ["SwiftPackageFileHelperModule", "FileHandlingModule", "ShellModule", "PADLogging"],
             path: "Sources/Shared/Public/PADProjectStatistics"
+        ),
+        .target(
+            name: "PADSwiftInterfaceFileLocator",
+            dependencies: ["FileHandlingModule", "ShellModule", "PADLogging"],
+            path: "Sources/Shared/Public/PADSwiftInterfaceFileLocator"
         ),
         
         // MARK: - Shared/Package

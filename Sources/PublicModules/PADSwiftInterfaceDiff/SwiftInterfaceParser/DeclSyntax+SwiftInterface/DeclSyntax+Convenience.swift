@@ -8,6 +8,25 @@ extension SyntaxCollection {
     }
 }
 
+extension AttributeListSyntax {
+    
+    private var excludedAttributes: Set<String> {
+        [
+            "@_hasMissingDesignatedInitializers",
+            "@_inheritsConvenienceInitializers"
+        ]
+    }
+    
+    /// Produces a description where all elements in the list are mapped to their `trimmedDescription`
+    var sanitizedList: [String] {
+        self.compactMap {
+            let description = $0.trimmedDescription
+            if excludedAttributes.contains(description) { return nil }
+            return description
+        }
+    }
+}
+
 extension InheritedTypeListSyntax {
     
     /// Produces a description where all elements in the list are mapped to their type's `trimmedDescription`
