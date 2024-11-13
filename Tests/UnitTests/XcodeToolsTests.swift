@@ -8,24 +8,24 @@
 import XCTest
 
 class XcodeToolsTests: XCTestCase {
-    
+
     func test_archive_swiftPackage() async throws {
-        
+
         let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
         let scheme = "SCHEME"
-        
+
         try await testArchiving(
             projectDirectoryPath: projectDirectoryPath,
             scheme: scheme,
             projectType: .swiftPackage
         )
     }
-    
+
     func test_archive_xcodeProject() async throws {
-        
+
         let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
         let scheme = "SCHEME"
-        
+
         try await testArchiving(
             projectDirectoryPath: projectDirectoryPath,
             scheme: scheme,
@@ -35,20 +35,20 @@ class XcodeToolsTests: XCTestCase {
 }
 
 private extension XcodeToolsTests {
-    
+
     func testArchiving(
         projectDirectoryPath: String,
         scheme: String,
         projectType: ProjectType
     ) async throws {
-        
+
         let archiveResult = "ARCHIVE_RESULT"
         let expectedDerivedDataPath = "\(projectDirectoryPath)/.build"
         var expectedHandleExecuteCalls: [String] = {
             switch projectType {
             case .swiftPackage:
                 ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES -skipPackagePluginValidation"]
-            case .xcodeProject(let scheme):
+            case let .xcodeProject(scheme):
                 ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES"]
             }
         }()
@@ -59,7 +59,7 @@ private extension XcodeToolsTests {
             (archiveResult, "XcodeTools")
         ]
         var expectedHandleFileExistsCalls = ["PROJECT_DIRECTORY_PATH/.build"]
-        
+
         var shell = MockShell()
         shell.handleExecute = { command in
             let expectedInput = expectedHandleExecuteCalls.removeFirst()
@@ -83,19 +83,19 @@ private extension XcodeToolsTests {
             XCTAssertEqual(message, expectedInput.message)
             XCTAssertEqual(subsystem, expectedInput.subsystem)
         }
-        
+
         let xcodeTools = XcodeTools(
             shell: shell,
             fileHandler: fileHandler,
             logger: logger
         )
-        
+
         let derivedDataPath = try await xcodeTools.archive(
             projectDirectoryPath: projectDirectoryPath,
             scheme: scheme,
             projectType: projectType
         )
-        
+
         XCTAssertEqual(derivedDataPath, expectedDerivedDataPath)
         XCTAssertTrue(expectedHandleExecuteCalls.isEmpty)
         XCTAssertTrue(expectedHandleLogCalls.isEmpty)

@@ -9,9 +9,9 @@ import PADCore
 
 /// Allows generation of human readable output from the provided information
 public struct MarkdownOutputGenerator: OutputGenerating {
-    
+
     public init() {}
-    
+
     /// Generates human readable output from the provided information
     public func generate(
         from changesPerTarget: [String: [Change]],
@@ -20,34 +20,34 @@ public struct MarkdownOutputGenerator: OutputGenerating {
         newVersionName: String?,
         warnings: [String]
     ) -> String {
-        
+
         let separator = "\n---"
         let changes = Self.changeLines(changesPerModule: changesPerTarget)
-        
+
         var lines = [
-            Self.title(changesPerTarget: changesPerTarget),
+            Self.title(changesPerTarget: changesPerTarget)
         ]
-        
+
         if let oldVersionName, let newVersionName {
             lines += [Self.repoInfo(oldVersionName: oldVersionName, newVersionName: newVersionName)]
         }
-        
+
         lines += [separator]
-        
+
         if !warnings.isEmpty {
             lines += Self.warningInfo(for: warnings) + [separator]
         }
-        
+
         if !changes.isEmpty {
             lines += changes + [separator]
         }
-        
+
         if let allTargets {
             lines += [
                 Self.analyzedModulesInfo(allTargets: allTargets)
             ]
         }
-        
+
         return lines.joined(separator: "\n")
     }
 }
@@ -55,52 +55,52 @@ public struct MarkdownOutputGenerator: OutputGenerating {
 // MARK: - Privates
 
 private extension MarkdownOutputGenerator {
-    
+
     static func title(changesPerTarget: [String: [Change]]) -> String {
-        
+
         if changesPerTarget.keys.isEmpty {
             return "# ✅ No changes detected"
         }
-        
+
         let totalChangeCount = changesPerTarget.totalChangeCount
         return "# 👀 \(totalChangeCount) public \(totalChangeCount == 1 ? "change" : "changes") detected"
     }
-    
+
     static func repoInfo(oldVersionName: String, newVersionName: String) -> String {
         "_Comparing `\(newVersionName)` to `\(oldVersionName)`_"
     }
-    
+
     static func analyzedModulesInfo(allTargets: [String]) -> String {
         "**Analyzed targets:** \(allTargets.joined(separator: ", "))"
     }
-    
+
     static func warningInfo(for warnings: [String]) -> [String] {
         warnings.map { "> [!WARNING]\n> \($0)" }
     }
-    
+
     static func changeLines(changesPerModule: [String: [Change]]) -> [String] {
         var lines = [String]()
-        
+
         changesPerModule.keys.sorted().forEach { targetName in
             guard let changesForTarget = changesPerModule[targetName], !changesPerModule.isEmpty else { return }
-            
+
             if !targetName.isEmpty {
                 lines.append("## `\(targetName)`")
             }
-            
+
             var groupedChanges = [String: [Change]]()
-            
+
             changesForTarget.forEach {
                 groupedChanges[$0.parentPath ?? ""] = (groupedChanges[$0.parentPath ?? ""] ?? []) + [$0]
             }
-            
+
             groupedChanges.keys.sorted().forEach { parent in
                 guard let changes = groupedChanges[parent], !changes.isEmpty else { return }
-                
+
                 if !parent.isEmpty {
                     lines.append("### `\(parent)`")
                 }
-                
+
                 let additionLines = changeSectionLines(
                     title: "#### ❇️ Added",
                     changes: changes.filter(\.changeType.isAddition)
@@ -113,19 +113,19 @@ private extension MarkdownOutputGenerator {
                     title: "#### 😶‍🌫️ Removed",
                     changes: changes.filter(\.changeType.isRemoval)
                 )
-                
+
                 if !additionLines.isEmpty { lines += additionLines }
                 if !changeLines.isEmpty { lines += changeLines }
                 if !removalLines.isEmpty { lines += removalLines }
             }
         }
-        
+
         return lines
     }
 }
 
 private extension MarkdownOutputGenerator {
-    
+
     static func changeSectionLines(title: String, changes: [Change]) -> [String] {
         if changes.isEmpty { return [] }
 
@@ -150,7 +150,7 @@ private extension MarkdownOutputGenerator {
         }
         return lines
     }
-    
+
     static func description(for change: Change) -> String {
         switch change.changeType {
         case let .addition(description):
@@ -164,7 +164,7 @@ private extension MarkdownOutputGenerator {
 }
 
 private extension [String: [Change]] {
-    
+
     var totalChangeCount: Int {
         var totalChangeCount = 0
         keys.forEach { targetName in

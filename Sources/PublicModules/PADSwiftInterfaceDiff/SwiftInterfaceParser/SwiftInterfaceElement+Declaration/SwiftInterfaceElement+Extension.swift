@@ -1,37 +1,43 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
 class SwiftInterfaceExtension: SwiftInterfaceElement {
-    
+
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
-    
+
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
-    
+
     let extendedType: String
-    
+
     let inheritance: [String]?
-    
+
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
-    
+
     var pathComponentName: String {
-        [extendedType, genericWhereClauseDescription.map { "[\($0)]"}].compactMap { $0 }.joined()
+        [extendedType, genericWhereClauseDescription.map { "[\($0)]" }].compactMap { $0 }.joined()
     }
-    
+
     /// The members, declarations, ... inside of the body of the struct
     var children: [any SwiftInterfaceElement]
-    
-    var parent: (any SwiftInterfaceElement)? = nil
-    
+
+    var parent: (any SwiftInterfaceElement)?
+
     var diffableSignature: String { extendedType }
-    
+
     var consolidatableName: String { extendedType }
-    
+
     var description: String {
         compileDescription()
     }
-    
+
     init(
         attributes: [String],
         modifiers: [String],
@@ -50,8 +56,8 @@ class SwiftInterfaceExtension: SwiftInterfaceElement {
 }
 
 extension SwiftInterfaceExtension {
-    
-    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+
+    func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
@@ -63,23 +69,23 @@ extension SwiftInterfaceExtension {
 }
 
 private extension SwiftInterfaceExtension {
-    
+
     func compileDescription() -> String {
-        
+
         var components = [String]()
-        
+
         components += attributes
         components += modifiers
         components += ["extension"]
-        
+
         if let inheritance, !inheritance.isEmpty {
             components += ["\(extendedType): \(inheritance.joined(separator: ", "))"]
         } else {
             components += [extendedType]
         }
-        
+
         genericWhereClauseDescription.map { components += [$0] }
-        
+
         return components.joined(separator: " ")
     }
 }

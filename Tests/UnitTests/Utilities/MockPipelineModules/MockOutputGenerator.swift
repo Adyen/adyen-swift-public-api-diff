@@ -4,14 +4,14 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import PADOutputGenerator
 @testable import PADCore
+@testable import PADOutputGenerator
 import XCTest
 
 struct MockOutputGenerator: OutputGenerating {
 
     var onGenerate: ([String: [Change]], [String]?, String?, String?, [String]) throws -> String
-    
+
     func generate(
         from changesPerTarget: [String: [Change]],
         allTargets: [String]?,

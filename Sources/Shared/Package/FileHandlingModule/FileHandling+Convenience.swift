@@ -15,7 +15,7 @@ package enum FileHandlerError: LocalizedError, Equatable {
     case couldNotLoadFile(filePath: String)
     /// File/Directory does not exist at `path`
     case pathDoesNotExist(path: String)
-    
+
     public var errorDescription: String? {
         switch self {
         case .couldNotEncodeOutput:
@@ -33,7 +33,7 @@ package enum FileHandlerError: LocalizedError, Equatable {
 // MARK: - Convenience
 
 package extension FileHandling {
-    
+
     /// Creates a directory at the specified path and deletes any old directory if existing
     ///
     /// - Parameters:
@@ -45,25 +45,25 @@ package extension FileHandling {
         try? removeItem(atPath: cleanDirectoryPath)
         try createDirectory(atPath: cleanDirectoryPath)
     }
-    
+
     /// Persists an output string to a file
     ///
     /// - Parameters:
     ///   - output: The output string to persist
     ///   - outputFilePath: The file path to persist the output to
     func write(_ output: String, to outputFilePath: String) throws {
-        
+
         guard let data = output.data(using: String.Encoding.utf8) else {
             throw FileHandlerError.couldNotEncodeOutput
         }
-        
+
         // Remove existing directory if it exists
         try? removeItem(atPath: outputFilePath)
         if !createFile(atPath: outputFilePath, contents: data) {
             throw FileHandlerError.couldNotCreateFile(outputFilePath: outputFilePath)
         }
     }
-    
+
     /// Get the string contents from a file at a specified path
     ///
     /// - Parameters:

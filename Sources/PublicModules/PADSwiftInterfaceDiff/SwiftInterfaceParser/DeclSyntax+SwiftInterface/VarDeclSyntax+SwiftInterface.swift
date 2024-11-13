@@ -1,15 +1,21 @@
-import SwiftSyntax
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import SwiftParser
+import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/structdeclsyntax
 extension VariableDeclSyntax {
-    
+
     func toInterfaceElement() -> [SwiftInterfaceVar] {
-       
+
         let declarationAttributes = self.attributes.sanitizedList
         let modifiers = self.modifiers.sanitizedList
         let bindingSpecifier = self.bindingSpecifier.trimmedDescription
- 
+
         // Transforming:
         // - final public let a = 0, b = 1, c: Double = 5.0
         // Into:
@@ -22,7 +28,7 @@ extension VariableDeclSyntax {
                 // If the accessors are missing and we have a let we can assume it's get only
                 accessors = "get"
             }
-            
+
             return SwiftInterfaceVar(
                 attributes: declarationAttributes,
                 modifiers: modifiers,

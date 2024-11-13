@@ -9,7 +9,7 @@ import PADCore
 
 /// A helper to consolidate a `removal` and `addition` to `change`
 protocol SwiftInterfaceChangeConsolidating {
-    
+
     /// Tries to match a `removal` and `addition` to a `change`
     ///
     /// - Parameters:
@@ -18,7 +18,7 @@ protocol SwiftInterfaceChangeConsolidating {
 }
 
 struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
-    
+
     /// Tries to match a `removal` and `addition` to a `change`
     ///
     /// - Parameters:
@@ -50,12 +50,12 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
             let oldDescription = change.oldFirst ? change.element.description : match.element.description
             let newDescription = change.oldFirst ? match.element.description : change.element.description
             let listOfChanges = listOfChanges(between: change, and: match)
-            
+
             if listOfChanges.isEmpty {
                 assertionFailure("We should not end up here - investigate how this happened")
                 break
             }
-            
+
             consolidatedChanges.append(
                 .init(
                     changeType: .change(
@@ -122,9 +122,9 @@ extension IndependentSwiftInterfaceChange {
     /// It could potentially still lead to false positives when having multiple functions with changes and the same name and parent but this is acceptable in this phase.
     func isConsolidatable(with otherChange: IndependentSwiftInterfaceChange) -> Bool {
         element.consolidatableName == otherChange.element.consolidatableName &&
-        type(of: element) == type(of: otherChange.element) &&
-        element.parentPath == otherChange.element.parentPath &&
-        changeType.name != otherChange.changeType.name // We only want to match independent changes that are hava a different changeType
+            type(of: element) == type(of: otherChange.element) &&
+            element.parentPath == otherChange.element.parentPath &&
+            changeType.name != otherChange.changeType.name // We only want to match independent changes that are hava a different changeType
     }
 }
 

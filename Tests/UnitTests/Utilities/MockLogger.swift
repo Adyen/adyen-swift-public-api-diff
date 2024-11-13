@@ -8,19 +8,19 @@
 import XCTest
 
 struct MockLogger: Logging {
-    
+
     var handleLog: (String, String) -> Void = { _, _ in
         XCTFail("Unexpectedly called `\(#function)`")
     }
-    
+
     var handleDebug: (String, String) -> Void = { _, _ in
         XCTFail("Unexpectedly called `\(#function)`")
     }
-    
+
     func log(_ message: String, from subsystem: String) {
         handleLog(message, subsystem)
     }
-    
+
     func debug(_ message: String, from subsystem: String) {
         handleDebug(message, subsystem)
     }

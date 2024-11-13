@@ -13,12 +13,12 @@ public struct Change: Equatable {
         case removal(description: String)
         case change(oldDescription: String, newDescription: String)
     }
-    
+
     public private(set) var changeType: ChangeType
     public private(set) var parentPath: String?
 
     public private(set) var listOfChanges: [String] = []
-    
+
     public init(
         changeType: ChangeType,
         parentPath: String? = nil,
@@ -53,7 +53,7 @@ extension Change.ChangeType {
             return false
         }
     }
-    
+
     public var isChange: Bool {
         switch self {
         case .addition:

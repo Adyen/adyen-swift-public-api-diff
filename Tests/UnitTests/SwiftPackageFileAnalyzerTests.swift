@@ -4,21 +4,21 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import PADProjectBuilder
-@testable import PADPackageFileAnalyzer
 @testable import PADCore
+@testable import PADPackageFileAnalyzer
+@testable import PADProjectBuilder
 
 @testable import SwiftPackageFileHelperModule
 
 import XCTest
 
 class SwiftPackageFileAnalyzerTests: XCTestCase {
-    
+
     func test_noPackageLibraryDifferences_causeNoChanges() throws {
-        
+
         let handleFileExpectation = expectation(description: "handleFileExists is called twice")
         handleFileExpectation.expectedFulfillmentCount = 2
-        
+
         var fileHandler = MockFileHandler()
         fileHandler.handleFileExists = { _ in
             handleFileExpectation.fulfill()
@@ -34,39 +34,39 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             let encodedPackageDescription = try! JSONEncoder().encode(packageDescription)
             return String(data: encodedPackageDescription, encoding: .utf8)!
         }
-        
+
         let projectAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
             shell: shell,
             logger: nil
         )
-        
+
         let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "NewPackage"),
             newProjectUrl: URL(filePath: "NewPackage")
         )
-        
+
         let expectedChanges: [Change] = []
         XCTAssertEqual(changes.changes, expectedChanges)
-        
+
         waitForExpectations(timeout: 1)
     }
-    
+
     func test_packageLibraryDifferences_causeChanges() throws {
-        
+
         let handleFileExpectation = expectation(description: "handleFileExists is called twice")
         handleFileExpectation.expectedFulfillmentCount = 2
-        
+
         var fileHandler = MockFileHandler()
         fileHandler.handleFileExists = { _ in
             handleFileExpectation.fulfill()
             return true
         }
-        
+
         var shell = MockShell()
         shell.handleExecute = { command in
             let packageDescription: SwiftPackageDescription
-            
+
             if command.range(of: "NewPackage") != nil {
                 packageDescription = SwiftPackageDescription(
                     defaultLocalization: "en-us",
@@ -85,7 +85,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                             moduleType: .swiftTarget,
                             productDependencies: ["Some Product Dependency", "New Product Dependency"],
                             targetDependencies: ["Some Target Dependency", "New Target Dependency"]
-                        ),
+                        )
                     ],
                     toolsVersion: "1.0"
                 )
@@ -107,27 +107,27 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                             moduleType: .swiftTarget,
                             productDependencies: ["Some Product Dependency", "Old Product Dependency"],
                             targetDependencies: ["Some Target Dependency", "Old Target Dependency"]
-                        ),
+                        )
                     ],
                     toolsVersion: "2.0"
                 )
             }
-            
+
             let encodedPackageDescription = try! JSONEncoder().encode(packageDescription)
             return String(data: encodedPackageDescription, encoding: .utf8)!
         }
-        
+
         let projectAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
             shell: shell,
             logger: nil
         )
-        
+
         let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldPackage"),
             newProjectUrl: URL(filePath: "NewPackage")
         )
-        
+
         let expectedChanges: [Change] = [
             .init(
                 changeType: .change(
@@ -220,16 +220,16 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 listOfChanges: []
             )
         ]
-        
+
         XCTAssertEqual(changes.changes, expectedChanges)
-        
+
         waitForExpectations(timeout: 1)
     }
-    
+
     func test_project_causesNoChanges() throws {
-        
+
         let handleFileExpectation = expectation(description: "handleFileExists is called once")
-        
+
         var fileHandler = MockFileHandler()
         fileHandler.handleFileExists = { _ in
             handleFileExpectation.fulfill()
@@ -239,15 +239,15 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             fileHandler: fileHandler,
             logger: nil
         )
-        
+
         let changes = try projectAnalyzer.analyze(
             oldProjectUrl: URL(filePath: "OldProject"),
             newProjectUrl: URL(filePath: "NewProject")
         )
-        
+
         let expectedChanges: [Change] = []
         XCTAssertEqual(changes.changes, expectedChanges)
-        
+
         waitForExpectations(timeout: 1)
     }
 }

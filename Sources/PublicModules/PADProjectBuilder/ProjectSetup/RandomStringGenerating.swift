@@ -7,14 +7,14 @@
 import Foundation
 
 package protocol RandomStringGenerating {
-    
+
     func generateRandomString() -> String
 }
 
 package struct RandomStringGenerator: RandomStringGenerating {
-    
+
     package init() {}
-    
+
     package func generateRandomString() -> String {
         UUID().uuidString
     }

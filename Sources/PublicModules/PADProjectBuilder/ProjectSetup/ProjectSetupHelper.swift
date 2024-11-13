@@ -1,22 +1,28 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
 import PADCore
 import PADLogging
 
-import ShellModule
 import FileHandlingModule
+import ShellModule
 
 /// Helps setting up the project by:
 /// - Copying project files into a working directory (and skipping unwanted files)
 /// - Fetching a remote project (if applicable)
 struct ProjectSetupHelper: ProjectSetupHelping {
-    
+
     let workingDirectoryPath: String
     let shell: any ShellHandling
     let randomStringGenerator: any RandomStringGenerating
     let fileHandler: any FileHandling
     let logger: (any Logging)?
-    
+
     init(
         workingDirectoryPath: String,
         randomStringGenerator: any RandomStringGenerating = RandomStringGenerator(),
@@ -30,7 +36,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
         self.fileHandler = fileHandler
         self.logger = logger
     }
-    
+
     func setup(
         _ projectSource: ProjectSource,
         projectType: ProjectType
@@ -38,18 +44,18 @@ struct ProjectSetupHelper: ProjectSetupHelping {
         try await Task {
             let checkoutPath = workingDirectoryPath + "\(randomStringGenerator.generateRandomString())"
             switch projectSource {
-            case .local(let path):
+            case let .local(path):
                 shell.execute("cp -a '\(path)' '\(checkoutPath)'")
-            case .git(let branch, let repository):
+            case let .git(branch, repository):
                 let git = Git(shell: shell, fileHandler: fileHandler, logger: logger)
                 try git.clone(repository, at: branch, targetDirectoryPath: checkoutPath)
             }
-            
+
             filterProjectFiles(at: checkoutPath, for: projectType)
             return URL(filePath: checkoutPath)
         }.value
     }
-    
+
     func filterProjectFiles(at checkoutPath: String, for projectType: ProjectType) {
         try? fileHandler.contentsOfDirectory(atPath: checkoutPath)
             .filter { !projectType.fileIsIncluded(filePath: $0) }
@@ -60,7 +66,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
 }
 
 extension ProjectSetupHelper {
-    
+
     /// Convenience method that calls into `setup(_:projectType:)` for the old and new source
     func setupProjects(
         oldSource: ProjectSource,
@@ -71,26 +77,26 @@ extension ProjectSetupHelper {
             workingDirectoryPath: workingDirectoryPath,
             logger: logger
         )
-        
+
         // async let to make them perform in parallel
         async let newProjectDirectoryPath = try projectSetupHelper.setup(newSource, projectType: projectType)
         async let oldProjectDirectoryPath = try projectSetupHelper.setup(oldSource, projectType: projectType)
-        
+
         return try await (oldProjectDirectoryPath, newProjectDirectoryPath)
     }
 }
 
 private extension ProjectType {
-    
+
     var excludedFileSuffixes: [String] {
         switch self {
-            case .swiftPackage:
-                [".xcodeproj", ".xcworkspace"]
-            case .xcodeProject:
-                ["Package.swift"]
+        case .swiftPackage:
+            [".xcodeproj", ".xcworkspace"]
+        case .xcodeProject:
+            ["Package.swift"]
         }
     }
-    
+
     func fileIsIncluded(filePath: String) -> Bool {
         for excludedFileSuffix in excludedFileSuffixes {
             if filePath.hasSuffix(excludedFileSuffix) { return false }

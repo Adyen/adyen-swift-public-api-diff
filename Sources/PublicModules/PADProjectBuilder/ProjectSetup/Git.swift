@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
 import PADCore
@@ -8,7 +14,7 @@ import ShellModule
 
 internal enum GitError: LocalizedError, Equatable {
     case couldNotClone(branchOrTag: String, repository: String)
-    
+
     var errorDescription: String? {
         switch self {
         case let .couldNotClone(branchOrTag, repository):
@@ -18,11 +24,11 @@ internal enum GitError: LocalizedError, Equatable {
 }
 
 internal struct Git {
-    
+
     private let shell: ShellHandling
     private let fileHandler: FileHandling
     private let logger: Logging?
-    
+
     init(
         shell: ShellHandling,
         fileHandler: FileHandling,
@@ -32,7 +38,7 @@ internal struct Git {
         self.fileHandler = fileHandler
         self.logger = logger
     }
-    
+
     /// Clones a repository at a specific branch or tag into the current directory
     ///
     /// - Parameters:

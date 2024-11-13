@@ -1,7 +1,13 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
-import PADLogging
 import PADCore
+import PADLogging
 import PADSwiftInterfaceFileLocator
 
 import FileHandlingModule
@@ -10,53 +16,37 @@ import SwiftPackageFileHelperModule
 
 /// Allows building of the old & new project and returns the `.swiftinterface` files
 struct SwiftInterfaceProducer {
-    
+
     private typealias ProjectPreparationResult = (archiveScheme: String, schemesToCompare: [String])
     private typealias DerivedDataPaths = (new: String, old: String)
-    
+
     let workingDirectoryPath: String
     let projectType: ProjectType
     let swiftInterfaceType: SwiftInterfaceType
     let fileHandler: any FileHandling
     let shell: any ShellHandling
     let logger: (any Logging)?
-    
-    init(
-        workingDirectoryPath: String,
-        projectType: ProjectType,
-        swiftInterfaceType: SwiftInterfaceType,
-        fileHandler: any FileHandling,
-        shell: any ShellHandling,
-        logger: (any Logging)?
-    ) {
-        self.workingDirectoryPath = workingDirectoryPath
-        self.projectType = projectType
-        self.swiftInterfaceType = swiftInterfaceType
-        self.fileHandler = fileHandler
-        self.shell = shell
-        self.logger = logger
-    }
-    
+
     /// Builds the projects and returns the `.swiftinterface` files
     func produceInterfaceFiles(
         oldProjectDirectory: URL,
         newProjectDirectory: URL
     ) async throws -> [SwiftInterfaceFile] {
-     
+
         let newProjectDirectoryPath = newProjectDirectory.path()
         let oldProjectDirectoryPath = oldProjectDirectory.path()
-        
+
         let projectPreparationResult = try prepareProjectsForArchiving(
             newProjectDirectoryPath: newProjectDirectoryPath,
             oldProjectDirectoryPath: oldProjectDirectoryPath
         )
-        
+
         let derivedDataPaths = try await archiveProjects(
             newProjectDirectoryPath: newProjectDirectoryPath,
             oldProjectDirectoryPath: oldProjectDirectoryPath,
             scheme: projectPreparationResult.archiveScheme
         )
-        
+
         return try locateInterfaceFiles(
             newDerivedDataPath: derivedDataPaths.new,
             oldDerivedDataPath: derivedDataPaths.old,
@@ -66,7 +56,7 @@ struct SwiftInterfaceProducer {
 }
 
 extension SwiftInterfaceProducer {
-    
+
     /// Prepares the projects for archiving considering the project type
     ///
     /// - .swiftPackage
@@ -82,7 +72,7 @@ extension SwiftInterfaceProducer {
     ) throws -> ProjectPreparationResult {
         let archiveScheme: String
         let schemesToCompare: [String]
-        
+
         switch projectType {
         case .swiftPackage:
             archiveScheme = "_AllTargets"
@@ -91,24 +81,24 @@ extension SwiftInterfaceProducer {
                 .preparePackageWithConsolidatedLibrary(named: archiveScheme, at: newProjectDirectoryPath)
             try packageFileHelper
                 .preparePackageWithConsolidatedLibrary(named: archiveScheme, at: oldProjectDirectoryPath)
-            
+
             let newTargets = try Set(packageFileHelper.availableTargets(at: newProjectDirectoryPath))
             let oldTargets = try Set(packageFileHelper.availableTargets(at: oldProjectDirectoryPath))
-            
+
             schemesToCompare = newTargets.intersection(oldTargets).sorted()
-            
+
             if schemesToCompare.isEmpty {
                 throw Error.noTargetFound
             }
-            
+
         case let .xcodeProject(scheme):
             archiveScheme = scheme
             schemesToCompare = [scheme]
         }
-        
+
         return (archiveScheme, schemesToCompare)
     }
-    
+
     /// Archives the projects to produce `.swiftinterface` files
     /// - Parameters:
     ///   - newProjectDirectoryPath: The path to the "new" project directory
@@ -120,15 +110,15 @@ extension SwiftInterfaceProducer {
         oldProjectDirectoryPath: String,
         scheme: String
     ) async throws -> DerivedDataPaths {
-        
+
         // We don't run them in parallel to not conflict with resolving dependencies concurrently
-        
+
         let xcodeTools = XcodeTools(
             shell: shell,
             fileHandler: fileHandler,
             logger: logger
         )
-        
+
         let newDerivedDataPath = try await xcodeTools.archive(
             projectDirectoryPath: newProjectDirectoryPath,
             scheme: scheme,
@@ -139,11 +129,10 @@ extension SwiftInterfaceProducer {
             scheme: scheme,
             projectType: projectType
         )
-        
+
         return (newDerivedDataPath, oldDerivedDataPath)
     }
-    
-    
+
     /// Locates the `.swiftinterface` files for the provided schemes within the derived data directories
     /// - Parameters:
     ///   - newDerivedDataPath: The "new" derived data directory path
@@ -156,7 +145,7 @@ extension SwiftInterfaceProducer {
         schemes schemesToCompare: [String]
     ) throws -> [SwiftInterfaceFile] {
         logger?.log("🔎 Locating interface files for \(schemesToCompare.joined(separator: ", "))", from: String(describing: Self.self))
-        
+
         let interfaceFileLocator = SwiftInterfaceFileLocator(fileHandler: fileHandler, shell: shell, logger: logger)
         return schemesToCompare.compactMap { scheme in
             do {

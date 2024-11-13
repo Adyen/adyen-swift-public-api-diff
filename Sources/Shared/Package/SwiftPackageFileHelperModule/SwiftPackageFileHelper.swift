@@ -15,7 +15,7 @@ enum SwiftPackageFileHelperError: LocalizedError {
     case packageDescriptionError(_ description: String)
     case couldNotGeneratePackageDescription
     case couldNotConsolidateTargetsInPackageFile
-    
+
     var errorDescription: String? {
         switch self {
         case .couldNotGeneratePackageDescription:
@@ -29,11 +29,11 @@ enum SwiftPackageFileHelperError: LocalizedError {
 }
 
 package struct SwiftPackageFileHelper {
-    
+
     private let fileHandler: FileHandling
     private let shell: any ShellHandling
     private let logger: (any Logging)?
-    
+
     package init(
         fileHandler: FileHandling,
         shell: any ShellHandling,
@@ -43,40 +43,40 @@ package struct SwiftPackageFileHelper {
         self.shell = shell
         self.logger = logger
     }
-    
+
     package static func packagePath(for projectDirectoryPath: String) -> String {
         projectDirectoryPath.appending("/Package.swift")
     }
-    
+
     package func availableTargets(
         at projectDirectoryPath: String,
         moduleType: SwiftPackageDescription.Target.ModuleType? = nil,
         targetType: SwiftPackageDescription.Target.TargetType? = nil
     ) throws -> Set<String> {
-        
+
         var targets = try packageDescription(at: projectDirectoryPath).targets
-        
+
         if let moduleType {
             targets = targets.filter { $0.moduleType == moduleType }
         }
-        
+
         if let targetType {
             targets = targets.filter { $0.type == targetType }
         }
-        
+
         return Set(targets.map(\.name))
     }
-    
+
     package func packageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
         try generatePackageDescription(at: projectDirectoryPath)
     }
-    
+
     /// Inserts a new library into the targets section containing all targets from the target section
     package func preparePackageWithConsolidatedLibrary(
         named consolidatedLibraryName: String,
         at projectDirectoryPath: String
     ) throws {
-        
+
         let packagePath = Self.packagePath(for: projectDirectoryPath)
         let packageContent = try fileHandler.loadString(from: packagePath)
         let targets = try availableTargets(
@@ -84,10 +84,10 @@ package struct SwiftPackageFileHelper {
             moduleType: .swiftTarget,
             targetType: .library
         )
-        
+
         let consolidatedEntry = consolidatedLibraryEntry(consolidatedLibraryName, from: targets.sorted())
         let updatedPackageContent = try updatedContent(packageContent, with: consolidatedEntry)
-        
+
         // Write the updated content back to the file
         try fileHandler.write(updatedPackageContent, to: packagePath)
     }
@@ -98,28 +98,28 @@ package struct SwiftPackageFileHelper {
 // MARK: Generate Package Description
 
 private extension SwiftPackageFileHelper {
-    
+
     func generatePackageDescription(at projectDirectoryPath: String) throws -> SwiftPackageDescription {
-        
+
         let result = try loadPackageDescription(projectDirectoryPath: projectDirectoryPath)
-        
+
         let newLine = "\n"
         let errorTag = "error: "
         let warningTag = "warning: "
-        
+
         var packageDescriptionLines = result.components(separatedBy: newLine)
         var warnings = [String]()
-        
+
         while let firstLine = packageDescriptionLines.first {
-            
+
             // If there are warnings/errors when generating the description
             // there are non-json lines added on the top of the result
             // That we have to get rid of first to generate the description object
-            
+
             if firstLine.starts(with: errorTag) {
                 throw SwiftPackageFileHelperError.packageDescriptionError(result)
             }
-            
+
             if firstLine.starts(with: warningTag) {
                 let directoryTag = "'\(URL(filePath: projectDirectoryPath).lastPathComponent)': "
                 let warning = firstLine
@@ -127,20 +127,19 @@ private extension SwiftPackageFileHelper {
                     .replacingOccurrences(of: directoryTag, with: "", options: .caseInsensitive)
                 warnings += [warning]
             }
-            
-            if 
+
+            if
                 firstLine.starts(with: "{"),
-                let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8)
-            {
+                let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8) {
                 return try decodePackageDescription(from: packageDescriptionData, warnings: warnings)
             }
-            
+
             packageDescriptionLines.removeFirst()
         }
-        
+
         throw SwiftPackageFileHelperError.couldNotGeneratePackageDescription
     }
-    
+
     func loadPackageDescription(
         projectDirectoryPath: String
     ) throws -> String {
@@ -148,10 +147,10 @@ private extension SwiftPackageFileHelper {
             "cd \(projectDirectoryPath);",
             "swift package describe --type json"
         ]
-        
+
         return shell.execute(command.joined(separator: " "))
     }
-    
+
     func decodePackageDescription(from packageDescriptionData: Data, warnings: [String]) throws -> SwiftPackageDescription {
         var packageDescription = try JSONDecoder().decode(SwiftPackageDescription.self, from: packageDescriptionData)
         packageDescription.warnings = warnings
@@ -162,21 +161,21 @@ private extension SwiftPackageFileHelper {
 // MARK: Update Package Content
 
 private extension SwiftPackageFileHelper {
-    
+
     /// Generates a library entry from the name and available target names to be inserted into the `Package.swift` file
     func consolidatedLibraryEntry(
         _ name: String,
         from availableTargets: [String]
     ) -> String {
         """
-        
+
                 .library(
                     name: "\(name)",
                     targets: [\(availableTargets.map { "\"\($0)\"" }.joined(separator: ", "))]
                 ),
         """
     }
-    
+
     /// Generates the updated content for the `Package.swift` adding the consolidated library entry (containing all targets) in the products section
     func updatedContent(
         _ packageContent: String,

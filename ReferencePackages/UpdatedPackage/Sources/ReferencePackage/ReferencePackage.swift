@@ -32,7 +32,7 @@ public protocol ParentProtocol<ParentType> {
 public protocol CustomProtocol<CustomAssociatedType, AnotherAssociatedType>: ParentProtocol<Double> {
     associatedtype CustomAssociatedType: Equatable
     associatedtype AnotherAssociatedType: Strideable
-    
+
     var getSetVar: AnotherAssociatedType { get set }
     var getVar: CustomAssociatedType { get }
     func function() -> CustomAssociatedType
@@ -41,8 +41,8 @@ public protocol CustomProtocol<CustomAssociatedType, AnotherAssociatedType>: Par
 public struct CustomStruct<T: Strideable>: CustomProtocol {
     public typealias CustomAssociatedType = Int
     public typealias AnotherAssociatedType = Double
-    public typealias Iterator = Array<AnotherAssociatedType>
-    
+    public typealias Iterator = [AnotherAssociatedType]
+
     @available(macOS, unavailable, message: "Unavailable on macOS")
     public struct NestedStruct {
         @available(*, deprecated, renamed: "nestedVar")
@@ -50,7 +50,7 @@ public struct CustomStruct<T: Strideable>: CustomProtocol {
         @available(swift, introduced: 5.9)
         public let nestedVar: String = "var"
     }
-    
+
     public var getSetVar: Double
     public var getVar: Int
     @discardableResult
@@ -60,7 +60,7 @@ public struct CustomStruct<T: Strideable>: CustomProtocol {
 // MARK: - Generic public class
 
 public class CustomClass<T: Equatable> {
-    
+
     public weak var weakObject: CustomClass?
     public lazy var lazyVar: String = { "I am a lazy" }()
     @_spi(SomeSpi)
@@ -68,26 +68,26 @@ public class CustomClass<T: Equatable> {
     open var computedVar: String { "I am computed" }
     package let constantLet: String = "I'm a let"
     public var optionalVar: T?
-    
+
     public let a = 0, b = 0, c = 0, d: Double = 5.0
-    
+
     @MainActor
-    public func asyncThrowingFunc<Element>(_ element: Element) async throws -> Void where Element: Strideable {}
+    public func asyncThrowingFunc<Element>(_ element: Element) async throws where Element: Strideable {}
     public func rethrowingFunc(throwingArg: @escaping () throws -> String) rethrows {}
-    
+
     public init(weakObject: CustomClass? = nil, optionalVar: T? = nil) {
         self.weakObject = weakObject
         self.optionalVar = optionalVar
-        
+
         lazyVar = "Great!"
     }
-    
+
     public init?() {}
-    
+
     public convenience init!(value: T) {
         self.init(optionalVar: value)
     }
-    
+
     public subscript(index: Int) -> T? {
         get { optionalVar }
         set { optionalVar = newValue }
@@ -107,13 +107,13 @@ extension Array {
 open class OpenSpiConformingClass<T: Equatable & Strideable>: CustomProtocol {
     public typealias CustomAssociatedType = T
     public typealias AnotherAssociatedType = T
-    public typealias Iterator = Array<Double>
-    
+    public typealias Iterator = [Double]
+
     public var getSetVar: T
     public var getVar: T
     @inlinable
     public func function() -> T where T: Equatable { getVar }
-    
+
     public init(getSetVar: T, getVar: T) {
         self.getSetVar = getSetVar
         self.getVar = getVar
@@ -144,11 +144,11 @@ public actor CustomActor: SimpleProtocol {}
 
 public enum OperatorNamespace: String {
     case someValue = "1"
-    
+
     public static prefix func ++ (_ counter: OperatorNamespace) -> String {
         counter.rawValue
     }
-    
+
     public static postfix func ++ (_ counter: OperatorNamespace) -> String {
         counter.rawValue
     }
@@ -176,7 +176,7 @@ public enum CustomEnum<T> {
     case caseWithTuple(_ foo: String, bar: Int)
     case caseWithBlock((Int) throws -> Void)
     case a, b, c, d, e(NestedStructInExtension)
-    
+
     indirect case recursive(CustomEnum)
 }
 
@@ -186,7 +186,7 @@ public enum RawValueEnum: String {
 }
 
 extension CustomEnum: SimpleProtocol {
-    
+
     public struct NestedStructInExtension {
         public let string: String
         public init(string: String = "Hello") {
@@ -196,14 +196,14 @@ extension CustomEnum: SimpleProtocol {
 }
 
 extension CustomEnum.NestedStructInExtension {
-    
+
     var description: String {
         return string
     }
 }
 
 public extension CustomEnum where T == String {
-    
+
     var titleOfCaseWithNamedString: String? {
         if case let .caseWithNamedString(title) = self {
             return title

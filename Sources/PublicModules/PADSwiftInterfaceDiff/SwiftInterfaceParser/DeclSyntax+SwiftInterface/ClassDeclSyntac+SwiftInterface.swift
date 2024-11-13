@@ -1,9 +1,15 @@
-import SwiftSyntax
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import SwiftParser
+import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/classdeclsyntax
 extension ClassDeclSyntax {
-    
+
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> SwiftInterfaceClass {
         SwiftInterfaceClass(
             attributes: self.attributes.sanitizedList,
