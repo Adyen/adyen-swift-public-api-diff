@@ -315,7 +315,7 @@ public typealias CustomAssociatedType = Swift.Int
 
 ```
 ```javascript
-public typealias Iterator = Swift.Array<ReferencePackage.CustomStruct<T>.AnotherAssociatedType>
+public typealias Iterator = [ReferencePackage.CustomStruct<T>.AnotherAssociatedType]
 
 ```
 ```javascript
