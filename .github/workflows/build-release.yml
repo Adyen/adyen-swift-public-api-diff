@@ -24,7 +24,7 @@ jobs:
         
     - name: 🛠️ Build with release configuration
       run: |
-        swift build --configuration release -skipPackagePluginValidation | xcpretty --utf --color && exit ${PIPESTATUS[0]}
+        swift build --configuration release | xcpretty --utf --color && exit ${PIPESTATUS[0]}
         
     - uses: actions/upload-artifact@v4
       with:

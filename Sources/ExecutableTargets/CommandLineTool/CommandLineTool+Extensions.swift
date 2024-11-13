@@ -14,6 +14,7 @@ extension SwiftInterfaceType: ExpressibleByArgument {
         switch argument {
         case "public": self = .public
         case "private": self = .private
+        case "package": self = .package
         default: return nil
         }
     }

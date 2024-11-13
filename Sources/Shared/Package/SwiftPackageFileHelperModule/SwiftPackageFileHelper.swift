@@ -152,9 +152,14 @@ private extension SwiftPackageFileHelper {
     }
 
     func decodePackageDescription(from packageDescriptionData: Data, warnings: [String]) throws -> SwiftPackageDescription {
-        var packageDescription = try JSONDecoder().decode(SwiftPackageDescription.self, from: packageDescriptionData)
-        packageDescription.warnings = warnings
-        return packageDescription
+        do {
+            var packageDescription = try JSONDecoder().decode(SwiftPackageDescription.self, from: packageDescriptionData)
+            packageDescription.warnings = warnings
+            return packageDescription
+        } catch {
+            logger?.log(String(describing: error), from: String(describing: Self.self))
+            throw error
+        }
     }
 }
 
