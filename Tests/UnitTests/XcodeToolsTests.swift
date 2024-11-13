@@ -17,7 +17,8 @@ class XcodeToolsTests: XCTestCase {
         try await testArchiving(
             projectDirectoryPath: projectDirectoryPath,
             scheme: scheme,
-            projectType: .swiftPackage
+            projectType: .swiftPackage,
+            platform: .iOS
         )
     }
 
@@ -29,7 +30,8 @@ class XcodeToolsTests: XCTestCase {
         try await testArchiving(
             projectDirectoryPath: projectDirectoryPath,
             scheme: scheme,
-            projectType: .xcodeProject(scheme: scheme)
+            projectType: .xcodeProject(scheme: scheme),
+            platform: .iOS
         )
     }
 }
@@ -39,7 +41,8 @@ private extension XcodeToolsTests {
     func testArchiving(
         projectDirectoryPath: String,
         scheme: String,
-        projectType: ProjectType
+        projectType: ProjectType,
+        platform: ProjectPlatform
     ) async throws {
 
         let archiveResult = "ARCHIVE_RESULT"
@@ -93,7 +96,8 @@ private extension XcodeToolsTests {
         let derivedDataPath = try await xcodeTools.archive(
             projectDirectoryPath: projectDirectoryPath,
             scheme: scheme,
-            projectType: projectType
+            projectType: projectType,
+            platform: platform
         )
 
         XCTAssertEqual(derivedDataPath, expectedDerivedDataPath)
