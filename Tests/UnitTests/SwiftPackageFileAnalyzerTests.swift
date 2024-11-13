@@ -4,9 +4,9 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import PADProjectBuilder
-@testable import PADPackageFileAnalyzer
 @testable import PADCore
+@testable import PADPackageFileAnalyzer
+@testable import PADProjectBuilder
 
 @testable import SwiftPackageFileHelperModule
 
@@ -85,7 +85,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                             moduleType: .swiftTarget,
                             productDependencies: ["Some Product Dependency", "New Product Dependency"],
                             targetDependencies: ["Some Target Dependency", "New Target Dependency"]
-                        ),
+                        )
                     ],
                     toolsVersion: "1.0"
                 )
@@ -107,7 +107,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                             moduleType: .swiftTarget,
                             productDependencies: ["Some Product Dependency", "Old Product Dependency"],
                             targetDependencies: ["Some Target Dependency", "Old Target Dependency"]
-                        ),
+                        )
                     ],
                     toolsVersion: "2.0"
                 )

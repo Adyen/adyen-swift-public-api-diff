@@ -25,7 +25,7 @@ public struct MarkdownOutputGenerator: OutputGenerating {
         let changes = Self.changeLines(changesPerModule: changesPerTarget)
         
         var lines = [
-            Self.title(changesPerTarget: changesPerTarget),
+            Self.title(changesPerTarget: changesPerTarget)
         ]
         
         if let oldVersionName, let newVersionName {

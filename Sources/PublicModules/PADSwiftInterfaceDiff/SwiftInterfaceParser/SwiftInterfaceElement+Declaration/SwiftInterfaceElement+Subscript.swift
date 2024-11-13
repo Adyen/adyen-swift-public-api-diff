@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
 extension SwiftInterfaceSubscript {
@@ -91,13 +97,13 @@ class SwiftInterfaceSubscript: SwiftInterfaceElement {
 
 extension SwiftInterfaceSubscript {
     
-    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+    func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
         changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
-        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map { $0.description }, newValues: parameters.map { $0.description }) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map(\.description), newValues: parameters.map(\.description)) // TODO: Maybe have a better way to show changes
         changes += diffDescription(propertyType: "return type", oldValue: other.returnType, newValue: returnType)
         changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
         changes += diffDescription(propertyType: "accessors", oldValue: other.accessors, newValue: accessors)
@@ -117,7 +123,7 @@ private extension SwiftInterfaceSubscript {
             [
                 "subscript",
                 genericParameterDescription,
-                "(\(parameters.map { $0.description }.joined(separator: ", ")))"
+                "(\(parameters.map(\.description).joined(separator: ", ")))"
             ].compactMap { $0 }.joined()
         ]
         

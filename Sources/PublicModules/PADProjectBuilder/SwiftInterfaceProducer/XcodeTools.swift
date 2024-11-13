@@ -6,10 +6,10 @@
 
 import Foundation
 
-import PADCore
-import ShellModule
 import FileHandlingModule
+import PADCore
 import PADLogging
+import ShellModule
 
 struct XcodeToolsError: LocalizedError, CustomDebugStringConvertible {
     var errorDescription: String

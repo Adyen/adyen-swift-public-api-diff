@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
 extension SwiftInterfaceEnumCase {
@@ -77,12 +83,12 @@ class SwiftInterfaceEnumCase: SwiftInterfaceElement {
 
 extension SwiftInterfaceEnumCase {
     
-    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+    func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
-        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters?.map { $0.description }, newValues: parameters?.map { $0.description })
+        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters?.map(\.description), newValues: parameters?.map(\.description))
         changes += diffDescription(propertyType: "raw value", oldValue: other.rawValue, newValue: rawValue)
         return changes.compactMap { $0 }
     }
@@ -99,7 +105,7 @@ private extension SwiftInterfaceEnumCase {
         components += ["case"]
         
         if let parameters {
-            components += ["\(name)(\(parameters.map { $0.description }.joined(separator: ", ")))"]
+            components += ["\(name)(\(parameters.map(\.description).joined(separator: ", ")))"]
         } else {
             components += [name]
         }

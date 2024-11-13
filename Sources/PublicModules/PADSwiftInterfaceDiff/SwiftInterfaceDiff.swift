@@ -1,8 +1,14 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
+import FileHandlingModule
 import PADCore
 import PADLogging
-import FileHandlingModule
 
 /// Takes a list of ``PADCore/SwiftInterfaceFile``s and detects changes between the old and new version
 public struct SwiftInterfaceDiff {
@@ -13,7 +19,6 @@ public struct SwiftInterfaceDiff {
     let swiftInterfaceParser: any SwiftInterfaceParsing
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
     let logger: (any Logging)?
-    
     
     /// Creates a new instance of ``SwiftInterfaceDiff``
     /// - Parameter logger: The (optional) logger
@@ -39,7 +44,6 @@ public struct SwiftInterfaceDiff {
         self.swiftInterfaceAnalyzer = swiftInterfaceAnalyzer
         self.logger = logger
     }
-    
     
     /// Analyzes the passed ``PADCore/SwiftInterfaceFile``s and returns a list of changes grouped by scheme/target
     /// - Parameter swiftInterfaceFiles: The ``PADCore/SwiftInterfaceFile``s to analyze

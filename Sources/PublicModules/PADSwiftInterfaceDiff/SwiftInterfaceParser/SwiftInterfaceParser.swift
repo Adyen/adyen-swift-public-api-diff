@@ -1,10 +1,16 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
-import SwiftSyntax
 import SwiftParser
+import SwiftSyntax
 
 /// Parses the source content of a swift file into intermediate objects for further processing
 ///
-/// See: 
+/// See:
 /// - [DeclSyntax](https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/declsyntax)
 class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     
@@ -47,138 +53,138 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     
     // MARK: - Class
     
-    open override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
 
-    open override func visitPost(_ node: ClassDeclSyntax) {
+    override open func visitPost(_ node: ClassDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
     
     // MARK: - Struct
     
-    open override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
 
-    open override func visitPost(_ node: StructDeclSyntax) {
+    override open func visitPost(_ node: StructDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
     
     // MARK: - TypeAlias
     
-    open override func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: TypeAliasDeclSyntax) {
+    override open func visitPost(_ node: TypeAliasDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
     
     // MARK: - Function
     
-    open override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: FunctionDeclSyntax) {
+    override open func visitPost(_ node: FunctionDeclSyntax) {
         endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
     
     // MARK: - Var
     
-    open override func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
 
-    open override func visitPost(_ node: VariableDeclSyntax) {
+    override open func visitPost(_ node: VariableDeclSyntax) {
         endScopeAndAddSymbol { _ in node.toInterfaceElement() }
     }
     
     // MARK: - AssociatedType
     
-    open override func visit(_ node: AssociatedTypeDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: AssociatedTypeDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: AssociatedTypeDeclSyntax) {
+    override open func visitPost(_ node: AssociatedTypeDeclSyntax) {
         endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
     
     // MARK: - Protocol
     
-    open override func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: ProtocolDeclSyntax) {
+    override open func visitPost(_ node: ProtocolDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
     
     // MARK: - Enum
     
-    open override func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: EnumDeclSyntax) {
+    override open func visitPost(_ node: EnumDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
     
     // MARK: - EnumCase
     
-    open override func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: EnumCaseDeclSyntax) {
+    override open func visitPost(_ node: EnumCaseDeclSyntax) {
         endScopeAndAddSymbol { node.toInterfaceElement(children: $0) }
     }
     
     // MARK: - Extension
     
-    open override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: ExtensionDeclSyntax) {
+    override open func visitPost(_ node: ExtensionDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
     
     // MARK: - Initializer
     
-    open override func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: InitializerDeclSyntax) {
+    override open func visitPost(_ node: InitializerDeclSyntax) {
         endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
     
     // MARK: - Actor
     
-    open override func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: ActorDeclSyntax) {
+    override open func visitPost(_ node: ActorDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
     
     // MARK: - Subscript
     
-    open override func visit(_ node: SubscriptDeclSyntax) -> SyntaxVisitorContinueKind {
+    override open func visit(_ node: SubscriptDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
     
-    open override func visitPost(_ node: SubscriptDeclSyntax) {
+    override open func visitPost(_ node: SubscriptDeclSyntax) {
         endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
 }
 
 // MARK: - Scope
 
-fileprivate indirect enum Scope {
+private indirect enum Scope {
 
     /// The root scope of a file
     case root(elements: [any SwiftInterfaceElement])
@@ -200,18 +206,18 @@ fileprivate indirect enum Scope {
         case .root:
             fatalError("Unbalanced calls to start() and end(_:)")
 
-        case .nested(.root(let rootElements), _):
+        case let .nested(.root(rootElements), _):
             self = .root(elements: rootElements + newElements)
 
-        case .nested(.nested(let parent, let parentElements), _):
+        case let .nested(.nested(parent, parentElements), _):
             self = .nested(parent: parent, elements: parentElements + newElements)
         }
     }
 
     var elements: [any SwiftInterfaceElement] {
         switch self {
-        case .root(let elements): return elements // All child elements recursive from the root
-        case .nested(_, let elements): return elements // All child elements recursive from a nested element
+        case let .root(elements): return elements // All child elements recursive from the root
+        case let .nested(_, elements): return elements // All child elements recursive from a nested element
         }
     }
 }

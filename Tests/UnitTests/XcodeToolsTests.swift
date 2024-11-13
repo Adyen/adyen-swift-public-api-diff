@@ -48,7 +48,7 @@ private extension XcodeToolsTests {
             switch projectType {
             case .swiftPackage:
                 ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES -skipPackagePluginValidation"]
-            case .xcodeProject(let scheme):
+            case let .xcodeProject(scheme):
                 ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES"]
             }
         }()

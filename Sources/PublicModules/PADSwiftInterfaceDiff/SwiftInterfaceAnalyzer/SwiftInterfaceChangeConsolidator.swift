@@ -122,9 +122,9 @@ extension IndependentSwiftInterfaceChange {
     /// It could potentially still lead to false positives when having multiple functions with changes and the same name and parent but this is acceptable in this phase.
     func isConsolidatable(with otherChange: IndependentSwiftInterfaceChange) -> Bool {
         element.consolidatableName == otherChange.element.consolidatableName &&
-        type(of: element) == type(of: otherChange.element) &&
-        element.parentPath == otherChange.element.parentPath &&
-        changeType.name != otherChange.changeType.name // We only want to match independent changes that are hava a different changeType
+            type(of: element) == type(of: otherChange.element) &&
+            element.parentPath == otherChange.element.parentPath &&
+            changeType.name != otherChange.changeType.name // We only want to match independent changes that are hava a different changeType
     }
 }
 
