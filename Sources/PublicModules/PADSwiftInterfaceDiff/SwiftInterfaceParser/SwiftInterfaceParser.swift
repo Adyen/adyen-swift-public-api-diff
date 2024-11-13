@@ -13,16 +13,16 @@ import SwiftSyntax
 /// See:
 /// - [DeclSyntax](https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/declsyntax)
 class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
-    
+
     // TODO: Handle (Nice to have)
     // - DeinitializerDeclSyntax
     // - PrecedenceGroupDeclSyntax
     // - OperatorDeclSyntax
     // - IfConfigClauseListSyntax
     // - ... (There are more but not important right now)
-    
+
     private var scope: Scope = .root(elements: [])
-    
+
     func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
         let visitor = Self()
         visitor.walk(Parser.parse(source: source))
@@ -31,18 +31,18 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
             elements: visitor.scope.elements
         )
     }
-    
+
     /// Designated initializer
     required init() {
         super.init(viewMode: .sourceAccurate)
     }
-    
+
     /// Starts a new scope which can contain zero or more nested symbols
     func startScope() -> SyntaxVisitorContinueKind {
         scope.start()
         return .visitChildren
     }
-    
+
     /// Ends the current scope and adds the symbol returned by the closure to the symbol tree
     /// - Parameter makeSymbolWithChildrenInScope: Closure that return a new ``Symbol``
     ///
@@ -50,9 +50,9 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     func endScopeAndAddSymbol(makeElementsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
         scope.end(makeElementsWithChildrenInScope: makeElementsWithChildrenInScope)
     }
-    
+
     // MARK: - Class
-    
+
     override open func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
@@ -60,9 +60,9 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     override open func visitPost(_ node: ClassDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
-    
+
     // MARK: - Struct
-    
+
     override open func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
@@ -70,29 +70,29 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     override open func visitPost(_ node: StructDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
-    
+
     // MARK: - TypeAlias
-    
+
     override open func visit(_ node: TypeAliasDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: TypeAliasDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
-    
+
     // MARK: - Function
-    
+
     override open func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: FunctionDeclSyntax) {
         endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
-    
+
     // MARK: - Var
-    
+
     override open func visit(_ node: VariableDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
@@ -100,83 +100,83 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     override open func visitPost(_ node: VariableDeclSyntax) {
         endScopeAndAddSymbol { _ in node.toInterfaceElement() }
     }
-    
+
     // MARK: - AssociatedType
-    
+
     override open func visit(_ node: AssociatedTypeDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: AssociatedTypeDeclSyntax) {
         endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
-    
+
     // MARK: - Protocol
-    
+
     override open func visit(_ node: ProtocolDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: ProtocolDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
-    
+
     // MARK: - Enum
-    
+
     override open func visit(_ node: EnumDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: EnumDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
-    
+
     // MARK: - EnumCase
-    
+
     override open func visit(_ node: EnumCaseDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: EnumCaseDeclSyntax) {
         endScopeAndAddSymbol { node.toInterfaceElement(children: $0) }
     }
-    
+
     // MARK: - Extension
-    
+
     override open func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: ExtensionDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
-    
+
     // MARK: - Initializer
-    
+
     override open func visit(_ node: InitializerDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: InitializerDeclSyntax) {
         endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
-    
+
     // MARK: - Actor
-    
+
     override open func visit(_ node: ActorDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: ActorDeclSyntax) {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
-    
+
     // MARK: - Subscript
-    
+
     override open func visit(_ node: SubscriptDeclSyntax) -> SyntaxVisitorContinueKind {
         startScope()
     }
-    
+
     override open func visitPost(_ node: SubscriptDeclSyntax) {
         endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
@@ -188,7 +188,7 @@ private indirect enum Scope {
 
     /// The root scope of a file
     case root(elements: [any SwiftInterfaceElement])
-    
+
     /// A nested scope, within a parent scope
     case nested(parent: Scope, elements: [any SwiftInterfaceElement])
 

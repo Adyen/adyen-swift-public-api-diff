@@ -7,38 +7,38 @@
 import Foundation
 
 class SwiftInterfaceVar: SwiftInterfaceElement {
-    
+
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
-    
+
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
-    
+
     /// e.g. let | var | inout | _mutating | _borrowing | _consuming
     let bindingSpecifier: String
-    
+
     let name: String
-    
+
     let typeAnnotation: String
-    
+
     let initializerValue: String?
-    
+
     let accessors: String?
-    
+
     var pathComponentName: String { "" } // Not relevant as / no children
-    
+
     let children: [any SwiftInterfaceElement] = []
-    
-    var parent: (any SwiftInterfaceElement)? = nil
-    
+
+    var parent: (any SwiftInterfaceElement)?
+
     var diffableSignature: String { name }
-    
+
     var consolidatableName: String { name }
-    
+
     var description: String {
         compileDescription()
     }
-    
+
     init(
         attributes: [String],
         modifiers: [String],
@@ -59,7 +59,7 @@ class SwiftInterfaceVar: SwiftInterfaceElement {
 }
 
 extension SwiftInterfaceVar {
-    
+
     func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
@@ -74,11 +74,11 @@ extension SwiftInterfaceVar {
 }
 
 private extension SwiftInterfaceVar {
-    
+
     func compileDescription() -> String {
-        
+
         var components = [String]()
-        
+
         components += attributes
         components += modifiers
         components += [bindingSpecifier]
@@ -86,7 +86,7 @@ private extension SwiftInterfaceVar {
 
         initializerValue.map { components += ["= \($0)"] }
         accessors.map { components += ["{ \($0) }"] }
-        
+
         return components.joined(separator: " ")
     }
 }

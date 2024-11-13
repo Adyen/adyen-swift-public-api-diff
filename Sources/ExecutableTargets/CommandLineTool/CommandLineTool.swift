@@ -17,7 +17,7 @@ import PADSwiftInterfaceDiff
 
 @main
 struct PublicApiDiff: AsyncParsableCommand {
-    
+
     static var configuration: CommandConfiguration = .init(
         commandName: "public-api-diff",
         subcommands: [
@@ -26,14 +26,14 @@ struct PublicApiDiff: AsyncParsableCommand {
             FrameworkToOutputCommand.self
         ]
     )
-    
+
     public func run() async throws {
         fatalError("No sub command provided")
     }
 }
 
 extension PublicApiDiff {
-    
+
     static func logger(
         with logLevel: LogLevel,
         logOutputFilePath: String?
@@ -43,7 +43,7 @@ extension PublicApiDiff {
             loggers += [LogFileLogger(outputFilePath: logOutputFilePath)]
         }
         loggers += [SystemLogger().withLogLevel(logLevel)]
-        
+
         return LoggingGroup(with: loggers)
     }
 }

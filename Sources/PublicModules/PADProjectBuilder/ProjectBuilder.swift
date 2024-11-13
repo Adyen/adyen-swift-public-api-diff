@@ -23,7 +23,7 @@ import ShellModule
 /// - Inspecting `Package.swift` for any changes between versions (if applicable / if ``ProjectType/swiftPackage``)
 /// - Returning a ``PADProjectBuilder/ProjectBuilder/Result`` containing package file changes, warnings + the found ``PADCore/SwiftInterfaceFile``s
 public struct ProjectBuilder {
-    
+
     /// The result returned by the build function of ``PADProjectBuilder/ProjectBuilder``
     public struct Result {
         /// The `.swiftinterface` file references found
@@ -31,13 +31,13 @@ public struct ProjectBuilder {
         /// The project directories for the setup projects
         public let projectDirectories: (old: URL, new: URL)
     }
-    
+
     private let projectType: ProjectType
     private let swiftInterfaceType: SwiftInterfaceType
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
     private let logger: (any Logging)?
-    
+
     public init(
         projectType: ProjectType,
         swiftInterfaceType: SwiftInterfaceType,
@@ -51,7 +51,7 @@ public struct ProjectBuilder {
             logger: logger
         )
     }
-    
+
     init(
         projectType: ProjectType,
         swiftInterfaceType: SwiftInterfaceType,
@@ -65,37 +65,37 @@ public struct ProjectBuilder {
         self.shell = shell
         self.logger = logger
     }
-    
+
     public func build(
         oldSource: ProjectSource,
         newSource: ProjectSource
     ) async throws -> Result {
-        
+
         let oldVersionName = oldSource.description
         let newVersionName = newSource.description
-        
+
         logger?.log("Comparing `\(newVersionName)` to `\(oldVersionName)`", from: "Main")
-        
+
         let currentDirectory = fileHandler.currentDirectoryPath
         let workingDirectoryPath = currentDirectory.appending("/tmp-public-api-diff")
-        
+
         // MARK: - Setup projects
-        
+
         let projectSetupHelper = ProjectSetupHelper(
             workingDirectoryPath: workingDirectoryPath,
             shell: shell,
             fileHandler: fileHandler,
             logger: logger
         )
-        
+
         let projectDirectories = try await projectSetupHelper.setupProjects(
             oldSource: oldSource,
             newSource: newSource,
             projectType: projectType
         )
-        
+
         // MARK: - Produce .swiftinterface files
-        
+
         let producer = SwiftInterfaceProducer(
             workingDirectoryPath: workingDirectoryPath,
             projectType: projectType,
@@ -104,12 +104,12 @@ public struct ProjectBuilder {
             shell: shell,
             logger: logger
         )
-        
+
         let swiftInterfaceFiles = try await producer.produceInterfaceFiles(
             oldProjectDirectory: projectDirectories.old,
             newProjectDirectory: projectDirectories.new
         )
-        
+
         return .init(
             swiftInterfaceFiles: swiftInterfaceFiles,
             projectDirectories: projectDirectories

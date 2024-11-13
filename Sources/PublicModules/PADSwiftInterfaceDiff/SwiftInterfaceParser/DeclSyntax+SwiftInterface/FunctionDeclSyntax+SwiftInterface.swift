@@ -9,11 +9,11 @@ import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/functiondeclsyntax
 extension FunctionDeclSyntax {
-    
+
     func toInterfaceElement() -> SwiftInterfaceFunction {
-        
+
         var effectSpecifiers = [String]()
-        
+
         if let effects = signature.effectSpecifiers {
             if let asyncSpecifier = effects.asyncSpecifier {
                 effectSpecifiers.append(asyncSpecifier.trimmedDescription)
@@ -22,7 +22,7 @@ extension FunctionDeclSyntax {
                 effectSpecifiers.append(throwsClause.trimmedDescription)
             }
         }
-        
+
         let parameters: [SwiftInterfaceFunction.Parameter] = self.signature.parameterClause.parameters.map {
             .init(
                 firstName: $0.firstName.trimmedDescription,
@@ -31,7 +31,7 @@ extension FunctionDeclSyntax {
                 defaultValue: $0.defaultValue?.value.trimmedDescription.sanitizingNewlinesAndSpaces
             )
         }
-        
+
         return SwiftInterfaceFunction(
             attributes: self.attributes.sanitizedList,
             modifiers: self.modifiers.sanitizedList,

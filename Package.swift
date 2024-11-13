@@ -38,9 +38,9 @@ let package = Package(
         .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.57.0")
     ],
     targets: [
-        
+
         // MARK: - Executable Targets
-        
+
         .executableTarget(
             name: "public-api-diff",
             dependencies: [
@@ -56,9 +56,9 @@ let package = Package(
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
-        
+
         // MARK: - Public Modules
-        
+
         .target(
             name: "PADSwiftInterfaceDiff",
             dependencies: [
@@ -66,7 +66,7 @@ let package = Package(
                 "PADLogging",
                 "FileHandlingModule",
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax")
             ],
             path: "Sources/PublicModules/PADSwiftInterfaceDiff"
         ),
@@ -98,9 +98,9 @@ let package = Package(
             dependencies: ["PADCore"],
             path: "Sources/PublicModules/PADOutputGenerator"
         ),
-        
+
         // MARK: - Shared/Public
-        
+
         .target(
             name: "PADCore",
             path: "Sources/Shared/Public/PADCore"
@@ -115,9 +115,9 @@ let package = Package(
             dependencies: ["FileHandlingModule", "ShellModule", "PADLogging"],
             path: "Sources/Shared/Public/PADSwiftInterfaceFileLocator"
         ),
-        
+
         // MARK: - Shared/Package
-        
+
         .target(
             name: "FileHandlingModule",
             path: "Sources/Shared/Package/FileHandlingModule"
@@ -131,9 +131,9 @@ let package = Package(
             dependencies: ["FileHandlingModule", "ShellModule", "PADLogging"],
             path: "Sources/Shared/Package/SwiftPackageFileHelperModule"
         ),
-        
+
         // MARK: - Test Targets
-        
+
         .testTarget(
             name: "UnitTests",
             dependencies: [

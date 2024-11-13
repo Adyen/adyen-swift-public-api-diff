@@ -9,7 +9,7 @@ import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/typealiasdeclsyntax-swift.struct
 extension TypeAliasDeclSyntax {
-    
+
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> SwiftInterfaceTypeAlias {
         SwiftInterfaceTypeAlias(
             attributes: self.attributes.sanitizedList,

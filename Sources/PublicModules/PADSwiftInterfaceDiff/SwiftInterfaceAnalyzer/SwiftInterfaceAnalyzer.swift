@@ -8,21 +8,21 @@ import Foundation
 import PADCore
 
 struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
-    
+
     let changeConsolidator: SwiftInterfaceChangeConsolidating
-    
+
     init(changeConsolidator: SwiftInterfaceChangeConsolidating = SwiftInterfaceChangeConsolidator()) {
         self.changeConsolidator = changeConsolidator
     }
-    
+
     func analyze(
         old: some SwiftInterfaceElement,
         new: some SwiftInterfaceElement
     ) -> [Change] {
-        
+
         // Very naive diff from both sides
         // There is room for improvement here but it's "performant enough" for now
-        
+
         let individualChanges = Self.recursiveCompare(
             element: old,
             to: new,
@@ -34,30 +34,30 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             oldFirst: false,
             isRoot: true
         )
-        
+
         // Matching removals/additions to changes when applicable
         return changeConsolidator.consolidate(individualChanges)
     }
-    
+
     private static func recursiveCompare(
         element lhs: some SwiftInterfaceElement,
         to rhs: some SwiftInterfaceElement,
         oldFirst: Bool,
         isRoot: Bool = false
     ) -> [IndependentSwiftInterfaceChange] {
-        
+
         var changes = [IndependentSwiftInterfaceChange]()
-        
+
         if lhs.recursiveDescription() == rhs.recursiveDescription() { return changes }
-        
+
         if !isRoot, oldFirst, lhs.description != rhs.description {
             changes += independentChanges(from: lhs, and: rhs, oldFirst: oldFirst)
         }
-        
+
         changes += lhs.children.flatMap { lhsElement in
-            
+
             // Trying to find a matching element
-            
+
             // First checking if we found an exact match based on the recursive description
             // as we don't want to match a non-change with a change
             //
@@ -66,19 +66,19 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             if rhs.children.first(where: { $0.recursiveDescription() == lhsElement.recursiveDescription() }) != nil {
                 return [IndependentSwiftInterfaceChange]()
             }
-            
+
             // First checking if we found a match based on the description
             if let descriptionMatch = rhs.children.first(where: { $0.description == lhsElement.description }) {
                 // so we check if the children changed
                 return Self.recursiveCompare(element: lhsElement, to: descriptionMatch, oldFirst: oldFirst)
             }
-            
+
             // ... then losening the criteria to find a comparable element
             if let rhsChildForName = rhs.children.first(where: { $0.isDiffable(with: lhsElement) }) {
                 // We found a comparable element so we check if the children changed
                 return Self.recursiveCompare(element: lhsElement, to: rhsChildForName, oldFirst: oldFirst)
             }
-            
+
             // No matching element was found so either it was removed or added
             let changeType: IndependentSwiftInterfaceChange.ChangeType = oldFirst ?
                 .removal(lhsElement.description) :
@@ -92,10 +92,10 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
                 )
             ]
         }
-        
+
         return changes
     }
-    
+
     private static func independentChanges(
         from lhs: any SwiftInterfaceElement,
         and rhs: any SwiftInterfaceElement,

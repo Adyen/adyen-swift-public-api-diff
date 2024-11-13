@@ -14,22 +14,22 @@ import ShellModule
 struct XcodeToolsError: LocalizedError, CustomDebugStringConvertible {
     var errorDescription: String
     var underlyingError: String
-    
+
     var debugDescription: String { errorDescription }
 }
 
 /// A helper that provides tools to build a project
 struct XcodeTools {
-    
+
     internal enum Constants {
         static let derivedDataPath: String = ".build"
         static let simulatorSdkCommand = "xcrun --sdk iphonesimulator --show-sdk-path"
     }
-    
+
     private let shell: ShellHandling
     private let fileHandler: FileHandling
     private let logger: Logging?
-    
+
     init(
         shell: ShellHandling = Shell(),
         fileHandler: FileHandling = FileManager.default,
@@ -39,7 +39,7 @@ struct XcodeTools {
         self.fileHandler = fileHandler
         self.logger = logger
     }
-    
+
     /// Archives a project at the specified path / scheme by building for library evolution
     /// - Parameters:
     ///   - projectDirectoryPath: The path to the project root directory
@@ -59,37 +59,37 @@ struct XcodeTools {
             "-sdk `\(Constants.simulatorSdkCommand)`",
             "BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         ]
-        
+
         switch projectType {
         case .swiftPackage:
             commandComponents += ["-skipPackagePluginValidation"]
         case .xcodeProject:
             break // Nothing to add
         }
-        
+
         let command = commandComponents.joined(separator: " ")
-        
+
         return try await Task {
             logger?.log("📦 Archiving \(scheme) from \(projectDirectoryPath)", from: String(describing: Self.self))
-            
+
             let result = shell.execute(command)
             let derivedDataPath = "\(projectDirectoryPath)/\(Constants.derivedDataPath)"
-            
+
             logger?.debug(result, from: String(describing: Self.self))
-            
+
             // It might be that the archive failed but the .swiftinterface files are still created
             // so we have to check outside if they exist.
             //
             // Also see: https://github.com/swiftlang/swift/issues/56573
             guard fileHandler.fileExists(atPath: derivedDataPath) else {
                 print(result)
-                
+
                 throw XcodeToolsError(
                     errorDescription: "💥 Building project failed",
                     underlyingError: result
                 )
             }
-            
+
             return derivedDataPath
         }.value
     }
