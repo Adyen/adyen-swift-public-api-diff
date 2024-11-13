@@ -48,11 +48,13 @@ private extension XcodeToolsTests {
         let archiveResult = "ARCHIVE_RESULT"
         let expectedDerivedDataPath = "\(projectDirectoryPath)/.build"
         var expectedHandleExecuteCalls: [String] = {
+            let command = "cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -derivedDataPath .build BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+            let iOSSpecificParameters = "-sdk `xcrun --sdk iphonesimulator --show-sdk-path` -destination \"generic/platform=iOS\""
             switch projectType {
             case .swiftPackage:
-                ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES -skipPackagePluginValidation"]
+                return ["\(command) \(iOSSpecificParameters) -skipPackagePluginValidation"]
             case let .xcodeProject(scheme):
-                ["cd \(projectDirectoryPath); xcodebuild clean build -scheme \"\(scheme)\" -destination \"generic/platform=iOS\" -derivedDataPath .build -sdk `xcrun --sdk iphonesimulator --show-sdk-path` BUILD_LIBRARY_FOR_DISTRIBUTION=YES"]
+                return ["\(command) \(iOSSpecificParameters)"]
             }
         }()
         var expectedHandleLogCalls: [(message: String, subsystem: String)] = [
