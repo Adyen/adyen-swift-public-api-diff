@@ -15,7 +15,8 @@ import PADPackageFileAnalyzer
 import PADProjectBuilder
 import PADSwiftInterfaceDiff
 
-/// Command that analyzes the differences between an old and new `.swiftinterface` file and produces a human readable output
+/// Command that analyzes the differences between an old and new `.swiftinterface`
+/// file and produces a human readable output
 struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
 
     static var configuration: CommandConfiguration = .init(commandName: "swift-interface")
