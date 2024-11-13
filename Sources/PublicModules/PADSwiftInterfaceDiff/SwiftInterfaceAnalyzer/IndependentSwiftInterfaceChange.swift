@@ -12,7 +12,7 @@ import PADCore
 /// This intermediate structure helps gathering a list of additions and removals
 /// that are later consolidated to a ``Change``
 struct IndependentSwiftInterfaceChange: Equatable {
-    
+
     enum ChangeType: Equatable {
         case addition(_ description: String)
         case removal(_ description: String)
@@ -30,14 +30,14 @@ struct IndependentSwiftInterfaceChange: Equatable {
 
     let oldFirst: Bool
     var parentPath: String? { element.parentPath }
-    
+
     static func == (lhs: IndependentSwiftInterfaceChange, rhs: IndependentSwiftInterfaceChange) -> Bool {
         lhs.changeType == rhs.changeType &&
             lhs.element.description == rhs.element.description &&
             lhs.oldFirst == rhs.oldFirst &&
             lhs.parentPath == rhs.parentPath
     }
-    
+
     func differences(to otherIndependentChange: IndependentSwiftInterfaceChange) -> [String] {
         element.differences(to: otherIndependentChange.element).sorted()
     }

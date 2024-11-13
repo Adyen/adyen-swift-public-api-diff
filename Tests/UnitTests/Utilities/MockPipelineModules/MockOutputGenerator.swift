@@ -11,7 +11,7 @@ import XCTest
 struct MockOutputGenerator: OutputGenerating {
 
     var onGenerate: ([String: [Change]], [String]?, String?, String?, [String]) throws -> String
-    
+
     func generate(
         from changesPerTarget: [String: [Change]],
         allTargets: [String]?,

@@ -9,7 +9,7 @@ import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/protocoldeclsyntax
 extension ProtocolDeclSyntax {
-    
+
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> SwiftInterfaceProtocol {
         SwiftInterfaceProtocol(
             attributes: self.attributes.sanitizedList,

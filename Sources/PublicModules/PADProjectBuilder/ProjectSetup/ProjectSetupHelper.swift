@@ -16,13 +16,13 @@ import ShellModule
 /// - Copying project files into a working directory (and skipping unwanted files)
 /// - Fetching a remote project (if applicable)
 struct ProjectSetupHelper: ProjectSetupHelping {
-    
+
     let workingDirectoryPath: String
     let shell: any ShellHandling
     let randomStringGenerator: any RandomStringGenerating
     let fileHandler: any FileHandling
     let logger: (any Logging)?
-    
+
     init(
         workingDirectoryPath: String,
         randomStringGenerator: any RandomStringGenerating = RandomStringGenerator(),
@@ -36,7 +36,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
         self.fileHandler = fileHandler
         self.logger = logger
     }
-    
+
     func setup(
         _ projectSource: ProjectSource,
         projectType: ProjectType
@@ -50,12 +50,12 @@ struct ProjectSetupHelper: ProjectSetupHelping {
                 let git = Git(shell: shell, fileHandler: fileHandler, logger: logger)
                 try git.clone(repository, at: branch, targetDirectoryPath: checkoutPath)
             }
-            
+
             filterProjectFiles(at: checkoutPath, for: projectType)
             return URL(filePath: checkoutPath)
         }.value
     }
-    
+
     func filterProjectFiles(at checkoutPath: String, for projectType: ProjectType) {
         try? fileHandler.contentsOfDirectory(atPath: checkoutPath)
             .filter { !projectType.fileIsIncluded(filePath: $0) }
@@ -66,7 +66,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
 }
 
 extension ProjectSetupHelper {
-    
+
     /// Convenience method that calls into `setup(_:projectType:)` for the old and new source
     func setupProjects(
         oldSource: ProjectSource,
@@ -77,17 +77,17 @@ extension ProjectSetupHelper {
             workingDirectoryPath: workingDirectoryPath,
             logger: logger
         )
-        
+
         // async let to make them perform in parallel
         async let newProjectDirectoryPath = try projectSetupHelper.setup(newSource, projectType: projectType)
         async let oldProjectDirectoryPath = try projectSetupHelper.setup(oldSource, projectType: projectType)
-        
+
         return try await (oldProjectDirectoryPath, newProjectDirectoryPath)
     }
 }
 
 private extension ProjectType {
-    
+
     var excludedFileSuffixes: [String] {
         switch self {
         case .swiftPackage:
@@ -96,7 +96,7 @@ private extension ProjectType {
             ["Package.swift"]
         }
     }
-    
+
     func fileIsIncluded(filePath: String) -> Bool {
         for excludedFileSuffix in excludedFileSuffixes {
             if filePath.hasSuffix(excludedFileSuffix) { return false }

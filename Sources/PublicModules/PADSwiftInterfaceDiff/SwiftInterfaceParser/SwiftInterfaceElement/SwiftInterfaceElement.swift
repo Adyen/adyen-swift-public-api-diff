@@ -7,56 +7,56 @@
 import Foundation
 
 protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
-    
+
     /// Name of the type
     ///
     /// Is used to match an extension's `extendedType` to the element it extends
     var typeName: String { get }
-    
+
     /// Types/Protocols the element inherits from
     var inheritance: [String]? { get set }
-    
+
     var children: [any SwiftInterfaceElement] { get set }
 }
 
 protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
-    
+
     /// The name of the element used to construct the parent path for its children
     var pathComponentName: String { get }
-    
+
     /// The full description of the element (without children)
     var description: String { get }
-    
+
     /// The cildren of the element (e.g. properties/functions of a struct/class/...)
     var children: [any SwiftInterfaceElement] { get }
-    
+
     /// A reduced signature of the element to be used to find 2 versions of the same element in a diff
     /// by deliberately omitting specifics like types and other decorators.
     ///
     /// e.g. `func foo(bar: Int = 0, baz: String)` would have a diffable signature of `foo(bar:baz)`
     var diffableSignature: String { get }
-    
+
     /// A very reduced signature that allows consolidating changes
     ///
     /// e.g. `func foo(bar: Int = 0, baz: String)` would have a consolidatable name of `foo`
     var consolidatableName: String { get }
-    
+
     /// The parent of the element (setup by using ``setupParentRelationships(parent:)``
     var parent: (any SwiftInterfaceElement)? { get set }
-    
+
     /// Produces a list of differences between one and another element
     func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String]
 }
 
 extension SwiftInterfaceElement {
-    
+
     func setupParentRelationships(parent: (any SwiftInterfaceElement)? = nil) {
         self.parent = parent
         children.forEach {
             $0.setupParentRelationships(parent: self)
         }
     }
-    
+
     /// The path to the parent based on the `pathComponentName`
     ///
     /// The path does not including the own `pathComponentName`
@@ -71,24 +71,24 @@ extension SwiftInterfaceElement {
                 parentPath: extensionElement.extendedType
             )
         }
-        
+
         var parent = self.parent
         var path = [parent?.pathComponentName]
-        
+
         while parent != nil {
             parent = parent?.parent
             path += [parent?.pathComponentName]
         }
-        
+
         return sanitized(
             parentPath: path.compactMap { $0 }.filter { !$0.isEmpty }.reversed().joined(separator: ".")
         )
     }
-    
+
     /// Removing module name prefix for nicer readability
     private func sanitized(parentPath: String) -> String {
         var sanitizedPathComponents = parentPath.components(separatedBy: ".")
-        
+
         // The first path component is always the module name so it's safe to remove all prefixes
         if let moduleName = sanitizedPathComponents.first {
             while sanitizedPathComponents.first == moduleName {
@@ -116,7 +116,7 @@ extension SwiftInterfaceElement {
 }
 
 extension SwiftInterfaceElement {
-    
+
     /// Produces the complete recursive description of the element
     func recursiveDescription(indentation: Int = 0) -> String {
         let spacer = "  "
@@ -128,11 +128,11 @@ extension SwiftInterfaceElement {
             }
             recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))}")
         }
-        
+
         if indentation == 0 {
             recursiveDescription.append("\n")
         }
-        
+
         return recursiveDescription
     }
 }

@@ -9,12 +9,12 @@ import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/enumcasedeclsyntax
 extension EnumCaseDeclSyntax {
-    
+
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> [SwiftInterfaceEnumCase] {
 
         let attributes = self.attributes.sanitizedList
         let modifiers = self.modifiers.sanitizedList
-        
+
         return elements.map {
             SwiftInterfaceEnumCase(
                 attributes: attributes,

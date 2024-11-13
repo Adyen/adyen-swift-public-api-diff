@@ -9,7 +9,7 @@ import Foundation
 extension SwiftInterfaceProducer {
     enum Error: LocalizedError {
         case noTargetFound
-        
+
         var errorDescription: String? {
             switch self {
             case .noTargetFound: "No targets found to analyze"

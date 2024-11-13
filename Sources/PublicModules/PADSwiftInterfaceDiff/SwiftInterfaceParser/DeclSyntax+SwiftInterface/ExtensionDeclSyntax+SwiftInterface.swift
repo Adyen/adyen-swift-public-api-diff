@@ -9,7 +9,7 @@ import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/extensiondeclsyntax
 extension ExtensionDeclSyntax {
-    
+
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> SwiftInterfaceExtension {
         SwiftInterfaceExtension(
             attributes: self.attributes.sanitizedList,

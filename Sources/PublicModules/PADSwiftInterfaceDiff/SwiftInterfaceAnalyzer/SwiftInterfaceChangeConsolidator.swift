@@ -9,7 +9,7 @@ import PADCore
 
 /// A helper to consolidate a `removal` and `addition` to `change`
 protocol SwiftInterfaceChangeConsolidating {
-    
+
     /// Tries to match a `removal` and `addition` to a `change`
     ///
     /// - Parameters:
@@ -18,7 +18,7 @@ protocol SwiftInterfaceChangeConsolidating {
 }
 
 struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
-    
+
     /// Tries to match a `removal` and `addition` to a `change`
     ///
     /// - Parameters:
@@ -50,12 +50,12 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
             let oldDescription = change.oldFirst ? change.element.description : match.element.description
             let newDescription = change.oldFirst ? match.element.description : change.element.description
             let listOfChanges = listOfChanges(between: change, and: match)
-            
+
             if listOfChanges.isEmpty {
                 assertionFailure("We should not end up here - investigate how this happened")
                 break
             }
-            
+
             consolidatedChanges.append(
                 .init(
                     changeType: .change(

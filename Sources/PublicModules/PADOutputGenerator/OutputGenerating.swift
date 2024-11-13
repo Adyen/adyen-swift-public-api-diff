@@ -9,9 +9,9 @@ import PADCore
 
 /// Interface definition for an output generator
 public protocol OutputGenerating<OutputType> {
-    
+
     associatedtype OutputType
-    
+
     /// Generates an output from input parameters
     /// - Parameters:
     ///   - changesPerTarget: A list of changes per target/module

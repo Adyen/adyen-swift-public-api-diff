@@ -9,7 +9,7 @@ import Foundation
 internal extension ProjectSource {
     enum Error: LocalizedError, Equatable {
         case invalidSourceValue(value: String)
-        
+
         var errorDescription: String? {
             switch self {
             case let .invalidSourceValue(value):

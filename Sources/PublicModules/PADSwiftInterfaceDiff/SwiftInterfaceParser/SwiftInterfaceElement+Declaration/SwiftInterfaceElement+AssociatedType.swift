@@ -7,38 +7,38 @@
 import Foundation
 
 class SwiftInterfaceAssociatedType: SwiftInterfaceElement {
-    
+
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
-    
+
     /// The name of the element
     let name: String
-    
+
     /// Types/Protocols the element inherits from
     let inheritance: [String]?
-    
+
     /// e.g. any Swift.Equatable
     let initializerValue: String?
-    
+
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
-    
+
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
-    
+
     var pathComponentName: String { name }
-    
+
     /// A associatedtype does not have children
     let children: [any SwiftInterfaceElement] = []
-    
-    var parent: (any SwiftInterfaceElement)? = nil
-    
+
+    var parent: (any SwiftInterfaceElement)?
+
     var diffableSignature: String { name }
-    
+
     var consolidatableName: String { name }
-    
+
     var description: String { compileDescription() }
-    
+
     init(
         attributes: [String],
         modifiers: [String],
@@ -57,7 +57,7 @@ class SwiftInterfaceAssociatedType: SwiftInterfaceElement {
 }
 
 extension SwiftInterfaceAssociatedType {
-    
+
     func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
@@ -71,25 +71,25 @@ extension SwiftInterfaceAssociatedType {
 }
 
 private extension SwiftInterfaceAssociatedType {
-    
+
     func compileDescription() -> String {
-        
+
         var components = [String]()
-        
+
         components += attributes
         components += modifiers
         components += ["associatedtype"]
-        
+
         if let inheritance, !inheritance.isEmpty {
             components += ["\(name): \(inheritance.joined(separator: ", "))"]
         } else {
             components += [name]
         }
-        
+
         initializerValue.map { components += ["= \($0)"] }
-        
+
         genericWhereClauseDescription.map { components += [$0] }
-        
+
         return components.joined(separator: " ")
     }
 }

@@ -7,77 +7,77 @@
 import Foundation
 
 extension SwiftInterfaceFunction {
-    
+
     struct Parameter {
-        
+
         let firstName: String
-        
+
         /// optional second "internal" name - can be ignored
         let secondName: String?
-        
+
         let type: String
-        
+
         let defaultValue: String?
-        
+
         var description: String {
             var description = [
                 firstName,
                 secondName
             ].compactMap { $0 }.joined(separator: " ")
-            
+
             if description.isEmpty {
                 description += "\(type)"
             } else {
                 description += ": \(type)"
             }
-            
+
             if let defaultValue {
                 description += " = \(defaultValue)"
             }
-            
+
             return description
         }
     }
 }
 
 class SwiftInterfaceFunction: SwiftInterfaceElement {
-    
+
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
-    
+
     let name: String
-    
+
     /// e.g. <T>
     let genericParameterDescription: String?
-    
+
     let parameters: [Parameter]
-    
+
     /// e.g. async, throws, rethrows
     let effectSpecifiers: [String]
-    
+
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
-    
+
     let returnType: String
-    
+
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
-    
+
     var pathComponentName: String { name }
-    
+
     /// A function does not have children
     let children: [any SwiftInterfaceElement] = []
-    
-    var parent: (any SwiftInterfaceElement)? = nil
-    
+
+    var parent: (any SwiftInterfaceElement)?
+
     var diffableSignature: String {
         "\(name)(\(parameters.map { "\($0.firstName):" }.joined()))"
     }
-    
+
     var consolidatableName: String { name }
-    
+
     var description: String { compileDescription() }
-    
+
     init(
         attributes: [String],
         modifiers: [String],
@@ -100,7 +100,7 @@ class SwiftInterfaceFunction: SwiftInterfaceElement {
 }
 
 extension SwiftInterfaceFunction {
-    
+
     func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
@@ -116,14 +116,14 @@ extension SwiftInterfaceFunction {
 }
 
 private extension SwiftInterfaceFunction {
-    
+
     func compileDescription() -> String {
         var components = [String]()
-        
+
         components += attributes
         components += modifiers
         components += ["func"]
-        
+
         components += [
             [
                 name,
@@ -131,12 +131,12 @@ private extension SwiftInterfaceFunction {
                 "(\(parameters.map(\.description).joined(separator: ", ")))"
             ].compactMap { $0 }.joined()
         ]
-        
+
         components += effectSpecifiers
         components += ["-> \(returnType)"]
-        
+
         genericWhereClauseDescription.map { components += [$0] }
-        
+
         return components.joined(separator: " ")
     }
 }

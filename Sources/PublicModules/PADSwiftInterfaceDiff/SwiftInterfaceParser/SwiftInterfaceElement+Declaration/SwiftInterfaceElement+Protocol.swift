@@ -7,37 +7,37 @@
 import Foundation
 
 class SwiftInterfaceProtocol: SwiftInterfaceExtendableElement {
-    
+
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
-    
+
     let name: String
-    
+
     let primaryAssociatedTypes: [String]?
-    
+
     var inheritance: [String]?
-    
+
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
-    
+
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
-    
+
     var pathComponentName: String { name }
-    
+
     /// The members, declarations, ... inside of the body of the struct
     var children: [any SwiftInterfaceElement]
-    
-    var parent: (any SwiftInterfaceElement)? = nil
-    
+
+    var parent: (any SwiftInterfaceElement)?
+
     var diffableSignature: String { name }
-    
+
     var consolidatableName: String { name }
-    
+
     var description: String { compileDescription() }
-    
+
     var typeName: String { name }
-    
+
     init(
         attributes: [String],
         modifiers: [String],
@@ -58,7 +58,7 @@ class SwiftInterfaceProtocol: SwiftInterfaceExtendableElement {
 }
 
 extension SwiftInterfaceProtocol {
-    
+
     func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
@@ -72,30 +72,30 @@ extension SwiftInterfaceProtocol {
 }
 
 private extension SwiftInterfaceProtocol {
-    
+
     func compileDescription() -> String {
-        
+
         var components = [String]()
-        
+
         components += attributes
         components += modifiers
         components += ["protocol"]
-        
+
         components += [{
             var components = [
                 name,
                 primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>" }
             ].compactMap { $0 }.joined()
-            
+
             if let inheritance, !inheritance.isEmpty {
                 components += ": \(inheritance.joined(separator: ", "))"
             }
-            
+
             return components
         }()]
-        
+
         genericWhereClauseDescription.map { components += [$0] }
-        
+
         return components.joined(separator: " ")
     }
 }

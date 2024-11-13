@@ -8,9 +8,9 @@
 import XCTest
 
 class OutputGeneratorTests: XCTestCase {
-    
+
     func test_noChanges_singleModule() {
-        
+
         let expectedOutput = """
         # ✅ No changes detected
         _Comparing `new_source` to `old_source`_
@@ -18,7 +18,7 @@ class OutputGeneratorTests: XCTestCase {
         ---
         **Analyzed targets:** Target_1
         """
-        
+
         let outputGenerator = MarkdownOutputGenerator()
         let output = outputGenerator.generate(
             from: [:],
@@ -29,9 +29,9 @@ class OutputGeneratorTests: XCTestCase {
         )
         XCTAssertEqual(output, expectedOutput)
     }
-    
+
     func test_oneChange_singleModule() {
-        
+
         let expectedOutput = """
         # 👀 1 public change detected
         _Comparing `new_source` to `old_source`_
@@ -46,9 +46,9 @@ class OutputGeneratorTests: XCTestCase {
         ---
         **Analyzed targets:** Target_1
         """
-        
+
         let outputGenerator = MarkdownOutputGenerator()
-        
+
         let output = outputGenerator.generate(
             from: ["Target_1": [.init(changeType: .addition(description: "Some Addition"), parentPath: "")]],
             allTargets: ["Target_1"],
@@ -58,9 +58,9 @@ class OutputGeneratorTests: XCTestCase {
         )
         XCTAssertEqual(output, expectedOutput)
     }
-    
+
     func test_multipleChanges_multipleModules() {
-        
+
         let expectedOutput = """
         # 👀 4 public changes detected
         _Comparing `new_source` to `old_repository @ old_branch`_
@@ -90,7 +90,7 @@ class OutputGeneratorTests: XCTestCase {
         """
 
         let outputGenerator = MarkdownOutputGenerator()
-        
+
         let output = outputGenerator.generate(
             from: [
                 "Target_1": [

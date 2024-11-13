@@ -34,12 +34,13 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
         .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.6"),
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.3")
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.3"),
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.57.0")
     ],
     targets: [
-        
+
         // MARK: - Executable Targets
-        
+
         .executableTarget(
             name: "public-api-diff",
             dependencies: [
@@ -50,11 +51,14 @@ let package = Package(
                 "PADSwiftInterfaceFileLocator",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
-            path: "Sources/ExecutableTargets/CommandLineTool"
+            path: "Sources/ExecutableTargets/CommandLineTool",
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
-        
+
         // MARK: - Public Modules
-        
+
         .target(
             name: "PADSwiftInterfaceDiff",
             dependencies: [
@@ -62,7 +66,7 @@ let package = Package(
                 "PADLogging",
                 "FileHandlingModule",
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax")
             ],
             path: "Sources/PublicModules/PADSwiftInterfaceDiff"
         ),
@@ -94,9 +98,9 @@ let package = Package(
             dependencies: ["PADCore"],
             path: "Sources/PublicModules/PADOutputGenerator"
         ),
-        
+
         // MARK: - Shared/Public
-        
+
         .target(
             name: "PADCore",
             path: "Sources/Shared/Public/PADCore"
@@ -111,9 +115,9 @@ let package = Package(
             dependencies: ["FileHandlingModule", "ShellModule", "PADLogging"],
             path: "Sources/Shared/Public/PADSwiftInterfaceFileLocator"
         ),
-        
+
         // MARK: - Shared/Package
-        
+
         .target(
             name: "FileHandlingModule",
             path: "Sources/Shared/Package/FileHandlingModule"
@@ -127,9 +131,9 @@ let package = Package(
             dependencies: ["FileHandlingModule", "ShellModule", "PADLogging"],
             path: "Sources/Shared/Package/SwiftPackageFileHelperModule"
         ),
-        
+
         // MARK: - Test Targets
-        
+
         .testTarget(
             name: "UnitTests",
             dependencies: [

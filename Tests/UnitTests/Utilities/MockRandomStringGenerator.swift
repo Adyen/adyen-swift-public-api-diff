@@ -8,12 +8,12 @@
 import XCTest
 
 struct MockRandomStringGenerator: RandomStringGenerating {
-    
+
     var onGenerateRandomString: () -> String = {
         XCTFail("Unexpectedly called `\(#function)`")
         return ""
     }
-    
+
     func generateRandomString() -> String {
         onGenerateRandomString()
     }

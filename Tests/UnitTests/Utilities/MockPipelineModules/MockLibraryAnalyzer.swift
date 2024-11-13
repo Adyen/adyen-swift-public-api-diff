@@ -9,9 +9,9 @@
 import XCTest
 
 struct MockSwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
-    
+
     var onAnalyze: (URL, URL) throws -> SwiftPackageFileAnalyzingResult
-    
+
     func analyze(oldProjectUrl: URL, newProjectUrl: URL) throws -> SwiftPackageFileAnalyzingResult {
         try onAnalyze(oldProjectUrl, newProjectUrl)
     }
