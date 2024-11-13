@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
 protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
@@ -55,7 +61,7 @@ extension SwiftInterfaceElement {
     ///
     /// The path does not including the own `pathComponentName`
     ///
-    /// - Important: `SwiftInterfaceExtension`'s parentPath is always the `extendedType` 
+    /// - Important: `SwiftInterfaceExtension`'s parentPath is always the `extendedType`
     /// of the element to group them under the extended element
     var parentPath: String {
         if let extensionElement = self as? SwiftInterfaceExtension {
@@ -105,7 +111,7 @@ extension SwiftInterfaceElement {
     /// If we used the `name` it could cause a false positive with other functions named `init` (e.g. convenience inits) when trying to find matching elements during this finding phase.
     /// In a later consolidation phase removals/additions are compared again based on their `name` to combine them to a `change`
     func isDiffable(with otherElement: any SwiftInterfaceElement) -> Bool {
-        return parentPath == otherElement.parentPath && type(of: self) == type(of: otherElement) && diffableSignature == otherElement.diffableSignature
+        parentPath == otherElement.parentPath && type(of: self) == type(of: otherElement) && diffableSignature == otherElement.diffableSignature
     }
 }
 

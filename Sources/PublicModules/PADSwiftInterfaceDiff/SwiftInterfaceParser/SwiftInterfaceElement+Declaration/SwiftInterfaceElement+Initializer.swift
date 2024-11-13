@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
 extension SwiftInterfaceInitializer {
@@ -93,14 +99,14 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
 
 extension SwiftInterfaceInitializer {
     
-    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+    func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
         changes += diffDescription(propertyType: "optional mark", oldValue: other.optionalMark, newValue: optionalMark)
         changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
-        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map { $0.description }, newValues: parameters.map { $0.description }) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map(\.description), newValues: parameters.map(\.description)) // TODO: Maybe have a better way to show changes
         changes += diffDescription(propertyType: "effect", oldValues: other.effectSpecifiers, newValues: effectSpecifiers)
         changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
         return changes.compactMap { $0 }
@@ -120,7 +126,7 @@ private extension SwiftInterfaceInitializer {
                 "init",
                 optionalMark,
                 genericParameterDescription,
-                "(\(parameters.map { $0.description }.joined(separator: ", ")))"
+                "(\(parameters.map(\.description).joined(separator: ", ")))"
             ].compactMap { $0 }.joined()
         ]
         

@@ -1,10 +1,16 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import SwiftSyntax
 
 extension SyntaxCollection {
     
     /// Produces a description where all elements in the list are mapped to their `trimmedDescription`
     var sanitizedList: [String] {
-        self.map { $0.trimmedDescription }
+        self.map(\.trimmedDescription)
     }
 }
 
@@ -31,7 +37,7 @@ extension InheritedTypeListSyntax {
     
     /// Produces a description where all elements in the list are mapped to their type's `trimmedDescription`
     var sanitizedList: [String] {
-        self.map { $0.type.trimmedDescription }
+        self.map(\.type.trimmedDescription)
     }
 }
 

@@ -10,10 +10,10 @@ import Foundation
 import PADCore
 import PADLogging
 
-import PADSwiftInterfaceDiff
-import PADProjectBuilder
 import PADOutputGenerator
 import PADPackageFileAnalyzer
+import PADProjectBuilder
+import PADSwiftInterfaceDiff
 
 @main
 struct PublicApiDiff: AsyncParsableCommand {

@@ -1,11 +1,17 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
-import PADLogging
 import PADCore
+import PADLogging
 import PADSwiftInterfaceFileLocator
 
-import ShellModule
 import FileHandlingModule
+import ShellModule
 
 /// The ``PADProjectBuilder/ProjectBuilder`` builds the old & new project and outputs a list
 /// of ``PADCore/SwiftInterfaceFile``s as well as changes that happened to the
