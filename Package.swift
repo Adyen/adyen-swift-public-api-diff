@@ -34,7 +34,8 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
         .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.54.6"),
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.3")
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.3"),
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.57.0")
     ],
     targets: [
         
@@ -50,7 +51,10 @@ let package = Package(
                 "PADSwiftInterfaceFileLocator",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
-            path: "Sources/ExecutableTargets/CommandLineTool"
+            path: "Sources/ExecutableTargets/CommandLineTool",
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
         
         // MARK: - Public Modules
