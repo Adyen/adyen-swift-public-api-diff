@@ -58,6 +58,7 @@ jobs:
     
     - name: 🔍 Detect Changes
       uses: Adyen/adyen-swift-public-api-diff@github-action
+      id: public_api_diff
       with:
         platform: "macOS"
         new: ${{ env.NEW_VERSION }}
@@ -67,6 +68,6 @@ jobs:
       name: 📝 Comment on PR
       uses: thollander/actions-comment-pull-request@v3
       with:
-        file-path: "${{ github.workspace }}/api_comparison.md"
+        file-path: "${{ steps.public_api_diff.outputs.filepath }}"
         comment-tag: api_changes
         mode: recreate

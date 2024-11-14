@@ -11,8 +11,8 @@ inputs:
         description: 'Specify the old version to compare to'
         required: true
 outputs:
-    markdown:
-        description: 'The generated markdown output'
+    filepath:
+        description: 'The filepath to the generated markdown output'
 runs:
     using: 'composite'
     steps:
@@ -25,7 +25,7 @@ runs:
         echo $PROJECT_FOLDER
         swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
-        echo "markdown=\"$(cat "$PROJECT_FOLDER/api_comparison.md")\"" >> $GITHUB_OUTPUT
+        echo "filepath=\"$PROJECT_FOLDER/api_comparison.md\"" >> $GITHUB_OUTPUT
       shell: bash
         
 
