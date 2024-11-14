@@ -67,7 +67,7 @@ jobs:
    - name: 🚦 Test Output
       run: |
         FILE_PATH="${{ steps.public_api_diff.outputs.filepath }}
-	echo "Filepath: $FILE_PATH"
+        echo "Filepath: $FILE_PATH"
        
     - if: ${{ github.event.pull_request.base.ref != '' }}
       name: 📝 Comment on PR
