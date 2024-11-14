@@ -10,9 +10,6 @@ inputs:
     old:
         description: 'Specify the old version to compare to'
         required: true
-outputs:
-    filepath:
-        description: 'The filepath to the generated markdown output'
 runs:
     using: 'composite'
     steps:
@@ -26,7 +23,6 @@ runs:
         swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/api_comparison.md"
-        echo "filepath=\"$PROJECT_FOLDER/api_comparison.md\"" >> $GITHUB_OUTPUT
         echo "DIFF_OUTPUT_FILEPATH=\"$PROJECT_FOLDER/api_comparison.md\"" >> $GITHUB_ENV
       shell: bash
         

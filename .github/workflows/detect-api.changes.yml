@@ -65,13 +65,13 @@ jobs:
 
     - name: 🚦 Test Output
       run: |
-        FILE_PATH="${{ steps.public_api_diff.outputs.filepath }}"
+        FILE_PATH="${{ env.DIFF_OUTPUT_FILEPATH }}"
         echo "Filepath: $FILE_PATH"
 
     - if: ${{ github.event.pull_request.base.ref != '' }}
       name: 📝 Comment on PR
       uses: thollander/actions-comment-pull-request@v3
       with:
-        file-path: "${{ steps.public_api_diff.outputs.filepath }}"
+        file-path: "${{ env.DIFF_OUTPUT_FILEPATH }}"
         comment-tag: api_changes
         mode: recreate
