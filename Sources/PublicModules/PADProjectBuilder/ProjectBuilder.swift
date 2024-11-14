@@ -33,6 +33,7 @@ public struct ProjectBuilder {
     }
 
     private let projectType: ProjectType
+    private let platform: ProjectPlatform
     private let swiftInterfaceType: SwiftInterfaceType
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
@@ -40,11 +41,13 @@ public struct ProjectBuilder {
 
     public init(
         projectType: ProjectType,
+        platform: ProjectPlatform,
         swiftInterfaceType: SwiftInterfaceType,
         logger: (any Logging)? = nil
     ) {
         self.init(
             projectType: projectType,
+            platform: platform,
             swiftInterfaceType: swiftInterfaceType,
             fileHandler: FileManager.default,
             shell: Shell(),
@@ -54,12 +57,14 @@ public struct ProjectBuilder {
 
     init(
         projectType: ProjectType,
+        platform: ProjectPlatform,
         swiftInterfaceType: SwiftInterfaceType,
         fileHandler: any FileHandling = FileManager.default,
         shell: any ShellHandling = Shell(),
         logger: (any Logging)?
     ) {
         self.projectType = projectType
+        self.platform = platform
         self.swiftInterfaceType = swiftInterfaceType
         self.fileHandler = fileHandler
         self.shell = shell
@@ -99,6 +104,7 @@ public struct ProjectBuilder {
         let producer = SwiftInterfaceProducer(
             workingDirectoryPath: workingDirectoryPath,
             projectType: projectType,
+            platform: platform,
             swiftInterfaceType: swiftInterfaceType,
             fileHandler: fileHandler,
             shell: shell,

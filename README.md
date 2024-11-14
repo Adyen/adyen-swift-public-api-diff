@@ -21,6 +21,7 @@ This method requires an iOS 17.5 Simulator to be installed
 ```
 swift run public-api-diff
     project
+    --platform iOS
     --new "develop~https://github.com/Adyen/adyen-ios.git"
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
 ```
@@ -28,11 +29,12 @@ swift run public-api-diff
 <details><summary><b>--help:</b></summary>
 
 ```
-USAGE: public-api-diff project --new <new> --old <old> [--scheme <scheme>] [--swift-interface-type <swift-interface-type>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
+USAGE: public-api-diff project --new <new> --old <old> --platform <platform> [--scheme <scheme>] [--swift-interface-type <swift-interface-type>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
 
 OPTIONS:
   --new <new>             Specify the updated version to compare to
   --old <old>             Specify the old version to compare to
+  --platform <platform>   The platform to build the project for (iOS/macOS)
   --scheme <scheme>       [Optional] Which scheme to build (Needed when
                           comparing 2 xcode projects)
   --swift-interface-type <swift-interface-type>

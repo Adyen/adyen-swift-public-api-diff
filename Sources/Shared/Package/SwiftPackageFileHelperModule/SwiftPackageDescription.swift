@@ -127,14 +127,19 @@ package extension SwiftPackageDescription.Dependency {
         // TODO: Which other requirements exist?
 
         package let exact: [String]?
+        package let range: [[String: String]]?
     }
 }
 
 extension SwiftPackageDescription.Dependency.Requirement: CustomStringConvertible {
 
     package var description: String {
-        if let exactVersion = exact?.first {
-            return "exact: \"\(exactVersion)\""
+        if let version = exact?.first {
+            return "exact: \"\(version)\""
+        }
+        
+        if let lowerUpper = range?.first, let lower = lowerUpper["lower_bound"], let upper = lowerUpper["upper_bound"] {
+            return "\"\(lower)\"..<\"\(upper)\""
         }
 
         return "UNKNOWN_REQUIREMENT"
@@ -155,6 +160,7 @@ package extension SwiftPackageDescription {
             case library = "library"
             case binary = "binary"
             case test = "test"
+            case executable = "executable"
         }
 
         package let name: String
@@ -208,6 +214,7 @@ extension SwiftPackageDescription.Target.TargetType: CustomStringConvertible {
         case .binary: "binaryTarget"
         case .library: "target"
         case .test: "testTarget"
+        case .executable: "executableTarget"
         }
     }
 }

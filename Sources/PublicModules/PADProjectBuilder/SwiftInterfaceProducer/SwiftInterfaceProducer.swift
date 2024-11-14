@@ -22,6 +22,7 @@ struct SwiftInterfaceProducer {
 
     let workingDirectoryPath: String
     let projectType: ProjectType
+    let platform: ProjectPlatform
     let swiftInterfaceType: SwiftInterfaceType
     let fileHandler: any FileHandling
     let shell: any ShellHandling
@@ -122,12 +123,14 @@ extension SwiftInterfaceProducer {
         let newDerivedDataPath = try await xcodeTools.archive(
             projectDirectoryPath: newProjectDirectoryPath,
             scheme: scheme,
-            projectType: projectType
+            projectType: projectType,
+            platform: platform
         )
         let oldDerivedDataPath = try await xcodeTools.archive(
             projectDirectoryPath: oldProjectDirectoryPath,
             scheme: scheme,
-            projectType: projectType
+            projectType: projectType,
+            platform: platform
         )
 
         return (newDerivedDataPath, oldDerivedDataPath)

@@ -18,7 +18,7 @@ internal enum GitError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case let .couldNotClone(branchOrTag, repository):
-            "Could not clone \(repository) @ \(branchOrTag) - Please check the provided information"
+            "Could not clone \(repository) @ \(branchOrTag) - Please check the debug logs for more information"
         }
     }
 }
@@ -50,9 +50,12 @@ internal struct Git {
     func clone(_ repository: String, at branchOrTag: String, targetDirectoryPath: String) throws {
         logger?.log("🐱 Cloning \(repository) @ \(branchOrTag) into \(targetDirectoryPath)", from: String(describing: Self.self))
         let command = "git clone -b \(branchOrTag) \(repository) \(targetDirectoryPath)"
-        shell.execute(command)
-
-        guard fileHandler.fileExists(atPath: targetDirectoryPath) else {
+        
+        let shellOutput = shell.execute(command)
+        logger?.debug(shellOutput, from: String(describing: Self.self))
+        
+        let directoryContents = try? fileHandler.contentsOfDirectory(atPath: targetDirectoryPath)
+        guard let directoryContents, !directoryContents.isEmpty else {
             throw GitError.couldNotClone(branchOrTag: branchOrTag, repository: repository)
         }
     }

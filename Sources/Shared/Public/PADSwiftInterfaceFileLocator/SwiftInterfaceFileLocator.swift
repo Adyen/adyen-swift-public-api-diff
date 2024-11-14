@@ -63,14 +63,18 @@ public struct SwiftInterfaceFileLocator {
         switch type {
         case .private:
             swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".private.swiftinterface") }
+        case .package:
+            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".package.swiftinterface") }
         case .public:
-            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".swiftinterface") && !$0.hasSuffix(".private.swiftinterface") }
+            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".swiftinterface") && !$0.hasSuffix(".private.swiftinterface") && !$0.hasSuffix(".package.swiftinterface") }
         }
 
         guard let swiftInterfacePath = swiftInterfacePaths.first else {
             switch type {
             case .private:
                 throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).private.swiftinterface'")
+            case .package:
+                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).package.swiftinterface'")
             case .public:
                 throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).swiftinterface'")
             }

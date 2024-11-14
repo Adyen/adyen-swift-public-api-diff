@@ -29,6 +29,9 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
     @Option(help: "Specify the old version to compare to")
     public var old: String
 
+    @Option(help: "The platform to build the project for (iOS/macOS)")
+    public var platform: ProjectPlatform
+
     /// The (optional) scheme to build
     ///
     /// Needed when comparing 2 xcode projects
@@ -74,6 +77,7 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
                 oldSource: oldSource,
                 newSource: newSource,
                 projectType: projectType,
+                platform: platform,
                 swiftInterfaceType: swiftInterfaceType,
                 logger: logger
             )
@@ -136,12 +140,14 @@ private extension ProjectToOutputCommand {
         oldSource: ProjectSource,
         newSource: ProjectSource,
         projectType: ProjectType,
+        platform: ProjectPlatform,
         swiftInterfaceType: SwiftInterfaceType,
         logger: any Logging
     ) async throws -> ProjectBuilder.Result {
 
         let projectBuilder = ProjectBuilder(
             projectType: projectType,
+            platform: platform,
             swiftInterfaceType: swiftInterfaceType,
             logger: logger
         )
@@ -205,5 +211,24 @@ private extension ProjectToOutputCommand {
             newVersionName: newVersionName,
             warnings: warnings
         )
+    }
+}
+
+extension ProjectPlatform: ExpressibleByArgument {
+
+    static var mapping: [String: ProjectPlatform] = [
+        "iOS": .iOS,
+        "macOS": .macOS
+    ]
+    
+    public init?(argument: String) {
+        for (key, value) in Self.mapping {
+            if argument.compare(key, options: .caseInsensitive) == .orderedSame {
+                self = value
+                return
+            }
+        }
+
+        return nil
     }
 }

@@ -49,16 +49,28 @@ struct XcodeTools {
     func archive(
         projectDirectoryPath: String,
         scheme: String,
-        projectType: ProjectType
+        projectType: ProjectType,
+        platform: ProjectPlatform
     ) async throws -> String {
+        
         var commandComponents = [
             "cd \(projectDirectoryPath);",
             "xcodebuild clean build -scheme \"\(scheme)\"",
-            "-destination \"generic/platform=iOS\"",
             "-derivedDataPath \(Constants.derivedDataPath)",
-            "-sdk `\(Constants.simulatorSdkCommand)`",
             "BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         ]
+        
+        switch platform {
+        case .iOS:
+            commandComponents += [
+                "-sdk `\(Constants.simulatorSdkCommand)`",
+                "-destination \"generic/platform=iOS\""
+            ]
+        case .macOS:
+            commandComponents += [
+                "-destination \"generic/platform=macOS\""
+            ]
+        }
 
         switch projectType {
         case .swiftPackage:
