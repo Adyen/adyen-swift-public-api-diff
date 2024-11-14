@@ -18,9 +18,9 @@ runs:
     steps:
     - name: "Run Diff"
       run: |
-        NEW=${{ github.event.inputs.new }}
-        OLD=${{ github.event.inputs.old }}
-        PLATFORM=${{ github.event.inputs.platform }}
+        NEW=${{ inputs.new }}
+        OLD=${{ inputs.old }}
+        PLATFORM=${{ inputs.platform }}
 
         echo "NEW: $NEW"
         echo "OLD: $OLD"
