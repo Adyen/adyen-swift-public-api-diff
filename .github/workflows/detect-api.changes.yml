@@ -26,12 +26,12 @@ jobs:
       uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: '15.4'
-        
+
     - name: 🚚 Fetch repo
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        
+
     - name: 👾 Define Diff Versions
       run: |
         NEW="${{ env.source }}~${{ env.githubRepo }}"
@@ -54,7 +54,7 @@ jobs:
         target: '${{ github.event.inputs.old || github.event.pull_request.base.ref }}'
         githubRepo: '${{github.server_url}}/${{github.repository}}.git'
         noTargetBranch: 'no target branch'
-    
+
     - name: 🔍 Detect Changes
       uses: Adyen/adyen-swift-public-api-diff@github-action
       id: public_api_diff
@@ -63,11 +63,11 @@ jobs:
         new: ${{ env.NEW_VERSION }}
         old: ${{ env.OLD_VERSION }}
 
-   - name: 🚦 Test Output
+    - name: 🚦 Test Output
       run: |
         FILE_PATH="${{ steps.public_api_diff.outputs.filepath }}
         echo "Filepath: $FILE_PATH"
-       
+
     - if: ${{ github.event.pull_request.base.ref != '' }}
       name: 📝 Comment on PR
       uses: thollander/actions-comment-pull-request@v3
