@@ -57,7 +57,7 @@ jobs:
         noTargetBranch: 'no target branch'
     
     - name: 🔍 Detect Changes
-      uses: Adyen/adyen-swift-public-api-diff
+      uses: Adyen/adyen-swift-public-api-diff@eadb869bd90b6a78ba9dc4c6aee36e6e716e5cec
       with:
         platform: "macOS"
         new: ${{ env.NEW_VERSION }}
