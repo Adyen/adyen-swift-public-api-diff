@@ -1,0 +1,30 @@
+name: 'Swift Public API Diff'
+description: 'Diff 2 versions of your Swift SDK'
+inputs:
+    platform:
+        description: 'The platform to build the project for (iOS/macOS)'
+        required: true
+    new:
+        description: 'Specify the updated version to compare to'
+        required: true
+    old:
+        description: 'Specify the old version to compare to'
+        required: true
+outputs:
+    markdown:
+        description: 'The generated markdown output'
+runs:
+    using: 'macos-14'
+    steps:
+    - name: "Run Diff"
+      run: |
+        PROJECT_FOLDER=$PWD
+        echo $PROJECT_FOLDER
+        swift run public-api-diff project --new "${NEW}" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
+        cat "$PROJECT_FOLDER/logs.txt"
+        cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_OUTPUT
+      shell: bash
+      env:
+        NEW=${{ github.event.inputs.new }}
+        OLD=${{ github.event.inputs.old }}
+        PLATFORM=${{ github.event.inputs.platform }}

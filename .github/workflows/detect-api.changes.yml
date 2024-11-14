@@ -33,11 +33,8 @@ jobs:
       with:
         fetch-depth: 0
         
-    - name: 🔍 Detect Changes
+    - name: 👾 Define Diff Versions
       run: |
-        PROJECT_FOLDER=$PWD
-        echo $PROJECT_FOLDER
-        
         NEW="${{ env.source }}~${{ env.githubRepo }}"
         if [[ '${{ github.head_ref || env.noTargetBranch }}' == 'release/*' ]]
         then
@@ -47,14 +44,25 @@ jobs:
             OLD="${{ env.target }}~${{ env.githubRepo }}"
         fi
         
-        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform macos --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
-        cat "$PROJECT_FOLDER/logs.txt"
-        cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
+        echo "OLD=$OLD" >> $GITHUB_OUTPUT
+        echo "NEW=$NEW" >> $GITHUB_OUTPUT
       env:
         source: '${{ github.event.inputs.new || github.head_ref }}'
         target: '${{ github.event.inputs.old || github.event.pull_request.base.ref }}'
         githubRepo: '${{github.server_url}}/${{github.repository}}.git'
         noTargetBranch: 'no target branch'
+        
+    - name: 🔍 Detect Changes
+      run: |
+        echo "OUTPUTS: ${{ env.steps.vars.outputs }}"
+        echo "NEW: ${{ env.steps.vars.outputs.NEW }}"
+        echo "OLD: ${{ env.steps.vars.outputs.OLD }}"
+        
+        PROJECT_FOLDER=$PWD
+        echo $PROJECT_FOLDER
+        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform macos --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
+        cat "$PROJECT_FOLDER/logs.txt"
+        cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
        
     - if: ${{ github.event.pull_request.base.ref != '' }}
       name: 📝 Comment on PR
