@@ -23,9 +23,9 @@ runs:
         PLATFORM=${{ inputs.platform }}
         PROJECT_FOLDER=$PWD
         echo $PROJECT_FOLDER
-        swift run public-api-diff project --new "${NEW}" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
+        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
-        echo "markdown=$(cat "$PROJECT_FOLDER/api_comparison.md")" >> $GITHUB_OUTPUT
+        echo "markdown=\"$(cat "$PROJECT_FOLDER/api_comparison.md")\"" >> $GITHUB_OUTPUT
       shell: bash
         
 
