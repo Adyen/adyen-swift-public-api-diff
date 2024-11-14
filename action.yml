@@ -14,7 +14,7 @@ outputs:
     markdown:
         description: 'The generated markdown output'
 runs:
-    using: 'macos-14'
+    using: 'node20'
     steps:
     - name: "Run Diff"
       run: |
