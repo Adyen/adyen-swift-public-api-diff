@@ -55,18 +55,13 @@ jobs:
         target: '${{ github.event.inputs.old || github.event.pull_request.base.ref }}'
         githubRepo: '${{github.server_url}}/${{github.repository}}.git'
         noTargetBranch: 'no target branch'
-        
+    
     - name: 🔍 Detect Changes
-      run: |
-        echo "OUTPUTS: ${{ env }}"
-        echo "NEW: ${{ env.NEW_VERSION }}"
-        echo "OLD: ${{ env.OLD_VERSION }}"
-        
-        PROJECT_FOLDER=$PWD
-        echo $PROJECT_FOLDER
-        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform macos --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
-        cat "$PROJECT_FOLDER/logs.txt"
-        cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
+      uses: Adyen/adyen-swift-public-api-diff
+      with:
+        platform: "macOS"
+        new: ${{ env.NEW_VERSION }}
+        old: ${{ env.OLD_VERSION }}
        
     - if: ${{ github.event.pull_request.base.ref != '' }}
       name: 📝 Comment on PR
