@@ -63,6 +63,11 @@ jobs:
         platform: "macOS"
         new: ${{ env.NEW_VERSION }}
         old: ${{ env.OLD_VERSION }}
+
+   - name: 🚦 Test Output
+      run: |
+        FILE_PATH="${{ steps.public_api_diff.outputs.filepath }}
+	echo "Filepath: $FILE_PATH"
        
     - if: ${{ github.event.pull_request.base.ref != '' }}
       name: 📝 Comment on PR
