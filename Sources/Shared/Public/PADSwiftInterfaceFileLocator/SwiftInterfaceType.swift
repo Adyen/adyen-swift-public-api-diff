@@ -10,7 +10,7 @@ import Foundation
 public enum SwiftInterfaceType {
     case `private`
     case `public`
-    case `package`
+    case package
 
     var name: String {
         switch self {

@@ -64,11 +64,11 @@ struct XcodeTools {
         case .iOS:
             commandComponents += [
                 "-sdk `\(Constants.simulatorSdkCommand)`",
-                "-destination \"generic/platform=iOS\"",
+                "-destination \"generic/platform=iOS\""
             ]
         case .macOS:
             commandComponents += [
-                "-destination \"generic/platform=macOS\"",
+                "-destination \"generic/platform=macOS\""
             ]
         }
 

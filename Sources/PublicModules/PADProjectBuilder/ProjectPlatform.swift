@@ -1,8 +1,7 @@
 //
-//  ProjectPlatform.swift
-//  public-api-diff
+// Copyright (c) 2024 Adyen N.V.
 //
-//  Created by Alexander Guretzki on 13/11/2024.
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
 /// The platform to build the project on
