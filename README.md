@@ -1,5 +1,8 @@
 [![🧪 Run Tests](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml)
 
+![github-header](https://github.com/user-attachments/assets/08ec7d60-eb0f-4937-b44a-afff02eff72c)
+
+
 # Swift Public API diff
 
 This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
@@ -151,6 +154,9 @@ swift build --configuration release
 - **swift-api-digester**
   - `xcrun swift-api-digester -dump-sdk`
   - `xcrun swift-api-digester -diagnose-sdk`
+
+## Projects using `public-api-diff`
+- [Adyen iOS Checkout](https://github.com/Adyen/adyen-ios)
 
 ## Inspiration
  - https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
