@@ -213,22 +213,3 @@ private extension ProjectToOutputCommand {
         )
     }
 }
-
-extension ProjectPlatform: ExpressibleByArgument {
-
-    static var mapping: [String: ProjectPlatform] = [
-        "iOS": .iOS,
-        "macOS": .macOS
-    ]
-    
-    public init?(argument: String) {
-        for (key, value) in Self.mapping {
-            if argument.compare(key, options: .caseInsensitive) == .orderedSame {
-                self = value
-                return
-            }
-        }
-
-        return nil
-    }
-}
