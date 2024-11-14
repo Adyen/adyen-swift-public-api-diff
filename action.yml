@@ -18,13 +18,20 @@ runs:
     steps:
     - name: "Run Diff"
       run: |
+	NEW=${{ github.event.inputs.new }}
+        OLD=${{ github.event.inputs.old }}
+        PLATFORM=${{ github.event.inputs.platform }}
+
+        echo "NEW: $NEW"
+        echo "OLD: $OLD"
+        echo "PLATFORM: $PLATFORM"
+
         PROJECT_FOLDER=$PWD
         echo $PROJECT_FOLDER
         swift run public-api-diff project --new "${NEW}" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-level debug --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_OUTPUT
       shell: bash
-      env:
-        NEW=${{ github.event.inputs.new }}
-        OLD=${{ github.event.inputs.old }}
-        PLATFORM=${{ github.event.inputs.platform }}
+        
+
+
