@@ -14,7 +14,7 @@ outputs:
     markdown:
         description: 'The generated markdown output'
 runs:
-    using: 'node20'
+    using: 'docker'
     steps:
     - name: "Run Diff"
       run: |
