@@ -14,7 +14,7 @@ outputs:
     markdown:
         description: 'The generated markdown output'
 runs:
-    using: 'docker'
+    using: 'composite'
     steps:
     - name: "Run Diff"
       run: |
