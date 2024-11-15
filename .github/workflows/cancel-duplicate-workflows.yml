@@ -1,0 +1,31 @@
+name: 🧹 Cancel duplicate work flows
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  cancel-multiple-workflow-runs:
+    name: "Cancel the self CI workflow run"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Cancel 'detect-api-changes'"
+        uses: potiuk/cancel-workflow-runs@master
+        with:
+          cancelMode: allDuplicates
+          cancelFutureDuplicates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflowFileName: detect-api.changes.yml
+      - name: "Cancel 'build-release'"
+        uses: potiuk/cancel-workflow-runs@master
+        with:
+          cancelMode: allDuplicates
+          cancelFutureDuplicates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflowFileName: build-release.yml
+      - name: "Cancel 'run-tests'"
+        uses: potiuk/cancel-workflow-runs@master
+        with:
+          cancelMode: allDuplicates
+          cancelFutureDuplicates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflowFileName: run-tests.yml
