@@ -13,19 +13,23 @@ inputs:
 runs:
     using: 'composite'
     steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: "Adyen/adyen-swift-public-api-diff"
-        ref: "main"
     - name: "Run Diff"
       run: |
+        git clone https://github.com/Adyen/adyen-swift-public-api-diff ./tmp-diff-checkout
+        cd ./tmp-diff-checkout
+        LATEST_VERSION = $(git describe --abbrev=0 --tags)
+        cd ..
+        echo $LATEST_VERSION
+      
         NEW=${{ inputs.new }}
         OLD=${{ inputs.old }}
         PLATFORM=${{ inputs.platform }}
         PROJECT_FOLDER=$PWD
         echo $PROJECT_FOLDER
         
-        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        curl -vLJO -H 'Accept: application/octet-stream' 'https://github.com/Adyen/adyen-swift-public-api-diff/releases/download/$LATEST_VERSION/public-api-diff'
+        
+        ./public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
