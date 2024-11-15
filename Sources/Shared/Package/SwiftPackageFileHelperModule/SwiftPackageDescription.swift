@@ -66,7 +66,7 @@ extension SwiftPackageDescription {
 extension SwiftPackageDescription.Platform: CustomStringConvertible {
 
     package var description: String {
-        "\(name)(\(version))"
+        ".\(name)(\(version))"
     }
 }
 

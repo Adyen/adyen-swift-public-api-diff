@@ -35,7 +35,7 @@ jobs:
     - name: 👾 Define Diff Versions
       run: |
         NEW="${{ env.source }}~${{ env.githubRepo }}"
-        if [[ '${{ github.head_ref || env.noTargetBranch }}' == 'release/*' ]]
+        if [[ '${{ github.head_ref || env.noTargetBranch }}' == release/* ]]
         then
             LATEST_TAG=$(git describe --tags --abbrev=0)
             OLD="$LATEST_TAG~${{ env.githubRepo }}"
@@ -56,7 +56,7 @@ jobs:
         noTargetBranch: 'no target branch'
 
     - name: 🔍 Detect Changes
-      uses: Adyen/adyen-swift-public-api-diff@github-action
+      uses: Adyen/adyen-swift-public-api-diff@main
       id: public_api_diff
       with:
         platform: "macOS"

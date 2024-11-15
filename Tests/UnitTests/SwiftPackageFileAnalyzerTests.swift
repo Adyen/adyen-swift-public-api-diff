@@ -155,14 +155,14 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             ),
             .init(
                 changeType: .change(
-                    oldDescription: "platforms: [iOS(12.0), macOS(10.0)]",
-                    newDescription: "platforms: [iOS(15.0), visionOS(1.0)]"
+                    oldDescription: "platforms: [.iOS(12.0), .macOS(10.0)]",
+                    newDescription: "platforms: [.iOS(15.0), .visionOS(1.0)]"
                 ),
                 parentPath: "Package.swift",
                 listOfChanges: [
-                    "Added visionOS(1.0)",
-                    "Changed from iOS(12.0) to iOS(15.0)",
-                    "Removed macOS(10.0)"
+                    "Added .visionOS(1.0)",
+                    "Changed from .iOS(12.0) to .iOS(15.0)",
+                    "Removed .macOS(10.0)"
                 ]
             ),
             .init(
