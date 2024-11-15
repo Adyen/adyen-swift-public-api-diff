@@ -13,6 +13,10 @@ inputs:
 runs:
     using: 'composite'
     steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: "Adyen/adyen-swift-public-api-diff"
+        ref: "0.4.0"
     - name: "Run Diff"
       run: |
         NEW=${{ inputs.new }}
