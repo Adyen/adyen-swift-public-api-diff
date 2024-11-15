@@ -62,11 +62,3 @@ jobs:
         platform: "macOS"
         new: ${{ env.NEW_VERSION }}
         old: ${{ env.OLD_VERSION }}
-
-    - if: ${{ github.event.pull_request.base.ref != '' }}
-      name: 📝 Comment on PR
-      uses: thollander/actions-comment-pull-request@v3
-      with:
-        file-path: "${{ env.public-api-diff-output-filepath }}"
-        comment-tag: api_changes
-        mode: recreate
