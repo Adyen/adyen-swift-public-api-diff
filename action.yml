@@ -13,6 +13,7 @@ inputs:
 runs:
     using: 'composite'
     steps:
+    - uses: actions/checkout@v4
     - name: "Run Diff"
       run: |
         NEW=${{ inputs.new }}
