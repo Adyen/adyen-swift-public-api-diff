@@ -21,11 +21,9 @@ runs:
         PROJECT_FOLDER=$PWD
         echo $PROJECT_FOLDER
         
-        # swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
-        # cat "$PROJECT_FOLDER/logs.txt"
+        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        cat "$PROJECT_FOLDER/logs.txt"
         
-        touch "$PROJECT_FOLDER/api_comparison.md"
-        echo "Hello World" >> "$PROJECT_FOLDER/api_comparison.md"
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
       shell: bash
       
