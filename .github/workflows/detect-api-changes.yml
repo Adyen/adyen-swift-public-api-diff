@@ -35,7 +35,7 @@ jobs:
     - name: 👾 Define Diff Versions
       run: |
         NEW="${{ env.source }}~${{ env.githubRepo }}"
-        if [[ '${{ github.head_ref || env.noTargetBranch }}' == 'release/*' ]]
+        if [[ '${{ github.head_ref || env.noTargetBranch }}' == release/* ]]
         then
             LATEST_TAG=$(git describe --tags --abbrev=0)
             OLD="$LATEST_TAG~${{ env.githubRepo }}"
