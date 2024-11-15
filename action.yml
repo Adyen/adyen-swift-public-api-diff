@@ -1,5 +1,5 @@
 name: 'Swift Public API Diff'
-description: 'Diff 2 versions of your Swift SDK'
+description: 'This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way. And outputs it to the step summary or PR comment.'
 inputs:
     platform:
         description: 'The platform to build the project for (iOS/macOS)'
