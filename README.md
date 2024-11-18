@@ -19,14 +19,24 @@ We strongly encourage you to contribute to our repository. Find out more in our 
 ## Usage
  
 ### From Project to Output
-This method requires an iOS 17.5 Simulator to be installed
 
-```
+```bash
+# Build using the iOS sdk
+# This method requires an iOS Simulator to be installed
 swift run public-api-diff
     project
     --platform iOS
     --new "develop~https://github.com/Adyen/adyen-ios.git"
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
+```
+
+```bash
+# Build using the macOS sdk
+swift run public-api-diff
+    project
+    --platform macOS
+    --new "main~https://github.com/Adyen/adyen-swift-public-api-diff"
+    --old "0.4.0~https://github.com/Adyen/adyen-swift-public-api-diff"
 ```
 
 <details><summary><b>--help:</b></summary>
@@ -54,7 +64,7 @@ OPTIONS:
  
 ### From `.swiftinterface` to Output
  
-```
+```bash
 swift run public-api-diff
     swift-interface
     --new "new/path/to/project.swiftinterface" 
@@ -89,7 +99,7 @@ OPTIONS:
 
 ### From `.framework` to Output
 
-```
+```bash
 swift run public-api-diff
     framework
     --target-name "TargetName"
@@ -127,22 +137,24 @@ OPTIONS:
 
 ## Release Build
 ### Create
-```
+```bash
 swift build --configuration release
 ```
 
 ### Run
-```
+```bash
 ./public-api-diff
     project
     --new "develop~https://github.com/Adyen/adyen-ios.git" 
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
-    
+```
+```bash
 ./public-api-diff
     swift-interface
     --new "new/path/to/project.swiftinterface" 
     --old "old/path/to/project.swiftinterface"
-    
+```
+```bash
 ./public-api-diff
     framework
     --target-name "TargetName"
