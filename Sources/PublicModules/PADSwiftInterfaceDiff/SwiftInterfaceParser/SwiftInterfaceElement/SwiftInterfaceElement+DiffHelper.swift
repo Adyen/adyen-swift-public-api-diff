@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 import PADCore
 
@@ -25,11 +31,11 @@ extension SwiftInterfaceElement {
         }
         
         switch changeType {
-        case .change(let old, let new):
+        case let .change(old, new):
             diffDescription += " from `\(old)` to `\(new)`"
-        case .removal(let string):
+        case let .removal(string):
             diffDescription += " `\(string)`"
-        case .addition(let string):
+        case let .addition(string):
             diffDescription += " `\(string)`"
         }
         
@@ -67,7 +73,7 @@ extension SwiftInterfaceElement {
 // MARK: -
 
 /// File-private helper to produce detailed descriptions
-fileprivate enum ChangeType {
+private enum ChangeType {
     case change(old: String, new: String)
     case removal(String)
     case addition(String)

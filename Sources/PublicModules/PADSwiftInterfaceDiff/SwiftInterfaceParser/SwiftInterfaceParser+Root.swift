@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 import PADCore
 
@@ -37,8 +43,8 @@ extension SwiftInterfaceParser {
             self.children.forEach { $0.setupParentRelationships(parent: self) }
         }
         
-        func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
-            return []
+        func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
+            []
         }
     }
 }

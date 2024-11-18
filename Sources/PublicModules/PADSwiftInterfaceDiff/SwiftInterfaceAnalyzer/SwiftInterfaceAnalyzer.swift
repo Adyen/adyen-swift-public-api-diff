@@ -45,7 +45,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     }
     
     func metrics(for swiftInterface: some SwiftInterfaceElement) -> SwiftInterfaceMetrics {
-        return swiftInterface.metrics()
+        swiftInterface.metrics()
     }
     
     private static func recursiveCompare(

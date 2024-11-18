@@ -4,10 +4,10 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-@testable import PADProjectBuilder
-@testable import PADOutputGenerator
-@testable import PADSwiftInterfaceDiff
 @testable import PADCore
+@testable import PADOutputGenerator
+@testable import PADProjectBuilder
+@testable import PADSwiftInterfaceDiff
 import XCTest
 
 class ReferencePackageTests: XCTestCase {
@@ -32,7 +32,7 @@ class ReferencePackageTests: XCTestCase {
     
     override static func tearDown() {
         
-        guard let referencePackagesRoot = try? Self.referencePackagesPath() else { return }
+        guard let referencePackagesRoot = try? referencePackagesPath() else { return }
         let oldReferencePackageDirectory = referencePackagesRoot.appending(path: "ReferencePackage").appending(path: XcodeTools.Constants.derivedDataPath)
         let newReferencePackageDirectory = referencePackagesRoot.appending(path: "UpdatedPackage").appending(path: XcodeTools.Constants.derivedDataPath)
         
@@ -59,7 +59,7 @@ class ReferencePackageTests: XCTestCase {
         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
         let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
         
-        for i in 0..<expectedLines.count  {
+        for i in 0..<expectedLines.count {
             if expectedLines[i] != markdownOutputLines[i] {
                 XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
                 return

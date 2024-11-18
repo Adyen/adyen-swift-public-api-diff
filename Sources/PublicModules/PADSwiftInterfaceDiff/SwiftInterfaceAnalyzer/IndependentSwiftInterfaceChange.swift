@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 import PADCore
 
@@ -27,9 +33,9 @@ struct IndependentSwiftInterfaceChange: Equatable {
     
     static func == (lhs: IndependentSwiftInterfaceChange, rhs: IndependentSwiftInterfaceChange) -> Bool {
         lhs.changeType == rhs.changeType &&
-        lhs.element.description == rhs.element.description &&
-        lhs.oldFirst == rhs.oldFirst &&
-        lhs.parentPath == rhs.parentPath
+            lhs.element.description == rhs.element.description &&
+            lhs.oldFirst == rhs.oldFirst &&
+            lhs.parentPath == rhs.parentPath
     }
     
     func differences(to otherIndependentChange: IndependentSwiftInterfaceChange) -> [String] {

@@ -128,10 +128,9 @@ private extension SwiftPackageFileHelper {
                 warnings += [warning]
             }
             
-            if 
+            if
                 firstLine.starts(with: "{"),
-                let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8)
-            {
+                let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8) {
                 return try decodePackageDescription(from: packageDescriptionData, warnings: warnings)
             }
             

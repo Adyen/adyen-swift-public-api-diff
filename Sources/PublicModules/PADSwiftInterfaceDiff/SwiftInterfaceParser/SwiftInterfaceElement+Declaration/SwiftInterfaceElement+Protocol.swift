@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 import PADCore
 
@@ -56,7 +62,7 @@ class SwiftInterfaceProtocol: SwiftInterfaceExtendableElement {
 
 extension SwiftInterfaceProtocol {
     
-    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+    func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
@@ -81,7 +87,7 @@ private extension SwiftInterfaceProtocol {
         components += [{
             var components = [
                 name,
-                primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>"}
+                primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>" }
             ].compactMap { $0 }.joined()
             
             if let inheritance, !inheritance.isEmpty {

@@ -1,13 +1,19 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import ArgumentParser
 import Foundation
 
 import PADCore
 import PADLogging
 
-import PADSwiftInterfaceDiff
-import PADProjectBuilder
 import PADOutputGenerator
 import PADPackageFileAnalyzer
+import PADProjectBuilder
+import PADSwiftInterfaceDiff
 
 /// Command that analyzes the differences between an old and new `.swiftinterface` file and produces a human readable output
 struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {

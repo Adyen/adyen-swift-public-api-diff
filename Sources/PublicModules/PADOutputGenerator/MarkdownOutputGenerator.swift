@@ -26,7 +26,7 @@ public struct MarkdownOutputGenerator: OutputGenerating {
         let changes = Self.changeLines(changesPerModule: changesPerTarget)
         
         var lines = [
-            Self.title(changesPerTarget: changesPerTarget),
+            Self.title(changesPerTarget: changesPerTarget)
         ]
         
         if let oldVersionName, let newVersionName {
@@ -89,7 +89,7 @@ private extension MarkdownOutputGenerator {
         let modules = metrics.keys.sorted()
         
         typeRows.append("| type | \(modules.joined(separator: " | ")) | total |")
-        typeRows.append("| --- | \(Array.init(repeating: " --- ", count: modules.count).joined(separator: " | ")) | --- |")
+        typeRows.append("| --- | \(Array(repeating: " --- ", count: modules.count).joined(separator: " | ")) | --- |")
         
         SwiftInterfaceElementDeclType.allCases.forEach { type in
             if type == .root { return }

@@ -1,7 +1,13 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
-import PADLogging
 import PADCore
+import PADLogging
 import PADSwiftInterfaceFileLocator
 
 import FileHandlingModule
@@ -142,7 +148,6 @@ extension SwiftInterfaceProducer {
         
         return (newDerivedDataPath, oldDerivedDataPath)
     }
-    
     
     /// Locates the `.swiftinterface` files for the provided schemes within the derived data directories
     /// - Parameters:

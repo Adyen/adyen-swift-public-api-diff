@@ -1,10 +1,16 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 
 import PADCore
 import PADLogging
 
-import ShellModule
 import FileHandlingModule
+import ShellModule
 
 /// Helps setting up the project by:
 /// - Copying project files into a working directory (and skipping unwanted files)
@@ -38,9 +44,9 @@ struct ProjectSetupHelper: ProjectSetupHelping {
         try await Task {
             let checkoutPath = workingDirectoryPath + "\(randomStringGenerator.generateRandomString())"
             switch projectSource {
-            case .local(let path):
+            case let .local(path):
                 shell.execute("cp -a '\(path)' '\(checkoutPath)'")
-            case .git(let branch, let repository):
+            case let .git(branch, repository):
                 let git = Git(shell: shell, fileHandler: fileHandler, logger: logger)
                 try git.clone(repository, at: branch, targetDirectoryPath: checkoutPath)
             }
@@ -84,10 +90,10 @@ private extension ProjectType {
     
     var excludedFileSuffixes: [String] {
         switch self {
-            case .swiftPackage:
-                [".xcodeproj", ".xcworkspace"]
-            case .xcodeProject:
-                ["Package.swift"]
+        case .swiftPackage:
+            [".xcodeproj", ".xcworkspace"]
+        case .xcodeProject:
+            ["Package.swift"]
         }
     }
     

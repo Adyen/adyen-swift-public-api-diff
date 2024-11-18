@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2024 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import Foundation
 import PADCore
 
@@ -57,7 +63,7 @@ class SwiftInterfaceVar: SwiftInterfaceElement {
 
 extension SwiftInterfaceVar {
     
-    func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String] {
+    func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
