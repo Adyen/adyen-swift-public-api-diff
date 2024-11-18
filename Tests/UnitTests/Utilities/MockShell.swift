@@ -8,12 +8,12 @@
 import XCTest
 
 struct MockShell: ShellHandling {
-    
+
     var handleExecute: (String) -> String = { _ in
         XCTFail("Unexpectedly called `\(#function)`")
         return ""
     }
-    
+
     @discardableResult
     func execute(_ command: String) -> String {
         handleExecute(command)

@@ -14,7 +14,7 @@ public struct SwiftInterfaceFile {
     public let oldFilePath: String
     /// The file path to the new/updated `.swiftinterface`
     public let newFilePath: String
-    
+
     /// Creates a new instance of a ``SwiftInterfaceFile``
     public init(
         name: String,

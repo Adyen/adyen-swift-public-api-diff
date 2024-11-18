@@ -9,7 +9,7 @@ import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/associatedtypedeclsyntax-swift.struct
 extension AssociatedTypeDeclSyntax {
-    
+
     func toInterfaceElement() -> SwiftInterfaceAssociatedType {
         SwiftInterfaceAssociatedType(
             attributes: self.attributes.sanitizedList,

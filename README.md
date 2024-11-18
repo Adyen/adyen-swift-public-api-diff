@@ -1,5 +1,8 @@
 [![🧪 Run Tests](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml)
 
+![github-header](https://github.com/user-attachments/assets/08ec7d60-eb0f-4937-b44a-afff02eff72c)
+
+
 # Swift Public API diff
 
 This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
@@ -21,6 +24,7 @@ This method requires an iOS 17.5 Simulator to be installed
 ```
 swift run public-api-diff
     project
+    --platform iOS
     --new "develop~https://github.com/Adyen/adyen-ios.git"
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
 ```
@@ -28,11 +32,12 @@ swift run public-api-diff
 <details><summary><b>--help:</b></summary>
 
 ```
-USAGE: public-api-diff project --new <new> --old <old> [--scheme <scheme>] [--swift-interface-type <swift-interface-type>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
+USAGE: public-api-diff project --new <new> --old <old> --platform <platform> [--scheme <scheme>] [--swift-interface-type <swift-interface-type>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
 
 OPTIONS:
   --new <new>             Specify the updated version to compare to
   --old <old>             Specify the old version to compare to
+  --platform <platform>   The platform to build the project for (iOS/macOS)
   --scheme <scheme>       [Optional] Which scheme to build (Needed when
                           comparing 2 xcode projects)
   --swift-interface-type <swift-interface-type>
@@ -149,6 +154,9 @@ swift build --configuration release
 - **swift-api-digester**
   - `xcrun swift-api-digester -dump-sdk`
   - `xcrun swift-api-digester -diagnose-sdk`
+
+## Projects using `public-api-diff`
+- [Adyen iOS Checkout](https://github.com/Adyen/adyen-ios)
 
 ## Inspiration
  - https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift

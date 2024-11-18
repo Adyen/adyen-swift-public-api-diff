@@ -24,7 +24,7 @@ import Foundation
 
 public protocol CustomProtocol {
     typealias CustomAssociatedType = Equatable
-    
+
     var getSetVar: any CustomAssociatedType { get set }
     var getVar: any CustomAssociatedType { get }
     func function() -> any CustomAssociatedType
@@ -40,7 +40,7 @@ public struct CustomStruct: CustomProtocol {
 // MARK: - Generic public class
 
 public class CustomClass<T: Equatable> {
-    
+
     public weak var weakObject: CustomClass?
     lazy var lazyVar: String = { "I am a lazy" }()
     @_spi(SomeSpi)
@@ -48,18 +48,18 @@ public class CustomClass<T: Equatable> {
     open var computedVar: String { "I am computed" }
     package let constantLet: String = "I'm a let"
     public var optionalVar: T?
-    
+
     @MainActor
     public func asyncThrowingFunc() async throws {}
     public func rethrowingFunc(throwingArg: @escaping () throws -> String) rethrows {}
-    
+
     public init(weakObject: CustomClass? = nil, optionalVar: T? = nil) {
         self.weakObject = weakObject
         self.optionalVar = optionalVar
     }
-    
+
     public init() {}
-    
+
     public convenience init(value: T) {
         self.init(optionalVar: value)
     }
@@ -70,12 +70,12 @@ public class CustomClass<T: Equatable> {
 @_spi(SystemProgrammingInterface)
 open class OpenSpiConformingClass: CustomProtocol {
     public typealias CustomAssociatedType = any Equatable
-    
+
     public var getSetVar: CustomAssociatedType
     public var getVar: CustomAssociatedType
     @inlinable
     public func function() -> CustomAssociatedType { fatalError() }
-    
+
     public init(getSetVar: CustomAssociatedType, getVar: CustomAssociatedType) {
         self.getSetVar = getSetVar
         self.getVar = getVar
@@ -106,11 +106,11 @@ public actor CustomActor {}
 
 public enum OperatorNamespace: String {
     case someValue = "1"
-    
+
     public static prefix func ++ (_ counter: OperatorNamespace) -> String {
         counter.rawValue
     }
-    
+
     public static postfix func ++ (_ counter: OperatorNamespace) -> String {
         counter.rawValue
     }
@@ -137,6 +137,6 @@ public enum CustomEnum {
     case caseWithString(String)
     case caseWithTuple(String, Int)
     case caseWithBlock((Int) throws -> Void)
-    
+
     indirect case recursive(CustomEnum)
 }

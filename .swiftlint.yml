@@ -1,0 +1,36 @@
+disabled_rules:
+  - trailing_whitespace
+  - nesting
+  - todo
+  - for_where
+
+excluded:
+  - Build
+  - .build
+  - Tests
+  - Internal
+  - Docs
+  - Demo
+  - Package.swift
+  - DerivedData
+  - Carthage
+  - TempProject
+  - Scripts
+
+line_length:
+  ignores_function_declarations: true
+  ignores_urls: true
+  warning: 140
+  
+file_length:
+  warning: 500
+  
+function_parameter_count:
+  warning: 10
+  error: 15
+  
+identifier_name:
+  min_length:
+    warning: 2
+  max_length:
+    warning: 40

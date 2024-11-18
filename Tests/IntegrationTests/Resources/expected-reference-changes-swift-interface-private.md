@@ -328,7 +328,7 @@ public typealias CustomAssociatedType = Swift.Int
 
 ```
 ```javascript
-public typealias Iterator = Swift.Array<ReferencePackage.CustomStruct<T>.AnotherAssociatedType>
+public typealias Iterator = [ReferencePackage.CustomStruct<T>.AnotherAssociatedType]
 
 ```
 ```javascript
@@ -379,7 +379,7 @@ Changes:
 
 ```
 ```javascript
-@_spi(SystemProgrammingInterface) public typealias Iterator = Swift.Array<Swift.Double>
+@_spi(SystemProgrammingInterface) public typealias Iterator = [Swift.Double]
 
 ```
 ```javascript

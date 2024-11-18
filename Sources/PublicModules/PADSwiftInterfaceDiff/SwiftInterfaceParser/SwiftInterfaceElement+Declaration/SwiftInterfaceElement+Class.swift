@@ -8,41 +8,41 @@ import Foundation
 import PADCore
 
 class SwiftInterfaceClass: SwiftInterfaceExtendableElement {
-    
+
     static var declType: SwiftInterfaceElementDeclType { .class }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
-    
+
     /// The name of the element
     let name: String
-    
+
     /// e.g. <T>
     let genericParameterDescription: String?
-    
+
     /// Types/Protocols the element inherits from
     var inheritance: [String]?
-    
+
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
-    
+
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
-    
+
     var pathComponentName: String { name }
-    
+
     var children: [any SwiftInterfaceElement]
-    
-    var parent: (any SwiftInterfaceElement)? = nil
-    
+
+    var parent: (any SwiftInterfaceElement)?
+
     var diffableSignature: String { name }
-    
+
     var consolidatableName: String { name }
-    
+
     var description: String { compileDescription() }
-    
+
     var typeName: String { name }
-    
+
     init(
         attributes: [String],
         modifiers: [String],
@@ -63,7 +63,7 @@ class SwiftInterfaceClass: SwiftInterfaceExtendableElement {
 }
 
 extension SwiftInterfaceClass {
-    
+
     func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
@@ -77,30 +77,30 @@ extension SwiftInterfaceClass {
 }
 
 private extension SwiftInterfaceClass {
-    
+
     func compileDescription() -> String {
-        
+
         var components = [String]()
-        
+
         components += attributes
         components += modifiers
         components += ["class"]
-        
+
         components += [{
             var components = [
                 name,
                 genericParameterDescription
             ].compactMap { $0 }.joined()
-            
+
             if let inheritance, !inheritance.isEmpty {
                 components += ": \(inheritance.joined(separator: ", "))"
             }
-            
+
             return components
         }()]
-        
+
         genericWhereClauseDescription.map { components += [$0] }
-        
+
         return components.joined(separator: " ")
     }
 }

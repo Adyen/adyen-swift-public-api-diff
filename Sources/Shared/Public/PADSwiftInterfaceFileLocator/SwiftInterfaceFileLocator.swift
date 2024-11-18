@@ -12,11 +12,11 @@ import ShellModule
 
 /// A helper to locate `.swiftinterface` files
 public struct SwiftInterfaceFileLocator {
-    
+
     let fileHandler: any FileHandling
     let shell: any ShellHandling
     let logger: (any Logging)?
-    
+
     package init(
         fileHandler: any FileHandling,
         shell: any ShellHandling,
@@ -26,7 +26,7 @@ public struct SwiftInterfaceFileLocator {
         self.shell = shell
         self.logger = logger
     }
-    
+
     public init(
         logger: (any Logging)? = nil
     ) {
@@ -36,7 +36,7 @@ public struct SwiftInterfaceFileLocator {
             logger: logger
         )
     }
-    
+
     /// Tries to locate a `.swiftinterface` files in the derivedData folder for a specific scheme
     /// - Parameters:
     ///   - scheme: The scheme to find the `.swiftinterface` file for
@@ -46,7 +46,7 @@ public struct SwiftInterfaceFileLocator {
     /// - Throws: An error if no `.swiftinterface` file can be found for the given scheme + derived data path
     public func locate(for scheme: String, derivedDataPath: String, type: SwiftInterfaceType) throws -> URL {
         let schemeSwiftModuleName = "\(scheme).swiftmodule"
-        
+
         let swiftModulePathsForScheme = shell.execute("cd '\(derivedDataPath)'; find . -type d -name '\(schemeSwiftModuleName)'")
             .components(separatedBy: .newlines)
             .map { URL(filePath: $0) }
@@ -54,28 +54,32 @@ public struct SwiftInterfaceFileLocator {
         guard let swiftModulePath = swiftModulePathsForScheme.first?.path() else {
             throw FileHandlerError.pathDoesNotExist(path: "find . -type d -name '\(schemeSwiftModuleName)'")
         }
-        
+
         let completeSwiftModulePath = derivedDataPath + "/" + swiftModulePath
-        
+
         let swiftModuleContent = try fileHandler.contentsOfDirectory(atPath: completeSwiftModulePath)
-        
+
         let swiftInterfacePaths: [String]
         switch type {
         case .private:
             swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".private.swiftinterface") }
+        case .package:
+            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".package.swiftinterface") }
         case .public:
-            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".swiftinterface") && !$0.hasSuffix(".private.swiftinterface") }
+            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".swiftinterface") && !$0.hasSuffix(".private.swiftinterface") && !$0.hasSuffix(".package.swiftinterface") }
         }
-        
+
         guard let swiftInterfacePath = swiftInterfacePaths.first else {
             switch type {
             case .private:
                 throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).private.swiftinterface'")
+            case .package:
+                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).package.swiftinterface'")
             case .public:
                 throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).swiftinterface'")
             }
         }
-        
+
         return URL(filePath: "\(completeSwiftModulePath)/\(swiftInterfacePath)")
     }
 }

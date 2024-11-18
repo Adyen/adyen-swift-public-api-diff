@@ -7,7 +7,7 @@
 import SwiftSyntax
 
 extension SyntaxCollection {
-    
+
     /// Produces a description where all elements in the list are mapped to their `trimmedDescription`
     var sanitizedList: [String] {
         self.map(\.trimmedDescription)
@@ -15,14 +15,14 @@ extension SyntaxCollection {
 }
 
 extension AttributeListSyntax {
-    
+
     private var excludedAttributes: Set<String> {
         [
             "@_hasMissingDesignatedInitializers",
             "@_inheritsConvenienceInitializers"
         ]
     }
-    
+
     /// Produces a description where all elements in the list are mapped to their `trimmedDescription`
     var sanitizedList: [String] {
         self.compactMap {
@@ -34,7 +34,7 @@ extension AttributeListSyntax {
 }
 
 extension InheritedTypeListSyntax {
-    
+
     /// Produces a description where all elements in the list are mapped to their type's `trimmedDescription`
     var sanitizedList: [String] {
         self.map(\.type.trimmedDescription)
@@ -42,7 +42,7 @@ extension InheritedTypeListSyntax {
 }
 
 extension AccessorBlockSyntax {
-    
+
     /// Produces a description where all newlines and spaces are replaced by a single space
     ///
     /// e.g. "get\n set\n" -> "get set"
@@ -52,7 +52,7 @@ extension AccessorBlockSyntax {
 }
 
 extension String {
-    
+
     /// Produces a string where all newlines and spaces are replaced by a single space
     ///
     /// e.g. "get\n set\n" -> "get set"

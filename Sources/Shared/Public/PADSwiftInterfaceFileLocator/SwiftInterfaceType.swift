@@ -10,11 +10,13 @@ import Foundation
 public enum SwiftInterfaceType {
     case `private`
     case `public`
-    
+    case package
+
     var name: String {
         switch self {
         case .private: "private"
         case .public: "public"
+        case .package: "package"
         }
     }
 }

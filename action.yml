@@ -1,0 +1,43 @@
+name: 'Swift Public API Diff'
+description: 'This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way. And outputs it to the step summary or PR comment.'
+inputs:
+    platform:
+        description: 'The platform to build the project for (iOS/macOS)'
+        required: true
+    new:
+        description: 'Specify the updated version to compare to'
+        required: true
+    old:
+        description: 'Specify the old version to compare to'
+        required: true
+runs:
+    using: 'composite'
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: "Adyen/adyen-swift-public-api-diff"
+        ref: "0.4.0"
+    - name: "Run Diff"
+      run: |
+        NEW=${{ inputs.new }}
+        OLD=${{ inputs.old }}
+        PLATFORM=${{ inputs.platform }}
+        PROJECT_FOLDER=$PWD
+        echo $PROJECT_FOLDER
+        
+        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        cat "$PROJECT_FOLDER/logs.txt"
+        
+        cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
+      shell: bash
+      
+    - if: ${{ github.event.pull_request.base.ref != '' }}
+      name: 📝 Comment on PR
+      uses: thollander/actions-comment-pull-request@v3
+      with:
+        file-path: "${{ github.workspace }}/api_comparison.md"
+        comment-tag: api_changes
+        mode: recreate
+        
+
+

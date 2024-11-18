@@ -9,7 +9,7 @@ import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/enumdeclsyntax
 extension EnumDeclSyntax {
-    
+
     func toInterfaceElement(children: [any SwiftInterfaceElement]) -> SwiftInterfaceEnum {
         SwiftInterfaceEnum(
             attributes: self.attributes.sanitizedList,

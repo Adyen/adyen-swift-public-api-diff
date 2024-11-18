@@ -9,9 +9,9 @@ import SwiftSyntax
 
 /// See: https://swiftpackageindex.com/swiftlang/swift-syntax/documentation/swiftsyntax/subscriptdeclsyntax
 extension SubscriptDeclSyntax {
-    
+
     func toInterfaceElement() -> SwiftInterfaceSubscript {
-        
+
         let parameters: [SwiftInterfaceSubscript.Parameter] = self.parameterClause.parameters.map {
             .init(
                 firstName: $0.firstName.trimmedDescription,
@@ -20,7 +20,7 @@ extension SubscriptDeclSyntax {
                 defaultValue: $0.defaultValue?.value.trimmedDescription.sanitizingNewlinesAndSpaces
             )
         }
-        
+
         return SwiftInterfaceSubscript(
             attributes: self.attributes.sanitizedList,
             modifiers: self.modifiers.sanitizedList,

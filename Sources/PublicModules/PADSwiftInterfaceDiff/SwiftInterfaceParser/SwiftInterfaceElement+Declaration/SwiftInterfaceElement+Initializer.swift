@@ -8,79 +8,79 @@ import Foundation
 import PADCore
 
 extension SwiftInterfaceInitializer {
-    
+
     struct Parameter {
-        
+
         let firstName: String
-        
+
         /// optional second "internal" name - can be ignored
         let secondName: String?
-        
+
         let type: String
-        
+
         let defaultValue: String?
-        
+
         var description: String {
             var description = [
                 firstName,
                 secondName
             ].compactMap { $0 }.joined(separator: " ")
-            
+
             if description.isEmpty {
                 description += "\(type)"
             } else {
                 description += ": \(type)"
             }
-            
+
             if let defaultValue {
                 description += " = \(defaultValue)"
             }
-            
+
             return description
         }
     }
 }
 
 class SwiftInterfaceInitializer: SwiftInterfaceElement {
-    
+
     static var declType: SwiftInterfaceElementDeclType { .`init` }
     
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     let attributes: [String]
-    
+
     let optionalMark: String?
-    
+
     /// e.g. <T>
     let genericParameterDescription: String?
-    
+
     let parameters: [Parameter]
-    
+
     /// e.g. async, throws, rethrows
     let effectSpecifiers: [String]
-    
+
     /// e.g. public, private, package, open, internal
     let modifiers: [String]
-    
+
     /// e.g. where T : Equatable
     let genericWhereClauseDescription: String?
-    
+
     var pathComponentName: String { "" } // Not relevant as / no children
-    
+
     /// A initializer does not have children
     let children: [any SwiftInterfaceElement] = []
-    
-    var parent: (any SwiftInterfaceElement)? = nil
-    
+
+    var parent: (any SwiftInterfaceElement)?
+
     var diffableSignature: String {
         "init(\(parameters.map { "\($0.firstName):" }.joined()))"
     }
-    
+
     var consolidatableName: String { "init" }
-    
+
     var description: String {
         compileDescription()
     }
-    
+
     init(
         attributes: [String],
         modifiers: [String],
@@ -101,7 +101,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
 }
 
 extension SwiftInterfaceInitializer {
-    
+
     func differences(to otherElement: some SwiftInterfaceElement) -> [String] {
         var changes = [String?]()
         guard let other = otherElement as? Self else { return [] }
@@ -117,13 +117,13 @@ extension SwiftInterfaceInitializer {
 }
 
 private extension SwiftInterfaceInitializer {
-    
+
     func compileDescription() -> String {
         var components = [String]()
-        
+
         components += attributes
         components += modifiers
-        
+
         components += [
             [
                 "init",
@@ -132,11 +132,11 @@ private extension SwiftInterfaceInitializer {
                 "(\(parameters.map(\.description).joined(separator: ", ")))"
             ].compactMap { $0 }.joined()
         ]
-        
+
         components += effectSpecifiers
-        
+
         genericWhereClauseDescription.map { components += [$0] }
-        
+
         return components.joined(separator: " ")
     }
 }

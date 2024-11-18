@@ -12,9 +12,9 @@ import PADLogging
 
 /// Takes a list of ``PADCore/SwiftInterfaceFile``s and detects changes between the old and new version
 public struct SwiftInterfaceDiff {
-    
+
     public typealias ModuleName = String
-    
+
     public struct Result {
         public let changes: [ModuleName: [Change]]
         public let metrics: [ModuleName: SwiftInterfaceMetricsDiff]
@@ -24,7 +24,7 @@ public struct SwiftInterfaceDiff {
     let swiftInterfaceParser: any SwiftInterfaceParsing
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
     let logger: (any Logging)?
-    
+
     /// Creates a new instance of ``SwiftInterfaceDiff``
     /// - Parameter logger: The (optional) logger
     public init(
@@ -37,7 +37,7 @@ public struct SwiftInterfaceDiff {
             logger: logger
         )
     }
-    
+
     init(
         fileHandler: FileHandling = FileManager.default,
         swiftInterfaceParser: any SwiftInterfaceParsing = SwiftInterfaceParser(),
@@ -49,31 +49,31 @@ public struct SwiftInterfaceDiff {
         self.swiftInterfaceAnalyzer = swiftInterfaceAnalyzer
         self.logger = logger
     }
-    
+
     /// Analyzes the passed ``PADCore/SwiftInterfaceFile``s and returns a list of changes grouped by scheme/target
     /// - Parameter swiftInterfaceFiles: The ``PADCore/SwiftInterfaceFile``s to analyze
     /// - Returns: A list of changes grouped by scheme/target
     public func run(with swiftInterfaceFiles: [SwiftInterfaceFile]) async throws -> Result {
-        
-        var changes = [ModuleName: [Change]]()
+
+        var changes = [String: [Change]]()
         var metrics = [ModuleName: SwiftInterfaceMetricsDiff]()
-        
+
         try swiftInterfaceFiles.forEach { file in
             logger?.log("🧑‍🔬 Analyzing \(file.name)", from: String(describing: Self.self))
             let newContent = try fileHandler.loadString(from: file.newFilePath)
             let oldContent = try fileHandler.loadString(from: file.oldFilePath)
             let newParsed = swiftInterfaceParser.parse(source: newContent, moduleName: file.name)
             let oldParsed = swiftInterfaceParser.parse(source: oldContent, moduleName: file.name)
-            
+
             let analysis = try swiftInterfaceAnalyzer.analyze(
                 old: oldParsed,
                 new: newParsed
             )
-            
+
             changes[file.name] = analysis.changes
             metrics[file.name] = analysis.metrics
         }
-        
+
         return .init(changes: changes, metrics: metrics)
     }
 }

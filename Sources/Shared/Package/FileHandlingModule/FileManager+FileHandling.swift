@@ -7,22 +7,22 @@
 import Foundation
 
 extension FileManager: FileHandling {
-    
+
     /// Creates a directory at the specified path
     package func createDirectory(atPath path: String) throws {
         try createDirectory(atPath: path, withIntermediateDirectories: true)
     }
-    
+
     /// Creates a file at the specified path with the provided content
     package func createFile(atPath path: String, contents data: Data) -> Bool {
         createFile(atPath: path, contents: data, attributes: nil)
     }
-    
+
     package func loadData(from filePath: String) throws -> Data {
         guard let data = self.contents(atPath: filePath) else {
             throw FileHandlerError.couldNotLoadFile(filePath: filePath)
         }
-        
+
         return data
     }
 }

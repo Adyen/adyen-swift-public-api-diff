@@ -9,13 +9,13 @@
 import XCTest
 
 struct MockSwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
-    
-    var handleAnalyze: (any SwiftInterfaceElement, any SwiftInterfaceElement) -> SwiftInterfaceAnalysis = { _, _ in
+
+    var handleAnalyze: (any SwiftInterfaceElement, any SwiftInterfaceElement) -> [Change] = { _, _ in
         XCTFail("Unexpectedly called `\(#function)`")
-        return .init(changes: [], metrics: .init(old: .init(), new: .init()))
+        return []
     }
-    
-    func analyze(old: some SwiftInterfaceElement, new: some SwiftInterfaceElement) throws -> SwiftInterfaceAnalysis {
+
+    func analyze(old: some SwiftInterfaceElement, new: some SwiftInterfaceElement) throws -> [Change] {
         handleAnalyze(old, new)
     }
 }
