@@ -11,7 +11,7 @@ on:
       old:
         description: 'Branch/tag of the old/comparison version'
         required: true
-      
+
 jobs:
   build:
     runs-on: macos-14 # Apple Silicon Runner
@@ -56,7 +56,7 @@ jobs:
         noTargetBranch: 'no target branch'
 
     - name: 🔍 Detect Changes
-      uses: Adyen/adyen-swift-public-api-diff@checkout-action
+      uses: ./
       id: public_api_diff
       with:
         platform: "macOS"
