@@ -11,7 +11,10 @@ on:
       old:
         description: 'Branch/tag of the old/comparison version'
         required: true
-      
+
+env:
+  BRANCH_NAME: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
 jobs:
   build:
     runs-on: macos-14 # Apple Silicon Runner
@@ -56,7 +59,7 @@ jobs:
         noTargetBranch: 'no target branch'
 
     - name: 🔍 Detect Changes
-      uses: Adyen/adyen-swift-public-api-diff@${{ github.ref_name }}
+      uses: Adyen/adyen-swift-public-api-diff@${{ env.BRANCH_NAME }}
       id: public_api_diff
       with:
         platform: "macOS"
