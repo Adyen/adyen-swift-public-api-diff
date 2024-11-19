@@ -10,7 +10,8 @@ let newSource: ProjectSource = try .from("some/local/path")
 
 let projectBuilder = ProjectBuilder(
     projectType: .swiftPackage, // .xcodeProject("scheme_name")
-    swiftInterfaceType: .public // .private
+    platform: .iOS, // .macOS
+    swiftInterfaceType: .public // .private / .package
 )
 
 let projectBuilderResult: ProjectBuilder.Result = try await projectBuilder.build(

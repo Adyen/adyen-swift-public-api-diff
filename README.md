@@ -164,6 +164,18 @@ swift build --configuration release
     --old "old/path/to/project.framework"
 ```
 
+## Github Action
+The public-api-diff can be used easily via the provided github action, which creates a comment on a PR (if applicable) and also adds it to the Github step summary.
+```bash
+- name: 🔍 Detect Changes
+  uses: Adyen/adyen-swift-public-api-diff@0.4.0
+  with:
+    platform: "iOS"
+    new: "develop~https://github.com/Adyen/adyen-ios.git"
+    old: "5.12.0~https://github.com/Adyen/adyen-ios.git"
+```
+See: [example workflow](https://github.com/Adyen/adyen-swift-public-api-diff/blob/main/Examples/github-workflow.yml)
+
 ## Alternatives
 - **swift-api-digester**
   - `xcrun swift-api-digester -dump-sdk`
