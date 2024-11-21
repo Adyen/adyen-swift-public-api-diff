@@ -1,7 +1,7 @@
 version: 1
 builder:
   configs:
-    - platform: ios
+    - platform: macos
       documentation_targets: [
         PADProjectBuilder,
         PADPackageFileAnalyzer,
