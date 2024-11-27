@@ -111,10 +111,10 @@ OPTIONS:
 ### From `.framework` to Output
 
 ```bash
-swift run public-api-diff
-    framework
-    --target-name "TargetName"
-    --new "new/path/to/project.framework" 
+swift run public-api-diff \
+    framework \
+    --target-name "TargetName" \
+    --new "new/path/to/project.framework" \
     --old "old/path/to/project.framework"
 ```
 
@@ -154,22 +154,22 @@ swift build --configuration release
 
 ### Run
 ```bash
-./public-api-diff
-    project
-    --new "develop~https://github.com/Adyen/adyen-ios.git" 
+./public-api-diff \
+    project \
+    --new "develop~https://github.com/Adyen/adyen-ios.git" \ 
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
 ```
 ```bash
-./public-api-diff
-    swift-interface
-    --new "new/path/to/project.swiftinterface" 
+./public-api-diff \
+    swift-interface \
+    --new "new/path/to/project.swiftinterface" \
     --old "old/path/to/project.swiftinterface"
 ```
 ```bash
-./public-api-diff
-    framework
-    --target-name "TargetName"
-    --new "new/path/to/project.framework" 
+./public-api-diff \
+    framework \
+    --target-name "TargetName" \
+    --new "new/path/to/project.framework" \
     --old "old/path/to/project.framework"
 ```
 
