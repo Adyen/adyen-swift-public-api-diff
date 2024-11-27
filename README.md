@@ -22,22 +22,20 @@ We strongly encourage you to contribute to our repository. Find out more in our 
  
 ### From Project to Output
 
+- Build using the iOS sdk (Requires an iOS Simulator to be installed)
 ```bash
-# Build using the iOS sdk
-# This method requires an iOS Simulator to be installed
-swift run public-api-diff
-    project
-    --platform iOS
-    --new "develop~https://github.com/Adyen/adyen-ios.git"
+swift run public-api-diff \
+    project \
+    --platform iOS \
+    --new "develop~https://github.com/Adyen/adyen-ios.git" \
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
 ```
-
+- Build using the macOS sdk
 ```bash
-# Build using the macOS sdk
-swift run public-api-diff
-    project
-    --platform macOS
-    --new "main~https://github.com/Adyen/adyen-swift-public-api-diff"
+swift run public-api-diff \
+    project \
+    --platform macOS \
+    --new "main~https://github.com/Adyen/adyen-swift-public-api-diff" \
     --old "0.4.0~https://github.com/Adyen/adyen-swift-public-api-diff"
 ```
 
@@ -65,11 +63,22 @@ OPTIONS:
 </details>
  
 ### From `.swiftinterface` to Output
- 
+
+**1.** Build 2 versions of your project with `BUILD_LIBRARY_FOR_DISTRIBUTION=YES`
 ```bash
-swift run public-api-diff
-    swift-interface
-    --new "new/path/to/project.swiftinterface" 
+xcodebuild clean build \
+    -scheme "YOUR_TARGET_NAME" \
+    -derivedDataPath .build \
+    -sdk "$(xcrun --sdk iphonesimulator --show-sdk-path)" \
+    -destination "generic/platform=iOS" \
+    BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+```
+
+**2.** Provide the `.swiftinterface` files to the public api diff
+```bash
+swift run public-api-diff \
+    swift-interface \
+    --new "new/path/to/project.swiftinterface" \
     --old "old/path/to/project.swiftinterface"
 ```
  
