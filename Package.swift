@@ -33,9 +33,9 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
-        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.55.0"),
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.55.3"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.3"),
-        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.57.0")
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.57.1")
     ],
     targets: [
 
