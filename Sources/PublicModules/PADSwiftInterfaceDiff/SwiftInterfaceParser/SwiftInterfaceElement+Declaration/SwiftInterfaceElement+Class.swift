@@ -79,7 +79,8 @@ private extension SwiftInterfaceClass {
         var description = ""
         description.append(attributes.joined(separator: "\n"), with: "")
         description.append(modifiers.joined(separator: " "), with: "\n")
-        description.append("class", with: " ")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("class", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
         description.append(genericParameterDescription, with: "")
         description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }

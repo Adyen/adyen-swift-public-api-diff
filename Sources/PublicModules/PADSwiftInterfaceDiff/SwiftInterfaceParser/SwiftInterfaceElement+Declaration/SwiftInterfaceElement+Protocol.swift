@@ -77,7 +77,8 @@ private extension SwiftInterfaceProtocol {
         var description = ""
         description.append(attributes.joined(separator: "\n"), with: "")
         description.append(modifiers.joined(separator: " "), with: "\n")
-        description.append("protocol", with: " ")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("protocol", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
         description.append(primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>" }, with: "")
         description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }

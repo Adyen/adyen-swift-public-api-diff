@@ -105,7 +105,8 @@ private extension SwiftInterfaceEnumCase {
         var description = ""
         description.append(attributes.joined(separator: "\n"), with: "")
         description.append(modifiers.joined(separator: " "), with: "\n")
-        description.append("case", with: " ")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("case", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
         description.append(parameterDescription, with: "") { "(\($0))" }
         return description

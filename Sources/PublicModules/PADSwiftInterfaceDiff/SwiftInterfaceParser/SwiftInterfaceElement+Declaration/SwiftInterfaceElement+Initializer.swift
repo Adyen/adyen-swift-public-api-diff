@@ -123,7 +123,8 @@ private extension SwiftInterfaceInitializer {
         var description = ""
         description.append(attributes.joined(separator: "\n"), with: "")
         description.append(modifiers.joined(separator: " "), with: "\n")
-        description.append("init", with: " ")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("init", with: modifiers.isEmpty ? "" : " ")
         description.append(optionalMark, with: "")
         description.append(genericParameterDescription, with: "")
         description.append("(\(parameterDescription))", with: "")

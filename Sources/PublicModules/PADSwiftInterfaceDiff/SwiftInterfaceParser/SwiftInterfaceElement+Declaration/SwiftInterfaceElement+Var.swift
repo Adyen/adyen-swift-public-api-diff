@@ -79,7 +79,8 @@ private extension SwiftInterfaceVar {
         var description = ""
         description.append(attributes.joined(separator: "\n"), with: "")
         description.append(modifiers.joined(separator: " "), with: "\n")
-        description.append(bindingSpecifier, with: " ")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append(bindingSpecifier, with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
         description.append(typeAnnotation, with: "") { ": \($0)" }
         description.append(initializerValue, with: " ") { "= \($0)" }

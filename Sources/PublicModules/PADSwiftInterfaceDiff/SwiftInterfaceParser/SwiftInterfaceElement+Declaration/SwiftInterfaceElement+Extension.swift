@@ -74,7 +74,8 @@ private extension SwiftInterfaceExtension {
         var description = ""
         description.append(attributes.joined(separator: "\n"), with: "")
         description.append(modifiers.joined(separator: " "), with: "\n")
-        description.append("extension", with: " ")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("extension", with: modifiers.isEmpty ? "" : " ")
         description.append(extendedType, with: " ")
         description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }
         description.append(genericWhereClauseDescription, with: " ")

@@ -5,8 +5,7 @@ _Comparing `new_public` to `old_public`_
 ## `ReferencePackage`
 #### ❇️ Added
 ```javascript
-public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable
-{
+public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable {
   case one
   case two
   public init?(rawValue: Swift.String)
@@ -16,16 +15,14 @@ public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.R
 
 ```
 ```javascript
-public protocol ParentProtocol
-{
+public protocol ParentProtocol {
   associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
   associatedtype Iterator: Swift.Collection
 }
 
 ```
 ```javascript
-public protocol ParentProtocol<ParentType>
-{
+public protocol ParentProtocol<ParentType> {
   associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
   associatedtype Iterator: Swift.Collection
 }
@@ -92,8 +89,7 @@ Changes:
 ### `Array`
 #### ❇️ Added
 ```javascript
-extension Swift.Array
-{
+extension Swift.Array {
   public subscript(safe index: Swift.Int) -> Element? { get }
 }
 
@@ -127,10 +123,12 @@ public var lazyVar: Swift.String { get set }
 #### 🔀 Changed
 ```javascript
 // From
-@_Concurrency.MainActor public func asyncThrowingFunc() async throws -> Swift.Void
+@_Concurrency.MainActor
+public func asyncThrowingFunc() async throws -> Swift.Void
 
 // To
-@_Concurrency.MainActor public func asyncThrowingFunc<Element>(_ element: Element) async throws -> Swift.Void where Element : Swift.Strideable
+@_Concurrency.MainActor
+public func asyncThrowingFunc<Element>(_ element: Element) async throws -> Swift.Void where Element : Swift.Strideable
 
 /**
 Changes:
@@ -190,15 +188,13 @@ case e(ReferencePackage.CustomEnum<T>.NestedStructInExtension)
 
 ```
 ```javascript
-extension ReferencePackage.CustomEnum where T == Swift.String
-{
+extension ReferencePackage.CustomEnum where T == Swift.String {
   public var titleOfCaseWithNamedString: Swift.String? { get }
 }
 
 ```
 ```javascript
-public struct NestedStructInExtension
-{
+public struct NestedStructInExtension {
   public let string: Swift.String { get }
   public init(string: Swift.String = "Hello")
 }
@@ -207,10 +203,16 @@ public struct NestedStructInExtension
 #### 🔀 Changed
 ```javascript
 // From
-case caseWithTuple(Swift.String, Swift.Int)
+case caseWithTuple(
+  Swift.String,
+  Swift.Int
+)
 
 // To
-case caseWithTuple(_: Swift.String, bar: Swift.Int)
+case caseWithTuple(
+  _: Swift.String,
+  bar: Swift.Int
+)
 
 /**
 Changes:
@@ -299,10 +301,12 @@ typealias CustomAssociatedType = Swift.Equatable
 ### `CustomStruct`
 #### ❇️ Added
 ```javascript
-@available(macOS, unavailable, message: "Unavailable on macOS") public struct NestedStruct
-{
-  @available(*, deprecated, renamed: "nestedVar") public let nestedLet: Swift.String { get }
-  @available(swift 5.9) public let nestedVar: Swift.String { get }
+@available(macOS, unavailable, message: "Unavailable on macOS")
+public struct NestedStruct {
+  @available(*, deprecated, renamed: "nestedVar")
+  public let nestedLet: Swift.String { get }
+  @available(swift 5.9)
+  public let nestedVar: Swift.String { get }
 }
 
 ```
@@ -325,10 +329,12 @@ public typealias ParentType = Swift.Double
 #### 🔀 Changed
 ```javascript
 // From
-@discardableResult public func function() -> any Swift.Equatable
+@discardableResult
+public func function() -> any Swift.Equatable
 
 // To
-@discardableResult public func function() -> Swift.Int
+@discardableResult
+public func function() -> Swift.Int
 
 /**
 Changes:

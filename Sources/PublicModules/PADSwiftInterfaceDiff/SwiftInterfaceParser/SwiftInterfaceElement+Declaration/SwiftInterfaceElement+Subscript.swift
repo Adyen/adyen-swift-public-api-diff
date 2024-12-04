@@ -121,7 +121,8 @@ private extension SwiftInterfaceSubscript {
         var description = ""
         description.append(attributes.joined(separator: "\n"), with: "")
         description.append(modifiers.joined(separator: " "), with: "\n")
-        description.append("subscript", with: " ")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("subscript", with: modifiers.isEmpty ? "" : " ")
         description.append(genericParameterDescription, with: "")
         description.append("(\(parameterDescription))", with: "")
         description.append(returnType, with: " ") { "-> \($0)" }

@@ -64,8 +64,6 @@ class ReferencePackageTests: XCTestCase {
             newVersionName: "new_public",
             warnings: []
         )
-        
-        print(markdownOutput)
 
         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
         let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
@@ -92,8 +90,6 @@ class ReferencePackageTests: XCTestCase {
             newVersionName: "new_private",
             warnings: []
         )
-        
-        print(markdownOutput)
 
         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
         let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
