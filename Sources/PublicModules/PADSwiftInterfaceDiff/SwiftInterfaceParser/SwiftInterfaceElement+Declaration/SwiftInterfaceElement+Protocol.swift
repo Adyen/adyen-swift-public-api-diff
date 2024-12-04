@@ -74,28 +74,15 @@ extension SwiftInterfaceProtocol {
 private extension SwiftInterfaceProtocol {
 
     func compileDescription() -> String {
-
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-        components += ["protocol"]
-
-        components += [{
-            var components = [
-                name,
-                primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>" }
-            ].compactMap { $0 }.joined()
-
-            if let inheritance, !inheritance.isEmpty {
-                components += ": \(inheritance.joined(separator: ", "))"
-            }
-
-            return components
-        }()]
-
-        genericWhereClauseDescription.map { components += [$0] }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("protocol", with: modifiers.isEmpty ? "" : " ")
+        description.append(name, with: " ")
+        description.append(primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>" }, with: "")
+        description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(genericWhereClauseDescription, with: " ")
+        return description
     }
 }

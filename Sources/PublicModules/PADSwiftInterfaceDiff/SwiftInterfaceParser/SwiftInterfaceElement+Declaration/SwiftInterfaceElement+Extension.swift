@@ -71,21 +71,14 @@ extension SwiftInterfaceExtension {
 private extension SwiftInterfaceExtension {
 
     func compileDescription() -> String {
-
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-        components += ["extension"]
-
-        if let inheritance, !inheritance.isEmpty {
-            components += ["\(extendedType): \(inheritance.joined(separator: ", "))"]
-        } else {
-            components += [extendedType]
-        }
-
-        genericWhereClauseDescription.map { components += [$0] }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("extension", with: modifiers.isEmpty ? "" : " ")
+        description.append(extendedType, with: " ")
+        description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(genericWhereClauseDescription, with: " ")
+        return description
     }
 }

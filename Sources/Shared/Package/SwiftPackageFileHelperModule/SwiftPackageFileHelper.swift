@@ -107,7 +107,7 @@ private extension SwiftPackageFileHelper {
         let errorTag = "error: "
         let warningTag = "warning: "
 
-        var packageDescriptionLines = result.components(separatedBy: newLine)
+        var packageDescriptionLines = result.components(separatedBy: "\n")
         var warnings = [String]()
 
         while let firstLine = packageDescriptionLines.first {
@@ -130,7 +130,7 @@ private extension SwiftPackageFileHelper {
 
             if
                 firstLine.starts(with: "{"),
-                let packageDescriptionData = packageDescriptionLines.joined(separator: newLine).data(using: .utf8) {
+                let packageDescriptionData = packageDescriptionLines.joined(separator: "\n").data(using: .utf8) {
                 return try decodePackageDescription(from: packageDescriptionData, warnings: warnings)
             }
 

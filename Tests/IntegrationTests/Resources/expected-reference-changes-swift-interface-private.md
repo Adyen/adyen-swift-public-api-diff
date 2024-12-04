@@ -5,8 +5,7 @@ _Comparing `new_private` to `old_private`_
 ## `ReferencePackage`
 #### ❇️ Added
 ```javascript
-public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable
-{
+public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable {
   case one
   case two
   public init?(rawValue: Swift.String)
@@ -16,16 +15,14 @@ public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.R
 
 ```
 ```javascript
-public protocol ParentProtocol
-{
+public protocol ParentProtocol {
   associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
   associatedtype Iterator: Swift.Collection
 }
 
 ```
 ```javascript
-public protocol ParentProtocol<ParentType>
-{
+public protocol ParentProtocol<ParentType> {
   associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
   associatedtype Iterator: Swift.Collection
 }
@@ -38,10 +35,12 @@ public protocol SimpleProtocol
 #### 🔀 Changed
 ```javascript
 // From
-@_spi(SystemProgrammingInterface) open class OpenSpiConformingClass: ReferencePackage.CustomProtocol
+@_spi(SystemProgrammingInterface)
+open class OpenSpiConformingClass: ReferencePackage.CustomProtocol
 
 // To
-@_spi(SystemProgrammingInterface) open class OpenSpiConformingClass<T>: ReferencePackage.CustomProtocol where T : Swift.Strideable
+@_spi(SystemProgrammingInterface)
+open class OpenSpiConformingClass<T>: ReferencePackage.CustomProtocol where T : Swift.Strideable
 
 /**
 Changes:
@@ -105,8 +104,7 @@ Changes:
 ### `Array`
 #### ❇️ Added
 ```javascript
-extension Swift.Array
-{
+extension Swift.Array {
   public subscript(safe index: Swift.Int) -> Element? { get }
 }
 
@@ -140,10 +138,12 @@ public var lazyVar: Swift.String { get set }
 #### 🔀 Changed
 ```javascript
 // From
-@_Concurrency.MainActor public func asyncThrowingFunc() async throws -> Swift.Void
+@_Concurrency.MainActor
+public func asyncThrowingFunc() async throws -> Swift.Void
 
 // To
-@_Concurrency.MainActor public func asyncThrowingFunc<Element>(_ element: Element) async throws -> Swift.Void where Element : Swift.Strideable
+@_Concurrency.MainActor
+public func asyncThrowingFunc<Element>(_ element: Element) async throws -> Swift.Void where Element : Swift.Strideable
 
 /**
 Changes:
@@ -203,15 +203,13 @@ case e(ReferencePackage.CustomEnum<T>.NestedStructInExtension)
 
 ```
 ```javascript
-extension ReferencePackage.CustomEnum where T == Swift.String
-{
+extension ReferencePackage.CustomEnum where T == Swift.String {
   public var titleOfCaseWithNamedString: Swift.String? { get }
 }
 
 ```
 ```javascript
-public struct NestedStructInExtension
-{
+public struct NestedStructInExtension {
   public let string: Swift.String { get }
   public init(string: Swift.String = "Hello")
 }
@@ -220,10 +218,16 @@ public struct NestedStructInExtension
 #### 🔀 Changed
 ```javascript
 // From
-case caseWithTuple(Swift.String, Swift.Int)
+case caseWithTuple(
+  Swift.String,
+  Swift.Int
+)
 
 // To
-case caseWithTuple(_: Swift.String, bar: Swift.Int)
+case caseWithTuple(
+  _: Swift.String,
+  bar: Swift.Int
+)
 
 /**
 Changes:
@@ -312,10 +316,12 @@ typealias CustomAssociatedType = Swift.Equatable
 ### `CustomStruct`
 #### ❇️ Added
 ```javascript
-@available(macOS, unavailable, message: "Unavailable on macOS") public struct NestedStruct
-{
-  @available(*, deprecated, renamed: "nestedVar") public let nestedLet: Swift.String { get }
-  @available(swift 5.9) public let nestedVar: Swift.String { get }
+@available(macOS, unavailable, message: "Unavailable on macOS")
+public struct NestedStruct {
+  @available(*, deprecated, renamed: "nestedVar")
+  public let nestedLet: Swift.String { get }
+  @available(swift 5.9)
+  public let nestedVar: Swift.String { get }
 }
 
 ```
@@ -338,10 +344,12 @@ public typealias ParentType = Swift.Double
 #### 🔀 Changed
 ```javascript
 // From
-@discardableResult public func function() -> any Swift.Equatable
+@discardableResult
+public func function() -> any Swift.Equatable
 
 // To
-@discardableResult public func function() -> Swift.Int
+@discardableResult
+public func function() -> Swift.Int
 
 /**
 Changes:
@@ -375,24 +383,31 @@ Changes:
 ### `OpenSpiConformingClass`
 #### ❇️ Added
 ```javascript
-@_spi(SystemProgrammingInterface) public typealias AnotherAssociatedType = T
+@_spi(SystemProgrammingInterface)
+public typealias AnotherAssociatedType = T
 
 ```
 ```javascript
-@_spi(SystemProgrammingInterface) public typealias Iterator = [Swift.Double]
+@_spi(SystemProgrammingInterface)
+public typealias Iterator = [Swift.Double]
 
 ```
 ```javascript
-@_spi(SystemProgrammingInterface) public typealias ParentType = Swift.Double
+@_spi(SystemProgrammingInterface)
+public typealias ParentType = Swift.Double
 
 ```
 #### 🔀 Changed
 ```javascript
 // From
-@_spi(SystemProgrammingInterface) @inlinable public func function() -> ReferencePackage.OpenSpiConformingClass.CustomAssociatedType
+@_spi(SystemProgrammingInterface)
+@inlinable
+public func function() -> ReferencePackage.OpenSpiConformingClass.CustomAssociatedType
 
 // To
-@_spi(SystemProgrammingInterface) @inlinable public func function() -> T
+@_spi(SystemProgrammingInterface)
+@inlinable
+public func function() -> T
 
 /**
 Changes:
@@ -401,10 +416,18 @@ Changes:
 ```
 ```javascript
 // From
-@_spi(SystemProgrammingInterface) public init(getSetVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType, getVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType)
+@_spi(SystemProgrammingInterface)
+public init(
+  getSetVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType,
+  getVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType
+)
 
 // To
-@_spi(SystemProgrammingInterface) public init(getSetVar: T, getVar: T)
+@_spi(SystemProgrammingInterface)
+public init(
+  getSetVar: T,
+  getVar: T
+)
 
 /**
 Changes:
@@ -416,10 +439,12 @@ Changes:
 ```
 ```javascript
 // From
-@_spi(SystemProgrammingInterface) public typealias CustomAssociatedType = any Swift.Equatable
+@_spi(SystemProgrammingInterface)
+public typealias CustomAssociatedType = any Swift.Equatable
 
 // To
-@_spi(SystemProgrammingInterface) public typealias CustomAssociatedType = T
+@_spi(SystemProgrammingInterface)
+public typealias CustomAssociatedType = T
 
 /**
 Changes:
@@ -428,10 +453,12 @@ Changes:
 ```
 ```javascript
 // From
-@_spi(SystemProgrammingInterface) public var getSetVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType
+@_spi(SystemProgrammingInterface)
+public var getSetVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType
 
 // To
-@_spi(SystemProgrammingInterface) public var getSetVar: T
+@_spi(SystemProgrammingInterface)
+public var getSetVar: T
 
 /**
 Changes:
@@ -440,10 +467,12 @@ Changes:
 ```
 ```javascript
 // From
-@_spi(SystemProgrammingInterface) public var getVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType
+@_spi(SystemProgrammingInterface)
+public var getVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType
 
 // To
-@_spi(SystemProgrammingInterface) public var getVar: T
+@_spi(SystemProgrammingInterface)
+public var getVar: T
 
 /**
 Changes:

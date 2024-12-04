@@ -96,20 +96,19 @@ extension SwiftInterfaceEnumCase {
 
 private extension SwiftInterfaceEnumCase {
 
+    var parameterDescription: String? {
+        guard let parameters else { return nil }
+        return formattedParameterDescription(for: parameters.map(\.description))
+    }
+    
     func compileDescription() -> String {
-
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-        components += ["case"]
-
-        if let parameters {
-            components += ["\(name)(\(parameters.map(\.description).joined(separator: ", ")))"]
-        } else {
-            components += [name]
-        }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("case", with: modifiers.isEmpty ? "" : " ")
+        description.append(name, with: " ")
+        description.append(parameterDescription, with: "") { "(\($0))" }
+        return description
     }
 }

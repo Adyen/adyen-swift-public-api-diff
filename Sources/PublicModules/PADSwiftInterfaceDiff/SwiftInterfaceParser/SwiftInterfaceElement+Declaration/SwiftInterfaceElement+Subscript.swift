@@ -113,26 +113,21 @@ extension SwiftInterfaceSubscript {
 
 private extension SwiftInterfaceSubscript {
 
+    var parameterDescription: String {
+        formattedParameterDescription(for: parameters.map(\.description))
+    }
+    
     func compileDescription() -> String {
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-
-        components += [
-            [
-                "subscript",
-                genericParameterDescription,
-                "(\(parameters.map(\.description).joined(separator: ", ")))"
-            ].compactMap { $0 }.joined()
-        ]
-
-        components += ["-> \(returnType)"]
-
-        genericWhereClauseDescription.map { components += [$0] }
-
-        accessors.map { components += ["{ \($0) }"] }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("subscript", with: modifiers.isEmpty ? "" : " ")
+        description.append(genericParameterDescription, with: "")
+        description.append("(\(parameterDescription))", with: "")
+        description.append(returnType, with: " ") { "-> \($0)" }
+        description.append(genericWhereClauseDescription, with: " ")
+        description.append(accessors, with: " ") { "{ \($0) }" }
+        return description
     }
 }

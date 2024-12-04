@@ -120,11 +120,11 @@ extension SwiftInterfaceElement {
     /// Produces the complete recursive description of the element
     func recursiveDescription(indentation: Int = 0) -> String {
         let spacer = "  "
-        var recursiveDescription = "\(String(repeating: spacer, count: indentation))\(description)"
+        var recursiveDescription = "\(indentedDescription(indentation: indentation))"
         if !self.children.isEmpty {
-            recursiveDescription.append("\n\(String(repeating: spacer, count: indentation)){")
+            recursiveDescription.append(" {")
             for child in self.children {
-                recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))\(child.recursiveDescription(indentation: indentation + 1))")
+                recursiveDescription.append("\n\(child.recursiveDescription(indentation: indentation + 1))")
             }
             recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))}")
         }
@@ -134,5 +134,13 @@ extension SwiftInterfaceElement {
         }
 
         return recursiveDescription
+    }
+    
+    func indentedDescription(indentation: Int) -> String {
+        var components = description.components(separatedBy: .newlines)
+        for (index, component) in components.enumerated() {
+            components[index] = "\(String(repeating: "  ", count: indentation))\(component)"
+        }
+        return components.joined(separator: "\n")
     }
 }

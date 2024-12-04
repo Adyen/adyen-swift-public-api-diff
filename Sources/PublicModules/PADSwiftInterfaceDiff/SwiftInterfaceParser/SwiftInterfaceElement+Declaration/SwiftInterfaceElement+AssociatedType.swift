@@ -73,23 +73,15 @@ extension SwiftInterfaceAssociatedType {
 private extension SwiftInterfaceAssociatedType {
 
     func compileDescription() -> String {
-
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-        components += ["associatedtype"]
-
-        if let inheritance, !inheritance.isEmpty {
-            components += ["\(name): \(inheritance.joined(separator: ", "))"]
-        } else {
-            components += [name]
-        }
-
-        initializerValue.map { components += ["= \($0)"] }
-
-        genericWhereClauseDescription.map { components += [$0] }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
+        description.append("associatedtype", with: modifiers.isEmpty ? "" : " ")
+        description.append(name, with: " ")
+        description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(initializerValue, with: " ") { "= \($0)" }
+        description.append(genericWhereClauseDescription, with: " ")
+        return description
     }
 }
