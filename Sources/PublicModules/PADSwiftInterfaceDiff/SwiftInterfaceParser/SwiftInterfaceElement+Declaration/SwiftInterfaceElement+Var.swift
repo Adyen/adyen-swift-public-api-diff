@@ -76,17 +76,14 @@ extension SwiftInterfaceVar {
 private extension SwiftInterfaceVar {
 
     func compileDescription() -> String {
-
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-        components += [bindingSpecifier]
-        components += ["\(name): \(typeAnnotation)"]
-
-        initializerValue.map { components += ["= \($0)"] }
-        accessors.map { components += ["{ \($0) }"] }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        description.append(bindingSpecifier, with: " ")
+        description.append(name, with: " ")
+        description.append(typeAnnotation, with: "") { ": \($0)" }
+        description.append(initializerValue, with: " ") { "= \($0)" }
+        description.append(accessors, with: " ") { "{ \($0) }" }
+        return description
     }
 }

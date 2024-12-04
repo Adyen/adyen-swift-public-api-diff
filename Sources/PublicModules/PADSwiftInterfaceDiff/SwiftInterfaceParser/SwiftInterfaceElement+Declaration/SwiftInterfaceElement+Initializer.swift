@@ -115,25 +115,20 @@ extension SwiftInterfaceInitializer {
 
 private extension SwiftInterfaceInitializer {
 
+    var parameterDescription: String {
+        formattedParameterDescription(for: parameters.map(\.description))
+    }
+    
     func compileDescription() -> String {
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-
-        components += [
-            [
-                "init",
-                optionalMark,
-                genericParameterDescription,
-                "(\(parameters.map(\.description).joined(separator: ", ")))"
-            ].compactMap { $0 }.joined()
-        ]
-
-        components += effectSpecifiers
-
-        genericWhereClauseDescription.map { components += [$0] }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        description.append("init", with: " ")
+        description.append(optionalMark, with: "")
+        description.append(genericParameterDescription, with: "")
+        description.append("(\(parameterDescription))", with: "")
+        description.append(effectSpecifiers.joined(separator: " "), with: " ")
+        description.append(genericWhereClauseDescription, with: " ")
+        return description
     }
 }

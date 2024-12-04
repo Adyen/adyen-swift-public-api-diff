@@ -73,24 +73,14 @@ extension SwiftInterfaceTypeAlias {
 private extension SwiftInterfaceTypeAlias {
 
     func compileDescription() -> String {
-
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-        components += ["typealias"]
-
-        components += [
-            [
-                name,
-                genericParameterDescription
-            ].compactMap { $0 }.joined()
-        ]
-
-        components += ["= \(initializerValue)"]
-
-        genericWhereClauseDescription.map { components += [$0] }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        description.append("typealias", with: " ")
+        description.append(name, with: " ")
+        description.append(genericParameterDescription, with: "")
+        description.append(initializerValue, with: " ") { "= \($0)" }
+        description.append(genericWhereClauseDescription, with: " ")
+        return description
     }
 }

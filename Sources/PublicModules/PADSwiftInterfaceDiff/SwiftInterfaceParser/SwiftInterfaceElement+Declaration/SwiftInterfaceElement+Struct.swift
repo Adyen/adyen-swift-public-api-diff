@@ -72,30 +72,16 @@ extension SwiftInterfaceStruct {
 }
 
 private extension SwiftInterfaceStruct {
-
+    
     func compileDescription() -> String {
-
-        var components = [String]()
-
-        components += attributes
-        components += modifiers
-        components += ["struct"]
-
-        components += [{
-            var components = [
-                name,
-                genericParameterDescription
-            ].compactMap { $0 }.joined()
-
-            if let inheritance, !inheritance.isEmpty {
-                components += ": \(inheritance.joined(separator: ", "))"
-            }
-
-            return components
-        }()]
-
-        genericWhereClauseDescription.map { components += [$0] }
-
-        return components.joined(separator: " ")
+        var description = ""
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
+        description.append("struct", with: " ")
+        description.append(name, with: " ")
+        description.append(genericParameterDescription, with: "")
+        description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(genericWhereClauseDescription, with: " ")
+        return description
     }
 }
