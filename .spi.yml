@@ -1,7 +1,9 @@
 version: 1
 builder:
   configs:
-    - platform: macos
+    - platform: macos-xcodebuild
+      swift_version: '5.9'
+      scheme: public-api-diff
       documentation_targets: [
         PADProjectBuilder,
         PADPackageFileAnalyzer,
