@@ -8,5 +8,6 @@ builder:
         PADProjectBuilder,
         PADPackageFileAnalyzer,
         PADSwiftInterfaceDiff,
-        PADOutputGenerator
+        PADOutputGenerator,
+        PADSwiftInterfaceFileLocator
       ]
