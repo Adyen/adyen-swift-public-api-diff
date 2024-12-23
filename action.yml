@@ -30,14 +30,6 @@ runs:
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
       shell: bash
-      
-    - if: ${{ github.event.pull_request.base.ref != '' }}
-      name: 📝 Comment on PR
-      uses: thollander/actions-comment-pull-request@v3
-      with:
-        file-path: "${{ github.workspace }}/api_comparison.md"
-        comment-tag: api_changes
-        mode: recreate
         
 
 
