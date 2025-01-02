@@ -11,7 +11,7 @@ public struct Change: Equatable {
     public enum ChangeType: Equatable {
         case addition(description: String)
         case removal(description: String)
-        case change(oldDescription: String, newDescription: String)
+        case modification(oldDescription: String, newDescription: String)
     }
 
     public private(set) var changeType: ChangeType
@@ -38,7 +38,7 @@ extension Change.ChangeType {
             return true
         case .removal:
             return false
-        case .change:
+        case .modification:
             return false
         }
     }
@@ -49,18 +49,18 @@ extension Change.ChangeType {
             return false
         case .removal:
             return true
-        case .change:
+        case .modification:
             return false
         }
     }
 
-    public var isChange: Bool {
+    public var isModification: Bool {
         switch self {
         case .addition:
             return false
         case .removal:
             return false
-        case .change:
+        case .modification:
             return true
         }
     }

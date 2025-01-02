@@ -130,7 +130,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
 
         let expectedChanges: [Change] = [
             .init(
-                changeType: .change(
+                changeType: .modification(
                     oldDescription: "// swift-tools-version: 2.0",
                     newDescription: "// swift-tools-version: 1.0"
                 ),
@@ -138,7 +138,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 listOfChanges: []
             ),
             .init(
-                changeType: .change(
+                changeType: .modification(
                     oldDescription: "defaultLocalization: \"nl-nl\"",
                     newDescription: "defaultLocalization: \"en-us\""
                 ),
@@ -146,7 +146,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 listOfChanges: []
             ),
             .init(
-                changeType: .change(
+                changeType: .modification(
                     oldDescription: "name: \"Old Name\"",
                     newDescription: "name: \"New Name\""
                 ),
@@ -154,7 +154,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 listOfChanges: []
             ),
             .init(
-                changeType: .change(
+                changeType: .modification(
                     oldDescription: "platforms: [.iOS(12.0), .macOS(10.0)]",
                     newDescription: "platforms: [.iOS(15.0), .visionOS(1.0)]"
                 ),
@@ -173,7 +173,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 listOfChanges: []
             ),
             .init(
-                changeType: .change(
+                changeType: .modification(
                     oldDescription: ".library(name: \"Some Library\", targets: [\"Some Target\", \"Old Target\"])",
                     newDescription: ".library(name: \"Some Library\", targets: [\"Some Target\", \"New Target\"])"
                 ),
@@ -198,7 +198,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 listOfChanges: []
             ),
             .init(
-                changeType: .change(
+                changeType: .modification(
                     oldDescription: ".binaryTarget(name: \"Some Target\", dependencies: [.target(name: \"Some Target Dependency\"), .target(name: \"Old Target Dependency\"), .product(name: \"Some Product Dependency\", ...), .product(name: \"Old Product Dependency\", ...)], path: \"some/old/path\")",
                     newDescription: ".target(name: \"Some Target\", dependencies: [.target(name: \"Some Target Dependency\"), .target(name: \"New Target Dependency\"), .product(name: \"Some Product Dependency\", ...), .product(name: \"New Product Dependency\", ...)], path: \"some/new/path\")"
                 ),

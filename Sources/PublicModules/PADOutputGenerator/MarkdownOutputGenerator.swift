@@ -31,6 +31,10 @@ public struct MarkdownOutputGenerator: OutputGenerating {
         if let oldVersionName, let newVersionName {
             lines += [Self.repoInfo(oldVersionName: oldVersionName, newVersionName: newVersionName)]
         }
+        
+        if !changes.isEmpty {
+            lines += [Self.totalChangesBreakdown(changesPerTarget: changesPerTarget)]
+        }
 
         lines += [separator]
 
@@ -62,8 +66,29 @@ private extension MarkdownOutputGenerator {
             return "# ✅ No changes detected"
         }
 
-        let totalChangeCount = changesPerTarget.totalChangeCount
-        return "# 👀 \(totalChangeCount) public \(totalChangeCount == 1 ? "change" : "changes") detected"
+        let totalChangeCount = changesPerTarget.totalCount(for: .allChanges)
+        
+        if changesPerTarget.potentiallyBreakingChangesCount > 0 {
+            return "# ⚠️ \(totalChangeCount) public \(totalChangeCount == 1 ? "change" : "changes") detected ⚠️"
+        } else {
+            return "# 👀 \(totalChangeCount) public \(totalChangeCount == 1 ? "change" : "changes") detected"
+        }
+    }
+    
+    static func totalChangesBreakdown(changesPerTarget: [String: [Change]]) -> String {
+        
+        let additions = changesPerTarget.totalCount(for: .additions)
+        let changes = changesPerTarget.totalCount(for: .modifications)
+        let removals = changesPerTarget.totalCount(for: .removals)
+        
+        guard additions + changes + removals > 0 else { return "" }
+        
+        var breakdown = "<table>"
+        if additions > 0 { breakdown += "<tr><td>❇️</td><td><b>\(additions) \(additions == 1 ? "Addition" : "Additions")</b></td></tr>" }
+        if changes > 0 { breakdown += "<tr><td>🔀</td><td><b>\(changes) \(changes == 1 ? "Modification" : "Modifications")</b></td></tr>" }
+        if removals > 0 { breakdown += "<tr><td>❌</td><td><b>\(removals) \(removals == 1 ? "Removal" : "Removals")</b></td></tr>" }
+        breakdown += "</table>"
+        return breakdown
     }
 
     static func repoInfo(oldVersionName: String, newVersionName: String) -> String {
@@ -106,11 +131,11 @@ private extension MarkdownOutputGenerator {
                     changes: changes.filter(\.changeType.isAddition)
                 )
                 let changeLines = changeSectionLines(
-                    title: "#### 🔀 Changed",
-                    changes: changes.filter(\.changeType.isChange)
+                    title: "#### 🔀 Modified",
+                    changes: changes.filter(\.changeType.isModification)
                 )
                 let removalLines = changeSectionLines(
-                    title: "#### 😶‍🌫️ Removed",
+                    title: "#### ❌ Removed",
                     changes: changes.filter(\.changeType.isRemoval)
                 )
 
@@ -157,7 +182,7 @@ private extension MarkdownOutputGenerator {
             return description
         case let .removal(description):
             return description
-        case let .change(before, after):
+        case let .modification(before, after):
             return "// From\n\(before)\n\n// To\n\(after)"
         }
     }
@@ -165,10 +190,30 @@ private extension MarkdownOutputGenerator {
 
 private extension [String: [Change]] {
 
-    var totalChangeCount: Int {
+    enum ChangeCountType {
+        case allChanges
+        case additions
+        case modifications
+        case removals
+    }
+    
+    var potentiallyBreakingChangesCount: Int {
+        return totalCount(for: .modifications) + totalCount(for: .removals)
+    }
+    
+    func totalCount(for countType: ChangeCountType) -> Int {
         var totalChangeCount = 0
         keys.forEach { targetName in
-            totalChangeCount += self[targetName]?.count ?? 0
+            switch countType {
+            case .allChanges:
+                totalChangeCount += self[targetName]?.count ?? 0
+            case .additions:
+                totalChangeCount += self[targetName]?.reduce(0, { $0 + ($1.changeType.isAddition ? 1 : 0) }) ?? 0
+            case .modifications:
+                totalChangeCount += self[targetName]?.reduce(0, { $0 + ($1.changeType.isModification ? 1 : 0) }) ?? 0
+            case .removals:
+                totalChangeCount += self[targetName]?.reduce(0, { $0 + ($1.changeType.isRemoval ? 1 : 0) }) ?? 0
+            }
         }
         return totalChangeCount
     }
