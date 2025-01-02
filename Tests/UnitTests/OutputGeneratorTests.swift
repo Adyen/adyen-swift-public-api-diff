@@ -35,7 +35,8 @@ class OutputGeneratorTests: XCTestCase {
         let expectedOutput = """
         # 👀 1 public change detected
         _Comparing `new_source` to `old_source`_
-
+        <table><tr><td>❇️</td><td><b>1 Addition</b></td></tr></table>
+        
         ---
         ## `Target_1`
         #### ❇️ Added
@@ -62,8 +63,9 @@ class OutputGeneratorTests: XCTestCase {
     func test_multipleChanges_multipleModules() {
 
         let expectedOutput = """
-        # 👀 4 public changes detected
+        # ⚠️ 4 public changes detected ⚠️
         _Comparing `new_source` to `old_repository @ old_branch`_
+        <table><tr><td>❇️</td><td><b>2 Additions</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
 
         ---
         ## `Target_1`
@@ -71,7 +73,7 @@ class OutputGeneratorTests: XCTestCase {
         ```javascript
         Some Addition
         ```
-        #### 😶‍🌫️ Removed
+        #### ❌ Removed
         ```javascript
         Some Removal
         ```
@@ -80,7 +82,7 @@ class OutputGeneratorTests: XCTestCase {
         ```javascript
         Another Addition
         ```
-        #### 😶‍🌫️ Removed
+        #### ❌ Removed
         ```javascript
         Another Removal
         ```

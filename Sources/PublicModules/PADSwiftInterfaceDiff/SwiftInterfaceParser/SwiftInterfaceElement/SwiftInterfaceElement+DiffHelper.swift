@@ -31,7 +31,7 @@ extension SwiftInterfaceElement {
         }
 
         switch changeType {
-        case let .change(old, new):
+        case let .modification(old, new):
             diffDescription += " from `\(old)` to `\(new)`"
         case let .removal(string):
             diffDescription += " `\(string)`"
@@ -74,13 +74,13 @@ extension SwiftInterfaceElement {
 
 /// File-private helper to produce detailed descriptions
 private enum ChangeType {
-    case change(old: String, new: String)
+    case modification(old: String, new: String)
     case removal(String)
     case addition(String)
 
     var title: String {
         switch self {
-        case .change: "Changed"
+        case .modification: "Modified"
         case .removal: "Removed"
         case .addition: "Added"
         }
@@ -88,7 +88,7 @@ private enum ChangeType {
 
     static func `for`(oldValue: String?, newValue: String?) -> Self? {
         if oldValue == newValue { return nil }
-        if let oldValue, let newValue { return .change(old: oldValue, new: newValue) }
+        if let oldValue, let newValue { return .modification(old: oldValue, new: newValue) }
         if let oldValue { return .removal(oldValue) }
         if let newValue { return .addition(newValue) }
         return nil

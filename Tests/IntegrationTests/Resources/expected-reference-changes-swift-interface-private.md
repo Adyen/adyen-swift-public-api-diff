@@ -1,5 +1,6 @@
-# 👀 54 public changes detected
+# ⚠️ 54 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
+<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>21 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -32,7 +33,7 @@ public protocol ParentProtocol<ParentType> {
 public protocol SimpleProtocol
 
 ```
-#### 🔀 Changed
+#### 🔀 Modified
 ```javascript
 // From
 @_spi(SystemProgrammingInterface)
@@ -135,7 +136,7 @@ public subscript(index: Swift.Int) -> T? { get set }
 public var lazyVar: Swift.String { get set }
 
 ```
-#### 🔀 Changed
+#### 🔀 Modified
 ```javascript
 // From
 @_Concurrency.MainActor
@@ -215,7 +216,7 @@ public struct NestedStructInExtension {
 }
 
 ```
-#### 🔀 Changed
+#### 🔀 Modified
 ```javascript
 // From
 case caseWithTuple(
@@ -250,7 +251,7 @@ Changes:
 - Removed parameter `ReferencePackage.CustomEnum`
 */
 ```
-#### 😶‍🌫️ Removed
+#### ❌ Removed
 ```javascript
 case caseWithString(Swift.String)
 ```
@@ -272,7 +273,7 @@ associatedtype CustomAssociatedType: Swift.Equatable
 associatedtype CustomAssociatedType: Swift.Equatable
 
 ```
-#### 🔀 Changed
+#### 🔀 Modified
 ```javascript
 // From
 func function() -> any Swift.Equatable
@@ -282,7 +283,7 @@ func function() -> Self.CustomAssociatedType
 
 /**
 Changes:
-- Changed return type from `any Swift.Equatable` to `Self.CustomAssociatedType`
+- Modified return type from `any Swift.Equatable` to `Self.CustomAssociatedType`
 */
 ```
 ```javascript
@@ -294,7 +295,7 @@ var getSetVar: Self.AnotherAssociatedType { get set }
 
 /**
 Changes:
-- Changed type from `any Swift.Equatable` to `Self.AnotherAssociatedType`
+- Modified type from `any Swift.Equatable` to `Self.AnotherAssociatedType`
 */
 ```
 ```javascript
@@ -306,10 +307,10 @@ var getVar: Self.CustomAssociatedType { get }
 
 /**
 Changes:
-- Changed type from `any Swift.Equatable` to `Self.CustomAssociatedType`
+- Modified type from `any Swift.Equatable` to `Self.CustomAssociatedType`
 */
 ```
-#### 😶‍🌫️ Removed
+#### ❌ Removed
 ```javascript
 typealias CustomAssociatedType = Swift.Equatable
 ```
@@ -341,7 +342,7 @@ public typealias Iterator = [ReferencePackage.CustomStruct<T>.AnotherAssociatedT
 public typealias ParentType = Swift.Double
 
 ```
-#### 🔀 Changed
+#### 🔀 Modified
 ```javascript
 // From
 @discardableResult
@@ -353,7 +354,7 @@ public func function() -> Swift.Int
 
 /**
 Changes:
-- Changed return type from `any Swift.Equatable` to `Swift.Int`
+- Modified return type from `any Swift.Equatable` to `Swift.Int`
 */
 ```
 ```javascript
@@ -365,7 +366,7 @@ public var getSetVar: Swift.Double
 
 /**
 Changes:
-- Changed type from `any Swift.Equatable` to `Swift.Double`
+- Modified type from `any Swift.Equatable` to `Swift.Double`
 */
 ```
 ```javascript
@@ -377,7 +378,7 @@ public var getVar: Swift.Int
 
 /**
 Changes:
-- Changed type from `any Swift.Equatable` to `Swift.Int`
+- Modified type from `any Swift.Equatable` to `Swift.Int`
 */
 ```
 ### `OpenSpiConformingClass`
@@ -397,7 +398,7 @@ public typealias Iterator = [Swift.Double]
 public typealias ParentType = Swift.Double
 
 ```
-#### 🔀 Changed
+#### 🔀 Modified
 ```javascript
 // From
 @_spi(SystemProgrammingInterface)
@@ -411,7 +412,7 @@ public func function() -> T
 
 /**
 Changes:
-- Changed return type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
+- Modified return type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
 */
 ```
 ```javascript
@@ -448,7 +449,7 @@ public typealias CustomAssociatedType = T
 
 /**
 Changes:
-- Changed assignment from `any Swift.Equatable` to `T`
+- Modified assignment from `any Swift.Equatable` to `T`
 */
 ```
 ```javascript
@@ -462,7 +463,7 @@ public var getSetVar: T
 
 /**
 Changes:
-- Changed type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
+- Modified type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
 */
 ```
 ```javascript
@@ -476,7 +477,7 @@ public var getVar: T
 
 /**
 Changes:
-- Changed type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
+- Modified type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
 */
 ```
 

@@ -124,7 +124,7 @@ private extension SwiftPackageFileAnalyzer {
         guard let new, let old else { return [] }
 
         return [.init(
-            changeType: .change(
+            changeType: .modification(
                 oldDescription: "\(keyName): \"\(old)\"",
                 newDescription: "\(keyName): \"\(new)\""
             ),
@@ -143,7 +143,7 @@ private extension SwiftPackageFileAnalyzer {
         let keyName = "name"
 
         return [.init(
-            changeType: .change(
+            changeType: .modification(
                 oldDescription: "\(keyName): \"\(old)\"",
                 newDescription: "\(keyName): \"\(new)\""
             ),
@@ -191,7 +191,7 @@ private extension SwiftPackageFileAnalyzer {
         let newPlatformsString = new.map { "\($0.description)" }.joined(separator: ", ")
 
         return [.init(
-            changeType: .change(
+            changeType: .modification(
                 oldDescription: "platforms: [\(oldPlatformsString)]",
                 newDescription: "platforms: [\(newPlatformsString)]"
             ),
@@ -265,7 +265,7 @@ private extension SwiftPackageFileAnalyzer {
         listOfChanges += removed.map { "Removed target \"\($0)\"" }
 
         return [.init(
-            changeType: .change(
+            changeType: .modification(
                 oldDescription: oldProduct.description,
                 newDescription: newProduct.description
             ),
@@ -360,7 +360,7 @@ private extension SwiftPackageFileAnalyzer {
         listOfChanges += removedProductDependencies.map { "Removed dependency .product(name: \"\($0)\", ...)" }
 
         return [.init(
-            changeType: .change(
+            changeType: .modification(
                 oldDescription: oldTarget.description,
                 newDescription: newTarget.description
             ),
@@ -425,7 +425,7 @@ private extension SwiftPackageFileAnalyzer {
         guard oldDependency != newDependency else { return [] }
 
         return [.init(
-            changeType: .change(
+            changeType: .modification(
                 oldDescription: oldDependency.description,
                 newDescription: newDependency.description
             ),
@@ -443,7 +443,7 @@ private extension SwiftPackageFileAnalyzer {
         guard old != new else { return [] }
 
         return [.init(
-            changeType: .change(
+            changeType: .modification(
                 oldDescription: "// swift-tools-version: \(old)",
                 newDescription: "// swift-tools-version: \(new)"
             ),

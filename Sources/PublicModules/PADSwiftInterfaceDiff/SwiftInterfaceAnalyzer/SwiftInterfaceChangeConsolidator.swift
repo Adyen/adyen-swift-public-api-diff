@@ -58,7 +58,7 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
 
             consolidatedChanges.append(
                 .init(
-                    changeType: .change(
+                    changeType: .modification(
                         oldDescription: oldDescription,
                         newDescription: newDescription
                     ),
