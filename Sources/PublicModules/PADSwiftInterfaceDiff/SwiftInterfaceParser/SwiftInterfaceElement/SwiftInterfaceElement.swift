@@ -129,10 +129,6 @@ extension SwiftInterfaceElement {
             recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))}")
         }
 
-        if indentation == 0 {
-            recursiveDescription.append("\n")
-        }
-
         return recursiveDescription
     }
     
