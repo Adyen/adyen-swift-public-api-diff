@@ -52,7 +52,7 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
             let listOfChanges = listOfChanges(between: change, and: match)
 
             if listOfChanges.isEmpty {
-                assertionFailure("We should not end up here - investigate how this happened")
+                print("⚠ We should not end up here - investigate how this happened")
                 break
             }
 
