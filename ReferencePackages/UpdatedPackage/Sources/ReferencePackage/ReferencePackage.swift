@@ -195,9 +195,9 @@ extension CustomEnum: SimpleProtocol {
     }
 }
 
-extension CustomEnum.NestedStructInExtension {
+extension CustomEnum.NestedStructInExtension: CustomStringConvertible {
 
-    var description: String {
+    public var description: String {
         return string
     }
 }

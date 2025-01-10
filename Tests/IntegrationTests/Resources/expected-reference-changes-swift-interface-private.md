@@ -192,9 +192,10 @@ extension ReferencePackage.CustomEnum where T == Swift.String {
 }
 ```
 ```javascript
-public struct NestedStructInExtension {
+public struct NestedStructInExtension: Swift.CustomStringConvertible {
   public init(string: Swift.String = "Hello")
   public let string: Swift.String { get }
+  public var description: Swift.String { get }
 }
 ```
 #### 🔀 Modified
