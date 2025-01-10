@@ -6,7 +6,7 @@ _Comparing `new_private` to `old_private`_
 ## `ReferencePackage`
 #### ❇️ Added
 ```javascript
-public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable {
+public enum RawValueEnum: Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {
   case one
   case two
   public init?(rawValue: Swift.String)
@@ -16,14 +16,14 @@ public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.R
 ```
 ```javascript
 public protocol ParentProtocol {
-  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
   associatedtype Iterator: Swift.Collection
+  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
 }
 ```
 ```javascript
 public protocol ParentProtocol<ParentType> {
-  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
   associatedtype Iterator: Swift.Collection
+  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
 }
 ```
 ```javascript
@@ -193,8 +193,8 @@ extension ReferencePackage.CustomEnum where T == Swift.String {
 ```
 ```javascript
 public struct NestedStructInExtension {
-  public let string: Swift.String { get }
   public init(string: Swift.String = "Hello")
+  public let string: Swift.String { get }
 }
 ```
 #### 🔀 Modified

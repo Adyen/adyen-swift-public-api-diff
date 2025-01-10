@@ -81,7 +81,7 @@ private extension SwiftInterfaceProtocol {
         description.append("protocol", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
         description.append(primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>" }, with: "")
-        description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(inheritance?.sorted().joined(separator: ", "), with: "") { ": \($0)" }
         description.append(genericWhereClauseDescription, with: " ")
         return description
     }
