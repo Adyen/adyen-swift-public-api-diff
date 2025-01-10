@@ -79,7 +79,7 @@ private extension SwiftInterfaceAssociatedType {
         if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
         description.append("associatedtype", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
-        description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(inheritance?.sorted().joined(separator: ", "), with: "") { ": \($0)" }
         description.append(initializerValue, with: " ") { "= \($0)" }
         description.append(genericWhereClauseDescription, with: " ")
         return description

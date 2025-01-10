@@ -6,32 +6,28 @@ _Comparing `new_public` to `old_public`_
 ## `ReferencePackage`
 #### ❇️ Added
 ```javascript
-public enum RawValueEnum: Swift.String, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable {
+public enum RawValueEnum: Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {
   case one
   case two
   public init?(rawValue: Swift.String)
   public typealias RawValue = Swift.String
   public var rawValue: Swift.String { get }
 }
-
 ```
 ```javascript
 public protocol ParentProtocol {
-  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
   associatedtype Iterator: Swift.Collection
+  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
 }
-
 ```
 ```javascript
 public protocol ParentProtocol<ParentType> {
-  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
   associatedtype Iterator: Swift.Collection
+  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
 }
-
 ```
 ```javascript
 public protocol SimpleProtocol
-
 ```
 #### 🔀 Modified
 ```javascript
@@ -93,33 +89,26 @@ Changes:
 extension Swift.Array {
   public subscript(safe index: Swift.Int) -> Element? { get }
 }
-
 ```
 ### `CustomClass`
 #### ❇️ Added
 ```javascript
 final public let a: Swift.Int { get }
-
 ```
 ```javascript
 final public let b: Swift.Int { get }
-
 ```
 ```javascript
 final public let c: Swift.Int { get }
-
 ```
 ```javascript
 final public let d: Swift.Double { get }
-
 ```
 ```javascript
 public subscript(index: Swift.Int) -> T? { get set }
-
 ```
 ```javascript
 public var lazyVar: Swift.String { get set }
-
 ```
 #### 🔀 Modified
 ```javascript
@@ -166,40 +155,33 @@ Changes:
 #### ❇️ Added
 ```javascript
 case a
-
 ```
 ```javascript
 case b
-
 ```
 ```javascript
 case c
-
 ```
 ```javascript
 case caseWithNamedString(title: T)
-
 ```
 ```javascript
 case d
-
 ```
 ```javascript
 case e(ReferencePackage.CustomEnum<T>.NestedStructInExtension)
-
 ```
 ```javascript
 extension ReferencePackage.CustomEnum where T == Swift.String {
   public var titleOfCaseWithNamedString: Swift.String? { get }
 }
-
 ```
 ```javascript
-public struct NestedStructInExtension {
-  public let string: Swift.String { get }
+public struct NestedStructInExtension: Swift.CustomStringConvertible {
   public init(string: Swift.String = "Hello")
+  public let string: Swift.String { get }
+  public var description: Swift.String { get }
 }
-
 ```
 #### 🔀 Modified
 ```javascript
@@ -244,19 +226,15 @@ case caseWithString(Swift.String)
 #### ❇️ Added
 ```javascript
 associatedtype AnotherAssociatedType: Swift.Strideable
-
 ```
 ```javascript
 associatedtype AnotherAssociatedType: Swift.Strideable
-
 ```
 ```javascript
 associatedtype CustomAssociatedType: Swift.Equatable
-
 ```
 ```javascript
 associatedtype CustomAssociatedType: Swift.Equatable
-
 ```
 #### 🔀 Modified
 ```javascript
@@ -309,23 +287,18 @@ public struct NestedStruct {
   @available(swift 5.9)
   public let nestedVar: Swift.String { get }
 }
-
 ```
 ```javascript
 public typealias AnotherAssociatedType = Swift.Double
-
 ```
 ```javascript
 public typealias CustomAssociatedType = Swift.Int
-
 ```
 ```javascript
 public typealias Iterator = [ReferencePackage.CustomStruct<T>.AnotherAssociatedType]
-
 ```
 ```javascript
 public typealias ParentType = Swift.Double
-
 ```
 #### 🔀 Modified
 ```javascript

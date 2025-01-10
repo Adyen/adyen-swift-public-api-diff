@@ -123,14 +123,10 @@ extension SwiftInterfaceElement {
         var recursiveDescription = "\(indentedDescription(indentation: indentation))"
         if !self.children.isEmpty {
             recursiveDescription.append(" {")
-            for child in self.children {
+            for child in self.children.sorted(by: { $0.description < $1.description }) {
                 recursiveDescription.append("\n\(child.recursiveDescription(indentation: indentation + 1))")
             }
             recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))}")
-        }
-
-        if indentation == 0 {
-            recursiveDescription.append("\n")
         }
 
         return recursiveDescription

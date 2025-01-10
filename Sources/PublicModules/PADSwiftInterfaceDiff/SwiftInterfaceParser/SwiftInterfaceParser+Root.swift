@@ -34,9 +34,8 @@ extension SwiftInterfaceParser {
 
         init(moduleName: String, elements: [any SwiftInterfaceElement]) {
             self.moduleName = moduleName
-            self.children = elements
 
-            self.children = Self.mergeExtensions(for: self.children, moduleName: moduleName)
+            self.children = Self.mergeExtensions(for: elements, moduleName: moduleName)
             self.children.forEach { $0.setupParentRelationships(parent: self) }
         }
 

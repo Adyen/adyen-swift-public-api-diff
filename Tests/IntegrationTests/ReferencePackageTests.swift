@@ -67,10 +67,10 @@ class ReferencePackageTests: XCTestCase {
 
         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
         let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
-
+        
         for i in 0..<expectedLines.count {
             if expectedLines[i] != markdownOutputLines[i] {
-                XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
+                XCTAssertEqual(expectedLines[i], markdownOutputLines[i], "Issue in line \(i)")
                 return
             }
         }

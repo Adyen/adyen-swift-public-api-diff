@@ -83,7 +83,7 @@ private extension SwiftInterfaceActor {
         description.append("actor", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
         description.append(genericParameterDescription, with: "")
-        description.append(inheritance?.joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(inheritance?.sorted().joined(separator: ", "), with: "") { ": \($0)" }
         description.append(genericWhereClauseDescription, with: " ")
         return description
     }
