@@ -16,7 +16,13 @@ runs:
     - uses: actions/checkout@v4
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
-        ref: "0.7.0"
+        #ref: "0.7.0"
+    - name: Cache Swift Build
+      uses: actions/cache@v3
+      with:
+        path: |
+            $(swift build --configuration release --show-bin-path)
+        key: ${{ runner.os }}-swift-build-${{ github.sha }}
     - name: "Run Diff"
       run: |
         NEW=${{ inputs.new }}
@@ -25,7 +31,25 @@ runs:
         PROJECT_FOLDER=$PWD
         echo $PROJECT_FOLDER
         
-        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        # Build the Swift project in release configuration and get the binary path 
+        BINARY_DIR_PATH=$(swift build --configuration release --show-bin-path) 
+        BINARY_PATH="$BINARY_DIR_PATH/public-api-diff" 
+        
+        # Check if the binary exists 
+        if [ ! -f "$BINARY" ]; then 
+            echo "Binary not found. Building the project..." 
+            swift build --configuration release 
+            # Check if the build was successful 
+            if [ $? -ne 0 ]; then 
+                echo "Build failed" 
+                exit 1 
+            fi 
+        else 
+            echo "Binary found at $BINARY_PATH" 
+        fi 
+        
+        # Run the binary $BINARY
+        $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
