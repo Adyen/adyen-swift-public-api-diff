@@ -38,13 +38,15 @@ runs:
         
         # Check if the binary exists 
         if [ ! -f "$BINARY_PATH" ]; then 
-            echo "📭 Binary not found. Building the project..." 
-            swift build --configuration release 
+            
+            echo "📭 Binary not found at $BINARY_PATH. Building the project..." 
+            swift build --configuration release
+            
             # Check if the build was successful 
-            if [ $? -ne 0 ]; then 
-                echo "Build failed" 
+            if [ ! -f "$BINARY_PATH" ]; then 
+                echo "Build failed"
                 exit 1
-            fi 
+            fi
         else 
             echo "📬 Binary found at $BINARY_PATH" 
         fi 
