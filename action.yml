@@ -20,7 +20,8 @@ runs:
     - name: Compute binary path
       id: compute-path
       run: echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
-      
+      shell: bash
+            
     - name: Cache Swift Build
       uses: actions/cache@v3
       with:
