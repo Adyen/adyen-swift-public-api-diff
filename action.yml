@@ -31,6 +31,7 @@ runs:
     
     - name: 🧰 Build Swift CLI
       run: swift build --configuration release
+      shell: bash
       
     - name: 💾 Save Binary
       uses: actions/cache/save@v3
