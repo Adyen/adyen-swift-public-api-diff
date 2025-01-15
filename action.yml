@@ -43,6 +43,7 @@ runs:
         else 
           echo "Binary found at ${{ env.BINARY_PATH }}" 
         fi
+      shell: bash
       
     - name: 💾 Save Binary
       if: steps.cache-restore.outputs.cache-hit != 'true'
