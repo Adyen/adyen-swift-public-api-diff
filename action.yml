@@ -24,16 +24,28 @@ runs:
       shell: bash
         
     - name: 🛻 Restore Binary
+      id: cache-restore
       uses: actions/cache/restore@v3
       with:
         path: ${{ env.BINARY_PATH }}
         key: build-cache-${{ runner.os }}-ENTER_VERSION_NUMBER_HERE
     
     - name: 🧰 Build Swift CLI
+      if: steps.cache-restore.outputs.cache-hit != 'true'
       run: swift build --configuration release
       shell: bash
       
+    - name: 🪪 Verify binary exists
+      run: |
+        if [ ! -f ${{ env.BINARY_PATH }} ]; then 
+          echo "Binary not found at ${{ env.BINARY_PATH }} after build" 
+          exit 1
+        else 
+          echo "Binary found at ${{ env.BINARY_PATH }}" 
+        fi
+      
     - name: 💾 Save Binary
+      if: steps.cache-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v3
       with:
         path: ${{ env.BINARY_PATH }}
@@ -48,13 +60,6 @@ runs:
         PROJECT_FOLDER=$PWD
         
         echo $PROJECT_FOLDER
-        
-        # Check if the binary exists 
-        if [ ! -f $BINARY_PATH ]; then
-            echo "📭 Binary not found at $BINARY_PATH. Exiting..."
-        else 
-            echo "📬 Binary found at $BINARY_PATH" 
-        fi 
         
         echo "▶️ Running binary at $BINARY_PATH" 
         $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
