@@ -56,7 +56,7 @@ jobs:
         noTargetBranch: 'no target branch'
 
     - name: 🔍 Detect Changes
-      uses: ${{ github.repository }}@${{ github.ref }}
+      uses: ./ # Uses the action.yml that's at the root of the repository
       id: public_api_diff
       with:
         platform: "macOS"
