@@ -17,11 +17,14 @@ runs:
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
         #ref: "0.7.0"
+    - name: Compute binary path
+      id: compute-path
+      run: echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
+      
     - name: Cache Swift Build
       uses: actions/cache@v3
       with:
-        path: |
-            swift build --configuration release --show-bin-path
+        path: ${{ env.BINARY_PATH }}
         key: ${{ runner.os }}-swift-build-6ec5ba25648323a388a756636e7f668b04d9f615
         #key: ${{ runner.os }}-swift-build-${{ github.sha }}
     - name: "Run Diff"
@@ -29,15 +32,13 @@ runs:
         NEW=${{ inputs.new }}
         OLD=${{ inputs.old }}
         PLATFORM=${{ inputs.platform }}
+        BINARY_PATH=${{ env.BINARY_PATH }}
         PROJECT_FOLDER=$PWD
+        
         echo $PROJECT_FOLDER
         
-        # Build the Swift project in release configuration and get the binary path 
-        BINARY_DIR_PATH=$(swift build --configuration release --show-bin-path) 
-        BINARY_PATH="$BINARY_DIR_PATH/public-api-diff"
-        
         # Check if the binary exists 
-        if [ ! -f "$BINARY_PATH" ]; then 
+        if [ ! -f $BINARY_PATH ]; then
             
             echo "📭 Binary not found at $BINARY_PATH. Building the project..." 
             swift build --configuration release
