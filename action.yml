@@ -13,8 +13,6 @@ inputs:
 
 env:
   VERSION_NUMBER: "0.7.0"
-  HEAD_GITHUB_REPO: '${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git'
-  BASE_GITHUB_REPO: '${{github.server_url}}/${{github.repository}}.git'
         
 runs:
     using: 'composite'
@@ -24,9 +22,12 @@ runs:
         repository: "Adyen/adyen-swift-public-api-diff"
         # ref: ${{ env.VERSION_NUMBER }}
         
-    - name: 👾 Compute binary path
+    - name: 👾 Compute prerequisites
       id: compute-path
-      run: echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
+      run: |
+        echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
+        echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
+        echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
       shell: bash
         
     - name: 🛻 Restore Binary
