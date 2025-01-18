@@ -103,7 +103,6 @@ private extension SwiftPackageFileHelper {
 
         let result = try loadPackageDescription(projectDirectoryPath: projectDirectoryPath)
 
-        let newLine = "\n"
         let errorTag = "error: "
         let warningTag = "warning: "
 
