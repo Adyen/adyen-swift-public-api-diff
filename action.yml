@@ -64,12 +64,15 @@ runs:
         PLATFORM=${{ inputs.platform }}
         BINARY_PATH=${{ env.BINARY_PATH }}
 
-        echo "Project folder: $PROJECT_FOLDER"
-        echo "Github Workspace: $GITHUB_WORKSPACE"
+        echo "🕵️‍♂️ Project folder: $PROJECT_FOLDER"
+        echo "🕵️‍♂️ Github Workspace: $GITHUB_WORKSPACE"
         
         echo "▶️ Running binary at $BINARY_PATH" 
         $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         # cat "$PROJECT_FOLDER/logs.txt"
+
+        echo "🕵️‍♂️ Trying to find api_comparison.md"
+        echo $(find . -type f -name "api_comparison.md")
 
         # if [[ ${{ env.HEAD_GITHUB_REPO != env.BASE_GITHUB_REPO }} ]]; then
           echo "---" >> $GITHUB_STEP_SUMMARY
