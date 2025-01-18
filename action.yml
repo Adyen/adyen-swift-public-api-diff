@@ -70,6 +70,13 @@ runs:
         echo "▶️ Running binary at $BINARY_PATH" 
         $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
+
+        # fix the equation check, should be !=
+        if [[ env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO ]]; then
+          echo > [!IMPORTANT] >> $GITHUB_STEP_SUMMARY
+          echo > This PR is from a forked repository. Commenting on PRs from forks is disabled due to insufficient access rights. >> $GITHUB_STEP_SUMMARY
+          echo --- >> $GITHUB_STEP_SUMMARY
+        fi
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
       shell: bash
@@ -84,13 +91,3 @@ runs:
         file-path: "${{ github.workspace }}/api_comparison.md"
         comment-tag: api_changes
         mode: recreate
-
-      # Change to != - just for testing for now
-    - if: ${{ env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }}
-      name: 💬 PR from forked repository info
-      run: |
-        echo "::warning::This PR is from a forked repository. Commenting on PRs from forks is disabled for access right reasons." >> $GITHUB_STEP_SUMMARY
-      shell: bash
-        
-
-
