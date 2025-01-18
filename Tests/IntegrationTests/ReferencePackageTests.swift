@@ -50,7 +50,7 @@ class ReferencePackageTests: XCTestCase {
         try? FileManager.default.removeItem(at: newReferencePackageDirectory)
     }
 
-    func test_swiftInterface_public() async throws {
+    func test_swiftInterfaceType_public() async throws {
 
         let interfaceType: InterfaceType = .public
 
@@ -75,8 +75,36 @@ class ReferencePackageTests: XCTestCase {
             }
         }
     }
+    
+    func test_swiftInterfaceType_package() async throws {
 
-    func test_swiftInterface_private() async throws {
+        let interfaceType: InterfaceType = .package
+
+        let expectedOutput = try expectedOutput(for: interfaceType)
+        let pipelineOutput = try await runPipeline(for: interfaceType)
+
+        let markdownOutput = MarkdownOutputGenerator().generate(
+            from: pipelineOutput,
+            allTargets: ["ReferencePackage"],
+            oldVersionName: "old_package",
+            newVersionName: "new_package",
+            warnings: []
+        )
+
+        let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
+        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
+
+        print(markdownOutput)
+        
+        for i in 0..<expectedLines.count {
+            if expectedLines[i] != markdownOutputLines[i] {
+                XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
+                return
+            }
+        }
+    }
+
+    func test_swiftInterfaceType_private() async throws {
 
         let interfaceType: InterfaceType = .private
 
@@ -117,12 +145,15 @@ private extension ReferencePackageTests {
 
     enum InterfaceType {
         case `public`
+        case `package`
         case `private`
 
         var expectedOutputFileName: String {
             switch self {
             case .public:
                 "expected-reference-changes-swift-interface-public"
+            case .package:
+                "expected-reference-changes-swift-interface-package"
             case .private:
                 "expected-reference-changes-swift-interface-private"
             }
@@ -132,6 +163,8 @@ private extension ReferencePackageTests {
             switch self {
             case .public:
                 "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.swiftinterface"
+            case .package:
+                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.package.swiftinterface"
             case .private:
                 "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.private.swiftinterface"
             }

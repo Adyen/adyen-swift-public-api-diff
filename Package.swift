@@ -140,9 +140,6 @@ let package = Package(
                 "public-api-diff"
             ],
             resources: [
-                // Copy Tests/ExampleTests/Resources directories as-is.
-                // Use to retain directory structure.
-                // Will be at top level in bundle.
                 .copy("Resources/expected-reference-changes.md")
             ]
         ),
@@ -150,10 +147,8 @@ let package = Package(
             name: "IntegrationTests",
             dependencies: ["public-api-diff"],
             resources: [
-                // Copy Tests/ExampleTests/Resources directories as-is.
-                // Use to retain directory structure.
-                // Will be at top level in bundle.
                 .copy("Resources/expected-reference-changes-swift-interface-private.md"),
+                .copy("Resources/expected-reference-changes-swift-interface-package.md"),
                 .copy("Resources/expected-reference-changes-swift-interface-public.md")
             ]
         )
