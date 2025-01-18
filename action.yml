@@ -10,12 +10,11 @@ inputs:
     old:
         description: 'Specify the old version to compare to'
         required: true
-
-env:
-  VERSION_NUMBER: "0.7.0"
         
 runs:
     using: 'composite'
+    env:
+      VERSION_NUMBER: "0.7.0"
     steps:
     - uses: actions/checkout@v4
       with:
@@ -25,6 +24,7 @@ runs:
     - name: 👾 Compute prerequisites
       id: compute-path
       run: |
+        echo "public-api-diff version: ${{ env.VERSION_NUMBER }}"
         echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
@@ -73,9 +73,11 @@ runs:
 
         # fix the equation check, should be !=
         if [[ env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO ]]; then
-          echo > [!IMPORTANT] >> $GITHUB_STEP_SUMMARY
-          echo > This PR is from a forked repository. Commenting on PRs from forks is disabled due to insufficient access rights. >> $GITHUB_STEP_SUMMARY
-          echo --- >> $GITHUB_STEP_SUMMARY
+          echo "Adding forked PR info to step summary"
+          
+          echo "> [!IMPORTANT]" >> $GITHUB_STEP_SUMMARY
+          echo "> This PR is from a forked repository. Commenting on PRs from forks is disabled due to insufficient access rights." >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
         fi
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
