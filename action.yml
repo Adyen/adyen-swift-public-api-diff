@@ -87,8 +87,9 @@ runs:
 
       # Change to != - just for testing for now
     - if: ${{ env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }}
-      name: ⚠️ Warning: PR from forked repository
-      run: echo "::warning::This PR is from a forked repository. Commenting on PRs from forks is disabled for access right reasons." >> $GITHUB_STEP_SUMMARY
+      name: 💬 PR from forked repository info
+      run: |
+        echo "::warning::This PR is from a forked repository. Commenting on PRs from forks is disabled for access right reasons." >> $GITHUB_STEP_SUMMARY
       shell: bash
         
 
