@@ -13,22 +13,19 @@ inputs:
         
 runs:
     using: 'composite'
-    env:
-      VERSION_NUMBER: "0.7.0"
     steps:
-    - uses: actions/checkout@v4
-      with:
-        repository: "Adyen/adyen-swift-public-api-diff"
-        # ref: ${{ env.VERSION_NUMBER }}
-        
-    - name: 👾 Compute prerequisites
-      id: compute-path
+    - name: 🍱 Compute prerequisites
       run: |
-        echo "public-api-diff version: ${{ env.VERSION_NUMBER }}"
+        echo "VERSION_NUMBER=0.7.0" >> $GITHUB_ENV
         echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
       shell: bash
+    
+    - uses: actions/checkout@v4
+      with:
+        repository: "Adyen/adyen-swift-public-api-diff"
+        # ref: ${{ env.VERSION_NUMBER }}
         
     - name: 🛻 Restore Binary
       id: cache-restore
