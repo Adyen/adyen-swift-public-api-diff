@@ -72,8 +72,11 @@ runs:
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
       shell: bash
-      
-    - if: ${{ github.event.pull_request.base.ref != '' }}
+
+      # We only want to comment if we're in a Pull Request and if the Pull Request is not from a forked Repository
+      # Forked Repositories have different rights for security reasons and thus it's not possible to comment on PRs without lowering the security
+      # once the tool is merged the base repo rights apply and the script can comment on PRs as expected.
+    - if: ${{ github.event.pull_request.base.ref != '' && env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }}
       name: 📝 Comment on PR
       uses: thollander/actions-comment-pull-request@v3
       with:
