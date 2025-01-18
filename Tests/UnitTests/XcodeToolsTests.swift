@@ -61,7 +61,8 @@ private extension XcodeToolsTests {
         var commandComponents = [
             "cd \(projectDirectoryPath);",
             "xcodebuild clean build -scheme \"\(scheme)\"",
-            "-derivedDataPath .build BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+            "-derivedDataPath .build BUILD_LIBRARY_FOR_DISTRIBUTION=YES",
+            "OTHER_SWIFT_FLAGS=-no-verify-emitted-module-interface"
         ]
         
         switch platform {
