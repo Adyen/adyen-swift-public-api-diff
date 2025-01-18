@@ -65,6 +65,7 @@ runs:
         BINARY_PATH=${{ env.BINARY_PATH }}
 
         echo "Project folder: $PROJECT_FOLDER"
+        echo "Github Workspace: $GITHUB_WORKSPACE"
         
         echo "▶️ Running binary at $BINARY_PATH" 
         $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
@@ -73,7 +74,6 @@ runs:
         # if [[ ${{ env.HEAD_GITHUB_REPO != env.BASE_GITHUB_REPO }} ]]; then
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "> [!IMPORTANT]" >> $GITHUB_STEP_SUMMARY
-          echo "> This PR is from a forked repository" >> $GITHUB_STEP_SUMMARY
           echo "> **Commenting on pull requests from forks is not possible** due to insufficient permissions." >> $GITHUB_STEP_SUMMARY
           echo "> Once merged, the output will be posted as an auto-updating comment under the pull request." >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
