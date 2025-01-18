@@ -10,34 +10,83 @@ inputs:
     old:
         description: 'Specify the old version to compare to'
         required: true
+        
 runs:
     using: 'composite'
     steps:
+    - name: 🍱 Compute prerequisites
+      run: |
+        echo "VERSION_NUMBER=0.7.0" >> $GITHUB_ENV
+        echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
+        echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
+        echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
+      shell: bash
+    
     - uses: actions/checkout@v4
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
-        ref: "0.7.0"
-    - name: "Run Diff"
+        # ref: ${{ env.VERSION_NUMBER }}
+        
+    - name: 🛻 Restore Binary
+      id: cache-restore
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ env.BINARY_PATH }}
+        key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
+    
+    - name: 🧰 Build Swift CLI
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      run: swift build --configuration release
+      shell: bash
+      
+    - name: 🪪 Verify binary exists
+      run: |
+        if [ ! -f ${{ env.BINARY_PATH }} ]; then 
+          echo "Binary not found at ${{ env.BINARY_PATH }} after build" 
+          exit 1
+        else 
+          echo "Binary found at ${{ env.BINARY_PATH }}" 
+        fi
+      shell: bash
+      
+    - name: 💾 Save Binary
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v3
+      with:
+        path: ${{ env.BINARY_PATH }}
+        key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
+        
+    - name: 🏃 Run Diff
       run: |
         NEW=${{ inputs.new }}
         OLD=${{ inputs.old }}
         PLATFORM=${{ inputs.platform }}
+        BINARY_PATH=${{ env.BINARY_PATH }}
         PROJECT_FOLDER=$PWD
-        echo $PROJECT_FOLDER
         
-        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
-        cat "$PROJECT_FOLDER/logs.txt"
+        echo "▶️ Running binary at $BINARY_PATH" 
+        $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        # cat "$PROJECT_FOLDER/logs.txt"
+
+        # if [[ ${{ env.HEAD_GITHUB_REPO != env.BASE_GITHUB_REPO }} ]]; then
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "> [!IMPORTANT]" >> $GITHUB_STEP_SUMMARY
+          echo "> This PR is from a forked repository" >> $GITHUB_STEP_SUMMARY
+          echo "> **Commenting on pull requests from forks is not possible** due to insufficient permissions." >> $GITHUB_STEP_SUMMARY
+          echo "> Once merged, the output will be posted as an auto-updating comment under the pull request." >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+        # fi
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
       shell: bash
-      
-    - if: ${{ github.event.pull_request.base.ref != '' }}
+
+      # We only want to comment if we're in a Pull Request and if the Pull Request is not from a forked Repository
+      # Forked Repositories have different rights for security reasons and thus it's not possible to comment on PRs without lowering the security
+      # once the tool is merged the base repo rights apply and the script can comment on PRs as expected.
+    - if: ${{ github.event.pull_request.base.ref != '' && env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }}
       name: 📝 Comment on PR
       uses: thollander/actions-comment-pull-request@v3
       with:
         file-path: "${{ github.workspace }}/api_comparison.md"
         comment-tag: api_changes
         mode: recreate
-        
-
-
