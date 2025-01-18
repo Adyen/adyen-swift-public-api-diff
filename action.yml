@@ -26,7 +26,7 @@ runs:
     - uses: actions/checkout@v4
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
-        ref: ${{ env.VERSION_NUMBER }}
+        # ref: ${{ env.VERSION_NUMBER }}
         
     - name: 🛻 Restore Binary
       id: cache-restore
