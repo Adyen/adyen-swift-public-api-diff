@@ -23,24 +23,22 @@ jobs:
     - name: Select latest Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.4'
+        xcode-version: '16.1'
         
     - name: 🚚 Fetch repo
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-       
+
     - name: 👾 Define Diff Versions
       run: |
-        NEW="${{ env.source }}~${{ env.githubRepo }}"
+        NEW="${{ env.source }}~${{ env.headGithubRepo }}"
+        OLD="${{ env.target }}~${{ env.baseGithubRepo }}"
         
-        # Release branches get compared to the last tag instead of the target branch
-        if [[ '${{ github.head_ref || env.noTargetBranch }}' == release/* ]]
+        if [[ '${{ env.targetBranchName || env.noTargetBranch }}' == release/* ]]
         then
             LATEST_TAG=$(git describe --tags --abbrev=0)
-            OLD="$LATEST_TAG~${{ env.githubRepo }}"
-        else
-            OLD="${{ env.target }}~${{ env.githubRepo }}"
+            OLD="$LATEST_TAG~${{ env.baseGithubRepo }}" 
         fi
         
         # Providing the output to the environment
@@ -49,13 +47,15 @@ jobs:
       env:
         source: '${{ github.event.inputs.new || github.head_ref }}'
         target: '${{ github.event.inputs.old || github.event.pull_request.base.ref }}'
-        githubRepo: '${{github.server_url}}/${{github.repository}}.git'
+        headGithubRepo: '${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git'
+        baseGithubRepo: '${{github.server_url}}/${{github.repository}}.git'
         noTargetBranch: 'no target branch'
+        targetBranchName: '${{ github.head_ref }}'
 
-    # The github action automatically posts on a PR
+    # The github action automatically posts on a PR (if it's not a fork-PR)
     # and/or outputs the diff to the $GITHUB_STEP_SUMMARY
     - name: 🔍 Detect Changes
-      uses: Adyen/adyen-swift-public-api-diff@0.4.0
+      uses: Adyen/adyen-swift-public-api-diff@0.8.0
       with:
         platform: "iOS"
         new: ${{ env.NEW_VERSION }}
