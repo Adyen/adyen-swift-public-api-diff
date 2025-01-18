@@ -123,11 +123,10 @@ extension SwiftPackageDescription.Dependency: CustomStringConvertible {
 package extension SwiftPackageDescription.Dependency {
 
     struct Requirement: Codable, Equatable {
-
-        // TODO: Which other requirements exist?
-
         package let exact: [String]?
         package let range: [[String: String]]?
+        package let branch: [String]?
+        package let revision: [String]?
     }
 }
 
@@ -140,6 +139,14 @@ extension SwiftPackageDescription.Dependency.Requirement: CustomStringConvertibl
         
         if let lowerUpper = range?.first, let lower = lowerUpper["lower_bound"], let upper = lowerUpper["upper_bound"] {
             return "\"\(lower)\"..<\"\(upper)\""
+        }
+        
+        if let branch = branch?.first {
+            return "branch: \"\(branch)\""
+        }
+        
+        if let revision = revision?.first {
+            return "revision: \"\(revision)\""
         }
 
         return "UNKNOWN_REQUIREMENT"
