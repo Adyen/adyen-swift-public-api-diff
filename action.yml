@@ -70,10 +70,11 @@ runs:
 
         # fix the equation check, should be !=
         # if [[ ${{ env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }} ]]; then
-          echo "Adding forked PR info to step summary"
-          
+          echo "---" >> $GITHUB_STEP_SUMMARY
           echo "> [!IMPORTANT]" >> $GITHUB_STEP_SUMMARY
-          echo "> This PR is from a forked repository. Commenting on PRs from forks is disabled due to insufficient access rights." >> $GITHUB_STEP_SUMMARY
+          echo "> This PR is from a forked repository" >> $GITHUB_STEP_SUMMARY
+          echo "> Commenting on PRs from forks is unavailable due to insufficient access rights." >> $GITHUB_STEP_SUMMARY
+          echo "> Once merged, the output will be posted as a auto-updating comment under the pull request." >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
         # fi
         
