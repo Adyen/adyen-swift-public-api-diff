@@ -57,7 +57,8 @@ struct XcodeTools {
             "cd \(projectDirectoryPath);",
             "xcodebuild clean build -scheme \"\(scheme)\"",
             "-derivedDataPath \(Constants.derivedDataPath)",
-            "BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
+            "BUILD_LIBRARY_FOR_DISTRIBUTION=YES",
+            "OTHER_SWIFT_FLAGS=-no-verify-emitted-module-interface"
         ]
         
         switch platform {
