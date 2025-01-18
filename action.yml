@@ -20,12 +20,13 @@ runs:
         echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
+        echo "PROJECT_FOLDER=$(pwd)" >> $GITHUB_ENV
       shell: bash
     
     - uses: actions/checkout@v4
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
-        ref: ${{ env.VERSION_NUMBER }}
+        # ref: ${{ env.VERSION_NUMBER }}
         
     - name: 🛻 Restore Binary
       id: cache-restore
@@ -62,7 +63,8 @@ runs:
         OLD=${{ inputs.old }}
         PLATFORM=${{ inputs.platform }}
         BINARY_PATH=${{ env.BINARY_PATH }}
-        PROJECT_FOLDER=$PWD
+
+        echo "Project folder: $PROJECT_FOLDER"
         
         echo "▶️ Running binary at $BINARY_PATH" 
         $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
