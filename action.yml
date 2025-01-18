@@ -68,10 +68,8 @@ runs:
         $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         # cat "$PROJECT_FOLDER/logs.txt"
 
-        echo ${{ env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }}
-
         # fix the equation check, should be !=
-        # if [[ env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO ]]; then
+        # if [[ ${{ env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }} ]]; then
           echo "Adding forked PR info to step summary"
           
           echo "> [!IMPORTANT]" >> $GITHUB_STEP_SUMMARY
