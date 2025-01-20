@@ -336,6 +336,8 @@ private extension SwiftPackageFileAnalyzer {
         let addedTargetDependencies = newTargetDependencies.subtracting(oldTargetDependencies)
         let removedTargetDependencies = oldTargetDependencies.subtracting(newTargetDependencies)
 
+        // TODO: Add analyzing of SwiftPackageDescription.Target.Resource
+        
         // MARK: Product Dependencies
 
         let oldProductDependencies = Set(oldTarget.productDependencies ?? [])
