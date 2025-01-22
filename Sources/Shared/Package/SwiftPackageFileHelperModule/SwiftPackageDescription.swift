@@ -179,7 +179,7 @@ package extension SwiftPackageDescription {
         package let productDependencies: [String]?
         /// `.target(name: ...) dependency
         package let targetDependencies: [String]?
-        // TODO: check this in the SwiftPackageFileAnalyzer
+        /// The resources used by the Target
         package let resources: [Resource]?
         
         // Ignoring following properties for now as they are not handled in the `PackageAnalyzer`
@@ -266,6 +266,23 @@ package extension SwiftPackageDescription.Target {
     }
 }
 
+extension SwiftPackageDescription.Target.Resource: CustomStringConvertible {
+
+    package var description: String {
+        return switch rule {
+        case .copy: ".copy(\"\(path)\")"
+        case .embeddInCode: ".embeddInCode(\"\(path)\")"
+        case let .process(metadata):
+            if let localization = metadata["localization"] {
+                ".process(\"\(path)\", localization: \"\(localization)\")"
+            } else {
+                ".process(\"\(path)\")"
+            }
+        }
+    }
+}
+
+
 package extension SwiftPackageDescription.Target.Resource {
     
     enum Rule: Codable, Equatable {
@@ -316,22 +333,6 @@ package extension SwiftPackageDescription.Target.Resource {
             case copy
             case embeddInCode = "embed_in_code"
             case process
-        }
-    }
-}
-
-extension SwiftPackageDescription.Target.Resource.Rule: CustomStringConvertible {
-
-    package var description: String {
-        return switch self {
-        case .copy: "copy"
-        case .embeddInCode: "embeddInCode"
-        case let .process(metadata):
-            if let localization = metadata["localization"] {
-                "process (localization: \(localization))"
-            } else {
-                "process"
-            }
         }
     }
 }
