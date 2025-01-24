@@ -328,6 +328,15 @@ private extension SwiftPackageFileAnalyzer {
     ) throws -> [Change] {
         guard oldTarget != newTarget else { return [] }
 
+        // MARK: Target Resources
+        
+        let oldResourcePaths = Set(oldTarget.resources?.map(\.path) ?? [])
+        let newResourcePaths = Set(newTarget.resources?.map(\.path) ?? [])
+        
+        let addedResourcePaths = newResourcePaths.subtracting(oldResourcePaths)
+        let consistentResourcePaths = oldResourcePaths.intersection(newResourcePaths)
+        let removedResourcePaths = oldResourcePaths.subtracting(newResourcePaths)
+        
         // MARK: Target Dependencies
 
         let oldTargetDependencies = Set(oldTarget.targetDependencies ?? [])
@@ -335,7 +344,7 @@ private extension SwiftPackageFileAnalyzer {
 
         let addedTargetDependencies = newTargetDependencies.subtracting(oldTargetDependencies)
         let removedTargetDependencies = oldTargetDependencies.subtracting(newTargetDependencies)
-
+        
         // MARK: Product Dependencies
 
         let oldProductDependencies = Set(oldTarget.productDependencies ?? [])
@@ -344,7 +353,29 @@ private extension SwiftPackageFileAnalyzer {
         let addedProductDependencies = newProductDependencies.subtracting(oldProductDependencies)
         let removedProductDependencies = oldProductDependencies.subtracting(newProductDependencies)
 
+        // MARK: Compiling list of changes
+        
         var listOfChanges = [String]()
+        
+        listOfChanges += addedResourcePaths.compactMap { path in
+            guard let resource = newTarget.resources?.first(where: { $0.path == path }) else { return nil }
+            return "Added resource \(resource.description)"
+        }
+        
+        listOfChanges += consistentResourcePaths.compactMap { path in
+            guard
+                let newResource = newTarget.resources?.first(where: { $0.path == path }),
+                let oldResource = oldTarget.resources?.first(where: { $0.path == path })
+            else { return nil }
+            
+            return "Changed resource from `\(oldResource.description)` to `\(newResource.description)`"
+        }
+        
+        listOfChanges += removedResourcePaths.compactMap { path in
+            guard let resource = oldTarget.resources?.first(where: { $0.path == path }) else { return nil }
+            return "Removed resource \(resource.description)"
+        }
+        
         listOfChanges += addedTargetDependencies.map { "Added dependency .target(name: \"\($0)\")" }
         listOfChanges += addedProductDependencies.map { "Added dependency .product(name: \"\($0)\", ...)" }
 

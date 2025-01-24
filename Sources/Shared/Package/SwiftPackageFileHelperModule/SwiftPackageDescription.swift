@@ -74,7 +74,7 @@ package extension SwiftPackageDescription {
 
     struct Product: Codable, Equatable, Hashable {
 
-        // TODO: Add `rule` property
+        // TODO: Add `type` property
 
         package let name: String
         package let targets: [String]
@@ -179,13 +179,14 @@ package extension SwiftPackageDescription {
         package let productDependencies: [String]?
         /// `.target(name: ...) dependency
         package let targetDependencies: [String]?
-
+        /// The resources used by the Target
+        package let resources: [Resource]?
+        
         // Ignoring following properties for now as they are not handled in the `PackageAnalyzer`
         // and thus would produce changes that are not visible
         //
         // let productMemberships: [String]?
         // let sources: [String]
-        // let resources: [Resource]?
 
         init(
             name: String,
@@ -193,7 +194,8 @@ package extension SwiftPackageDescription {
             path: String,
             moduleType: ModuleType,
             productDependencies: [String]? = nil,
-            targetDependencies: [String]? = nil
+            targetDependencies: [String]? = nil,
+            resources: [Resource]? = nil
         ) {
             self.name = name
             self.type = type
@@ -201,6 +203,7 @@ package extension SwiftPackageDescription {
             self.moduleType = moduleType
             self.productDependencies = productDependencies
             self.targetDependencies = targetDependencies
+            self.resources = resources
         }
 
         enum CodingKeys: String, CodingKey {
@@ -210,6 +213,7 @@ package extension SwiftPackageDescription {
             case targetDependencies = "target_dependencies"
             case type
             case path
+            case resources
         }
     }
 }
@@ -257,9 +261,78 @@ extension SwiftPackageDescription.Target: CustomStringConvertible {
 package extension SwiftPackageDescription.Target {
 
     struct Resource: Codable, Equatable {
-
-        // TODO: Add `rule` property
-
         package let path: String
+        package let rule: Rule
+    }
+}
+
+extension SwiftPackageDescription.Target.Resource: CustomStringConvertible {
+
+    package var description: String {
+        return switch rule {
+        case .copy: ".copy(\"\(path)\")"
+        case .embeddInCode: ".embeddInCode(\"\(path)\")"
+        case let .process(metadata):
+            if let localization = metadata["localization"] {
+                ".process(\"\(path)\", localization: \"\(localization)\")"
+            } else {
+                ".process(\"\(path)\")"
+            }
+        }
+    }
+}
+
+
+package extension SwiftPackageDescription.Target.Resource {
+    
+    enum Rule: Codable, Equatable {
+        case copy
+        case embeddInCode
+        case process([String: String])
+        
+        package init(from decoder: any Decoder) throws {
+   
+            enum RuleError: Error {
+                case unsupportedRule
+            }
+            
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            
+            if (try? container.decode([String: String].self, forKey: .copy)) != nil {
+                self = .copy
+                return
+            }
+            
+            if (try? container.decode([String: String].self, forKey: .embeddInCode)) != nil {
+                self = .embeddInCode
+                return
+            }
+            
+            if let metadata = try? container.decode([String: String].self, forKey: .process) {
+                self = .process(metadata)
+                return
+            }
+            
+            throw RuleError.unsupportedRule
+        }
+        
+        package func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            
+            switch self {
+            case .copy:
+                try container.encode([:] as [String: String], forKey: .copy)
+            case .embeddInCode:
+                try container.encode([:] as [String: String], forKey: .embeddInCode)
+            case let .process(metadata):
+                try container.encode(metadata, forKey: .process)
+            }
+        }
+        
+        enum CodingKeys: String, CodingKey {
+            case copy
+            case embeddInCode = "embed_in_code"
+            case process
+        }
     }
 }

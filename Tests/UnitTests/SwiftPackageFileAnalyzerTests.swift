@@ -84,7 +84,12 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                             path: "some/new/path",
                             moduleType: .swiftTarget,
                             productDependencies: ["Some Product Dependency", "New Product Dependency"],
-                            targetDependencies: ["Some Target Dependency", "New Target Dependency"]
+                            targetDependencies: ["Some Target Dependency", "New Target Dependency"],
+                            resources: [
+                                .init(path: "copy-path", rule: .copy),
+                                .init(path: "process-path", rule: .process([:])),
+                                .init(path: "process-localization-path", rule: .process(["localization":"en_US"])),
+                            ]
                         )
                     ],
                     toolsVersion: "1.0"
@@ -106,7 +111,13 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                             path: "some/old/path",
                             moduleType: .swiftTarget,
                             productDependencies: ["Some Product Dependency", "Old Product Dependency"],
-                            targetDependencies: ["Some Target Dependency", "Old Target Dependency"]
+                            targetDependencies: ["Some Target Dependency", "Old Target Dependency"],
+                            resources: [
+                                .init(path: "new-copy-path", rule: .copy),
+                                .init(path: "process-path", rule: .process(["localization":"en_US"])),
+                                .init(path: "process-localization-path", rule: .process([:])),
+                                .init(path: "embedd-in-code-path", rule: .embeddInCode),
+                            ]
                         )
                     ],
                     toolsVersion: "2.0"
@@ -204,13 +215,18 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 ),
                 parentPath: ".targets",
                 listOfChanges: [
+                    "Added resource .copy(\"copy-path\")",
+                    "Changed resource from `.process(\"process-path\", localization: \"en_US\")` to `.process(\"process-path\")`",
+                    "Changed resource from `.process(\"process-localization-path\")` to `.process(\"process-localization-path\", localization: \"en_US\")`",
+                    "Removed resource .copy(\"new-copy-path\")",
+                    "Removed resource .embeddInCode(\"embedd-in-code-path\")",
                     "Added dependency .target(name: \"New Target Dependency\")",
                     "Added dependency .product(name: \"New Product Dependency\", ...)",
                     "Changed path from \"some/old/path\" to \"some/new/path\"",
                     "Changed type from `.binaryTarget` to `.target`",
                     "Removed dependency .target(name: \"Old Target Dependency\")",
                     "Removed dependency .product(name: \"Old Product Dependency\", ...)"
-                ]
+                ].sorted()
             ),
             .init(
                 changeType: .removal(
@@ -220,7 +236,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 listOfChanges: []
             )
         ]
-
+        
         XCTAssertEqual(changes.changes, expectedChanges)
 
         waitForExpectations(timeout: 1)

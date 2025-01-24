@@ -26,7 +26,7 @@ public struct Change: Equatable {
     ) {
         self.changeType = changeType
         self.parentPath = parentPath
-        self.listOfChanges = listOfChanges
+        self.listOfChanges = listOfChanges.sorted()
     }
 }
 
