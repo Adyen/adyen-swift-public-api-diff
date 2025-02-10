@@ -18,9 +18,9 @@ public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
 
     private let fileHandler: any FileHandling
     private let shell: any ShellHandling
-    private let logger: (any Logging)?
+    internal let logger: (any Logging)?
 
-    private enum Constants {
+    internal enum Constants {
         static let packageFileName = "Package.swift"
         static func packageFileName(child: String) -> String {
             ".\(child)"
@@ -280,145 +280,6 @@ private extension SwiftPackageFileAnalyzer {
         )]
     }
 
-    // MARK: - Targets
-
-    private func analyzeTargets(
-        old: [SwiftPackageDescription.Target],
-        new: [SwiftPackageDescription.Target],
-        oldProjectBasePath: String,
-        newProjectBasePath: String
-    ) throws -> [Change] {
-        guard old != new else { return [] }
-
-        let oldTargetNames = Set(old.map(\.name))
-        let newTargetNames = Set(new.map(\.name))
-
-        let added = newTargetNames.subtracting(oldTargetNames)
-        let removed = oldTargetNames.subtracting(newTargetNames)
-        let consistent = Set(oldTargetNames).intersection(Set(newTargetNames))
-
-        var changes = [Change]()
-
-        changes += added.compactMap { addition in
-            guard let addedTarget = new.first(where: { $0.name == addition }) else { return nil }
-            return .init(
-                changeType: .addition(description: addedTarget.description),
-                parentPath: Constants.packageFileName(child: "targets")
-            )
-        }
-
-        try consistent.forEach { productName in
-            guard
-                let oldTarget = old.first(where: { $0.name == productName }),
-                let newTarget = new.first(where: { $0.name == productName })
-            else { return }
-
-            changes += try analyzeTarget(
-                oldTarget: oldTarget,
-                newTarget: newTarget,
-                oldProjectBasePath: oldProjectBasePath,
-                newProjectBasePath: newProjectBasePath
-            )
-        }
-
-        changes += removed.compactMap { removal in
-            guard let removedTarget = old.first(where: { $0.name == removal }) else { return nil }
-            return .init(
-                changeType: .removal(description: removedTarget.description),
-                parentPath: Constants.packageFileName(child: "targets")
-            )
-        }
-
-        return changes
-    }
-
-    private func analyzeTarget(
-        oldTarget: SwiftPackageDescription.Target,
-        newTarget: SwiftPackageDescription.Target,
-        oldProjectBasePath: String,
-        newProjectBasePath: String
-    ) throws -> [Change] {
-        guard oldTarget != newTarget else { return [] }
-        
-        // MARK: Target Resources
-        
-        logger?.log("Old project base path \(oldProjectBasePath)", from: String(describing: Self.self))
-        logger?.log("New project base path \(newProjectBasePath)", from: String(describing: Self.self))
-        
-        let oldResourcePaths = Set((oldTarget.resources?.map(\.path) ?? []).map { $0.trimmingPrefix(oldProjectBasePath) })
-        let newResourcePaths = Set((newTarget.resources?.map(\.path) ?? []).map { $0.trimmingPrefix(newProjectBasePath) })
-        
-        let addedResourcePaths = newResourcePaths.subtracting(oldResourcePaths)
-        let consistentResourcePaths = oldResourcePaths.intersection(newResourcePaths)
-        let removedResourcePaths = oldResourcePaths.subtracting(newResourcePaths)
-        
-        // MARK: Target Dependencies
-
-        let oldTargetDependencies = Set(oldTarget.targetDependencies ?? [])
-        let newTargetDependencies = Set(newTarget.targetDependencies ?? [])
-
-        let addedTargetDependencies = newTargetDependencies.subtracting(oldTargetDependencies)
-        let removedTargetDependencies = oldTargetDependencies.subtracting(newTargetDependencies)
-        
-        // MARK: Product Dependencies
-
-        let oldProductDependencies = Set(oldTarget.productDependencies ?? [])
-        let newProductDependencies = Set(newTarget.productDependencies ?? [])
-
-        let addedProductDependencies = newProductDependencies.subtracting(oldProductDependencies)
-        let removedProductDependencies = oldProductDependencies.subtracting(newProductDependencies)
-
-        // MARK: Compiling list of changes
-        
-        var listOfChanges = [String]()
-        
-        listOfChanges += addedResourcePaths.compactMap { path in
-            guard let resource = newTarget.resources?.first(where: { $0.path == path }) else { return nil }
-            return "Added resource \(resource.description)"
-        }
-        
-        listOfChanges += consistentResourcePaths.compactMap { path in
-            guard
-                let newResource = newTarget.resources?.first(where: { $0.path == path }),
-                let oldResource = oldTarget.resources?.first(where: { $0.path == path })
-            else { return nil }
-            
-            return "Changed resource from `\(oldResource.description)` to `\(newResource.description)`"
-        }
-        
-        listOfChanges += removedResourcePaths.compactMap { path in
-            guard let resource = oldTarget.resources?.first(where: { $0.path == path }) else { return nil }
-            return "Removed resource \(resource.description)"
-        }
-        
-        listOfChanges += addedTargetDependencies.map { "Added dependency .target(name: \"\($0)\")" }
-        listOfChanges += addedProductDependencies.map { "Added dependency .product(name: \"\($0)\", ...)" }
-
-        if oldTarget.path != newTarget.path {
-            listOfChanges += ["Changed path from \"\(oldTarget.path)\" to \"\(newTarget.path)\""]
-        }
-
-        if oldTarget.type != newTarget.type {
-            listOfChanges += ["Changed type from `.\(oldTarget.type.description)` to `.\(newTarget.type.description)`"]
-        }
-
-        listOfChanges += removedTargetDependencies.map { "Removed dependency .target(name: \"\($0)\")" }
-        listOfChanges += removedProductDependencies.map { "Removed dependency .product(name: \"\($0)\", ...)" }
-
-        
-        guard oldTarget.description != newTarget.description || !listOfChanges.isEmpty else { return [] }
-        
-        return [.init(
-            changeType: .modification(
-                oldDescription: oldTarget.description,
-                newDescription: newTarget.description
-            ),
-            parentPath: Constants.packageFileName(child: "targets"),
-            listOfChanges: listOfChanges
-        )]
-
-    }
-
     // MARK: - Dependencies
 
     private func analyzeDependencies(
@@ -498,13 +359,5 @@ private extension SwiftPackageFileAnalyzer {
             ),
             parentPath: Constants.packageFileName
         )]
-    }
-}
-
-private extension String {
-    func trimmingPrefix(_ prefix: String) -> String {
-        var trimmed = self
-        trimmed.trimPrefix(prefix)
-        return trimmed
     }
 }
