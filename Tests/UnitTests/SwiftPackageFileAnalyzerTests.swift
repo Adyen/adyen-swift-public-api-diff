@@ -71,7 +71,11 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 packageDescription = SwiftPackageDescription(
                     defaultLocalization: "en-us",
                     name: "New Name",
-                    platforms: [.init(name: "iOS", version: "15.0"), .init(name: "visionOS", version: "1.0")],
+                    platforms: [
+                        .init(name: "iOS", version: "15.0"),
+                        .init(name: "macOS", version: "10.0"),
+                        .init(name: "visionOS", version: "1.0")
+                    ],
                     products: [
                         .init(name: "New Library", targets: ["New Target"]),
                         .init(name: "Some Library", targets: ["Some Target", "New Target"])
@@ -98,7 +102,11 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
                 packageDescription = SwiftPackageDescription(
                     defaultLocalization: "nl-nl",
                     name: "Old Name",
-                    platforms: [.init(name: "iOS", version: "12.0"), .init(name: "macOS", version: "10.0")],
+                    platforms: [
+                        .init(name: "iOS", version: "12.0"),
+                        .init(name: "macOS", version: "10.0"),
+                        .init(name: "driverKit", version: "1.0")
+                    ],
                     products: [
                         .init(name: "Old Library", targets: ["Old Target"]),
                         .init(name: "Some Library", targets: ["Some Target", "Old Target"])
@@ -166,14 +174,14 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             ),
             .init(
                 changeType: .modification(
-                    oldDescription: "platforms: [.iOS(12.0), .macOS(10.0)]",
-                    newDescription: "platforms: [.iOS(15.0), .visionOS(1.0)]"
+                    oldDescription: "platforms: [.iOS(12.0), .macOS(10.0), .driverKit(1.0)]",
+                    newDescription: "platforms: [.iOS(15.0), .macOS(10.0), .visionOS(1.0)]"
                 ),
                 parentPath: "Package.swift",
                 listOfChanges: [
                     "Added .visionOS(1.0)",
                     "Changed from .iOS(12.0) to .iOS(15.0)",
-                    "Removed .macOS(10.0)"
+                    "Removed .driverKit(1.0)"
                 ]
             ),
             .init(
