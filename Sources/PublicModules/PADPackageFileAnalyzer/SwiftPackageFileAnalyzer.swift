@@ -342,6 +342,9 @@ private extension SwiftPackageFileAnalyzer {
         
         // MARK: Target Resources
         
+        logger?.log("Old project base path \(oldProjectBasePath)", from: String(describing: Self.self))
+        logger?.log("New project base path \(newProjectBasePath)", from: String(describing: Self.self))
+        
         let oldResourcePaths = Set((oldTarget.resources?.map(\.path) ?? []).map { $0.trimmingPrefix(oldProjectBasePath) })
         let newResourcePaths = Set((newTarget.resources?.map(\.path) ?? []).map { $0.trimmingPrefix(newProjectBasePath) })
         
