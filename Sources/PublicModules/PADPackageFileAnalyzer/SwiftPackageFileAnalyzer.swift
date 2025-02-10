@@ -176,7 +176,8 @@ private extension SwiftPackageFileAnalyzer {
         listOfChanges += consistent.compactMap { platformName in
             guard
                 let newPlatform = new.first(where: { $0.name == platformName }),
-                let oldPlatform = old.first(where: { $0.name == platformName })
+                let oldPlatform = old.first(where: { $0.name == platformName }),
+                newPlatform.description != oldPlatform.description
             else { return nil }
 
             return "Changed from \(oldPlatform.description) to \(newPlatform.description)"
