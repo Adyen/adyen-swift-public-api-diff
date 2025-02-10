@@ -130,7 +130,10 @@ private extension SwiftPackageFileHelper {
             if
                 firstLine.starts(with: "{"),
                 let packageDescriptionData = packageDescriptionLines.joined(separator: "\n").data(using: .utf8) {
-                return try decodePackageDescription(from: packageDescriptionData, warnings: warnings)
+                
+                var packageDescription = try decodePackageDescription(from: packageDescriptionData, warnings: warnings)
+                packageDescription.projectBasePath = projectDirectoryPath
+                return packageDescription
             }
 
             packageDescriptionLines.removeFirst()
