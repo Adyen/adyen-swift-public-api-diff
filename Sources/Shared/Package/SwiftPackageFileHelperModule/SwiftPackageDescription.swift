@@ -11,6 +11,8 @@ import Foundation
 /// See: [PackageDescription](https://docs.swift.org/package-manager/PackageDescription/index.html) & [PackageDescriptionSerialization](https://github.com/swiftlang/swift-package-manager/blob/main/Sources/PackageDescription/PackageDescriptionSerialization.swift)
 package struct SwiftPackageDescription: Codable, Equatable {
 
+    package var projectBasePath: String = ""
+    
     package let name: String
     package let platforms: [Platform]
     package let defaultLocalization: String?

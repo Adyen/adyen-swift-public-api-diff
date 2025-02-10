@@ -91,7 +91,12 @@ private extension SwiftPackageFileAnalyzer {
 
         changes += try analyzePlatforms(old: old.platforms, new: new.platforms)
         changes += try analyzeProducts(old: old.products, new: new.products)
-        changes += try analyzeTargets(old: old.targets, new: new.targets)
+        changes += try analyzeTargets(
+            old: old.targets,
+            new: new.targets,
+            oldProjectBasePath: old.projectBasePath,
+            newProjectBasePath: new.projectBasePath
+        )
         changes += try analyzeDependencies(old: old.dependencies, new: new.dependencies)
 
         return .init(changes: changes, warnings: new.warnings)
@@ -279,7 +284,9 @@ private extension SwiftPackageFileAnalyzer {
 
     private func analyzeTargets(
         old: [SwiftPackageDescription.Target],
-        new: [SwiftPackageDescription.Target]
+        new: [SwiftPackageDescription.Target],
+        oldProjectBasePath: String,
+        newProjectBasePath: String
     ) throws -> [Change] {
         guard old != new else { return [] }
 
@@ -308,7 +315,9 @@ private extension SwiftPackageFileAnalyzer {
 
             changes += try analyzeTarget(
                 oldTarget: oldTarget,
-                newTarget: newTarget
+                newTarget: newTarget,
+                oldProjectBasePath: oldProjectBasePath,
+                newProjectBasePath: newProjectBasePath
             )
         }
 
@@ -325,14 +334,16 @@ private extension SwiftPackageFileAnalyzer {
 
     private func analyzeTarget(
         oldTarget: SwiftPackageDescription.Target,
-        newTarget: SwiftPackageDescription.Target
+        newTarget: SwiftPackageDescription.Target,
+        oldProjectBasePath: String,
+        newProjectBasePath: String
     ) throws -> [Change] {
         guard oldTarget != newTarget else { return [] }
-
+        
         // MARK: Target Resources
         
-        let oldResourcePaths = Set(oldTarget.resources?.map(\.path) ?? [])
-        let newResourcePaths = Set(newTarget.resources?.map(\.path) ?? [])
+        let oldResourcePaths = Set((oldTarget.resources?.map(\.path) ?? []).map { $0.trimmingPrefix(oldProjectBasePath) })
+        let newResourcePaths = Set((newTarget.resources?.map(\.path) ?? []).map { $0.trimmingPrefix(newProjectBasePath) })
         
         let addedResourcePaths = newResourcePaths.subtracting(oldResourcePaths)
         let consistentResourcePaths = oldResourcePaths.intersection(newResourcePaths)
@@ -391,6 +402,9 @@ private extension SwiftPackageFileAnalyzer {
         listOfChanges += removedTargetDependencies.map { "Removed dependency .target(name: \"\($0)\")" }
         listOfChanges += removedProductDependencies.map { "Removed dependency .product(name: \"\($0)\", ...)" }
 
+        
+        guard oldTarget.description != newTarget.description || !listOfChanges.isEmpty else { return [] }
+        
         return [.init(
             changeType: .modification(
                 oldDescription: oldTarget.description,
@@ -481,5 +495,13 @@ private extension SwiftPackageFileAnalyzer {
             ),
             parentPath: Constants.packageFileName
         )]
+    }
+}
+
+private extension String {
+    func trimmingPrefix(_ prefix: String) -> String {
+        var trimmed = self
+        trimmed.trimPrefix(prefix)
+        return trimmed
     }
 }
