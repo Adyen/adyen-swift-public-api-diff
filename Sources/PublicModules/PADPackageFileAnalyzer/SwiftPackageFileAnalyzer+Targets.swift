@@ -138,14 +138,26 @@ private extension SwiftPackageFileAnalyzer {
     }
     
     func analyzeTargetResources(
-        oldResources: [SwiftPackageDescription.Target.Resource],
-        newResources: [SwiftPackageDescription.Target.Resource],
+        oldResources old: [SwiftPackageDescription.Target.Resource],
+        newResources new: [SwiftPackageDescription.Target.Resource],
         oldProjectBasePath: String,
         newProjectBasePath: String
     ) throws -> [String] {
         
-        let oldResourcePaths = Set(oldResources.map(\.path).map { $0.trimmingPrefix(oldProjectBasePath) })
-        let newResourcePaths = Set(newResources.map(\.path).map { $0.trimmingPrefix(newProjectBasePath) })
+        let oldResources = old.map { resource in
+            var updated = resource
+            updated.path = ".\(updated.path.trimmingPrefix(oldProjectBasePath))"
+            return updated
+        }
+        
+        let newResources = new.map { resource in
+            var updated = resource
+            updated.path = ".\(updated.path.trimmingPrefix(newProjectBasePath))"
+            return updated
+        }
+        
+        let oldResourcePaths = Set(oldResources.map(\.path))
+        let newResourcePaths = Set(newResources.map(\.path))
         
         let addedResourcePaths = newResourcePaths.subtracting(oldResourcePaths)
         let consistentResourcePaths = oldResourcePaths.intersection(newResourcePaths)
@@ -160,8 +172,8 @@ private extension SwiftPackageFileAnalyzer {
         
         listOfChanges += consistentResourcePaths.compactMap { path in
             guard
-                let newResource = newResources.first(where: { $0.path.trimmingPrefix(newProjectBasePath) == path }),
-                let oldResource = oldResources.first(where: { $0.path.trimmingPrefix(oldProjectBasePath) == path }),
+                let newResource = newResources.first(where: { $0.path == path }),
+                let oldResource = oldResources.first(where: { $0.path == path }),
                 newResource.description != oldResource.description
             else { return nil }
             
@@ -169,7 +181,7 @@ private extension SwiftPackageFileAnalyzer {
         }
         
         listOfChanges += removedResourcePaths.compactMap { path in
-            guard let resource = oldResources.first(where: { $0.path.trimmingPrefix(oldProjectBasePath) == path }) else { return nil }
+            guard let resource = oldResources.first(where: { $0.path == path }) else { return nil }
             return "Removed resource \(resource.description)"
         }
         
