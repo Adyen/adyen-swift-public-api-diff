@@ -144,9 +144,6 @@ private extension SwiftPackageFileAnalyzer {
         newProjectBasePath: String
     ) throws -> [String] {
         
-        logger?.log("Old project base path \(oldProjectBasePath)", from: String(describing: Self.self))
-        logger?.log("New project base path \(newProjectBasePath)", from: String(describing: Self.self))
-        
         let oldResourcePaths = Set(oldResources.map(\.path).map { $0.trimmingPrefix(oldProjectBasePath) })
         let newResourcePaths = Set(newResources.map(\.path).map { $0.trimmingPrefix(newProjectBasePath) })
         
@@ -175,6 +172,10 @@ private extension SwiftPackageFileAnalyzer {
             guard let resource = oldResources.first(where: { $0.path.trimmingPrefix(oldProjectBasePath) == path }) else { return nil }
             return "Removed resource \(resource.description)"
         }
+        
+        // TODO: Remove this again!
+        listOfChanges += ["[DEBUG] Old project base path \(oldProjectBasePath)"]
+        listOfChanges += ["[DEBUG] New project base path \(newProjectBasePath)"]
         
         return listOfChanges
     }

@@ -88,7 +88,7 @@ struct XcodeTools {
             let result = shell.execute(command)
             let derivedDataPath = "\(projectDirectoryPath)/\(Constants.derivedDataPath)"
 
-            //logger?.debug(result, from: String(describing: Self.self))
+            logger?.debug(result, from: String(describing: Self.self))
 
             // It might be that the archive failed but the .swiftinterface files are still created
             // so we have to check outside if they exist.

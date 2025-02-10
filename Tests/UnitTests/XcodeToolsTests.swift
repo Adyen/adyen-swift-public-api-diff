@@ -101,7 +101,7 @@ private extension XcodeToolsTests {
             ("📦 Archiving SCHEME from PROJECT_DIRECTORY_PATH", "XcodeTools")
         ]
         var expectedHandleDebugCalls: [(message: String, subsystem: String)] = [
-            //(archiveResult, "XcodeTools")
+            (archiveResult, "XcodeTools")
         ]
         var expectedHandleFileExistsCalls = ["PROJECT_DIRECTORY_PATH/.build"]
 
