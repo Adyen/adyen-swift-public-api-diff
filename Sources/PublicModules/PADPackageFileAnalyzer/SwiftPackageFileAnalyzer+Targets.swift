@@ -185,10 +185,6 @@ private extension SwiftPackageFileAnalyzer {
             return "Removed resource \(resource.description)"
         }
         
-        // TODO: Remove this again!
-        listOfChanges += ["[DEBUG] Old project base path \(oldProjectBasePath)"]
-        listOfChanges += ["[DEBUG] New project base path \(newProjectBasePath)"]
-        
         return listOfChanges
     }
 }
