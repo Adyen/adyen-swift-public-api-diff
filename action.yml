@@ -16,7 +16,7 @@ runs:
     steps:
     - name: 🍱 Compute prerequisites
       run: |
-        echo "VERSION_NUMBER=$(uuidgen)" >> $GITHUB_ENV
+        echo "VERSION_NUMBER=0.8.2" >> $GITHUB_ENV
         echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
@@ -26,6 +26,7 @@ runs:
     - uses: actions/checkout@v4
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
+        ref: ${{ env.VERSION_NUMBER }}
         
     - name: 🛻 Restore Binary
       id: cache-restore
@@ -67,13 +68,13 @@ runs:
         $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
 
-        # if [[ ${{ env.HEAD_GITHUB_REPO != env.BASE_GITHUB_REPO }} ]]; then
+        if [[ ${{ env.HEAD_GITHUB_REPO != env.BASE_GITHUB_REPO }} ]]; then
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "> [!IMPORTANT]" >> $GITHUB_STEP_SUMMARY
           echo "> **Commenting on pull requests from forks is not possible** due to insufficient permissions." >> $GITHUB_STEP_SUMMARY
           echo "> Once merged, the output will be posted as an auto-updating comment under the pull request." >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
-        # fi
+        fi
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
       shell: bash
