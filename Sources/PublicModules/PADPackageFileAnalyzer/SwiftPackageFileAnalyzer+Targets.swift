@@ -146,13 +146,13 @@ private extension SwiftPackageFileAnalyzer {
         
         let oldResources = old.map { resource in
             var updated = resource
-            updated.path = ".\(updated.path.trimmingPrefix(oldProjectBasePath))"
+            updated.path = updated.path.trimmingPrefix(oldProjectBasePath)
             return updated
         }
         
         let newResources = new.map { resource in
             var updated = resource
-            updated.path = ".\(updated.path.trimmingPrefix(newProjectBasePath))"
+            updated.path = updated.path.trimmingPrefix(newProjectBasePath)
             return updated
         }
         
