@@ -25,7 +25,7 @@ jobs:
     - name: Select latest Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.4'
+        xcode-version: '16.1'
 
     - name: 🚚 Fetch repo
       uses: actions/checkout@v4
@@ -54,11 +54,35 @@ jobs:
         target: '${{ github.event.inputs.old || github.event.pull_request.base.ref }}'
         githubRepo: '${{github.server_url}}/${{github.repository}}.git'
         noTargetBranch: 'no target branch'
+        
+    - name: 🏃 Run Diff
+      run: |
+        NEW=${{ inputs.new }}
+        OLD=${{ inputs.old }}
+        PLATFORM=${{ inputs.platform }}
+        PROJECT_FOLDER=${{ github.workspace }}
+        
+        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        cat "$PROJECT_FOLDER/logs.txt"
 
-    - name: 🔍 Detect Changes
-      uses: ./ # Uses the action.yml that's at the root of the repository
-      id: public_api_diff
+        if [[ ${{ env.HEAD_GITHUB_REPO != env.BASE_GITHUB_REPO }} ]]; then
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "> [!IMPORTANT]" >> $GITHUB_STEP_SUMMARY
+          echo "> **Commenting on pull requests from forks is not possible** due to insufficient permissions." >> $GITHUB_STEP_SUMMARY
+          echo "> Once merged, the output will be posted as an auto-updating comment under the pull request." >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
+      shell: bash
+
+      # We only want to comment if we're in a Pull Request and if the Pull Request is not from a forked Repository
+      # Forked Repositories have different rights for security reasons and thus it's not possible to comment on PRs without lowering the security
+      # once the tool is merged the base repo rights apply and the script can comment on PRs as expected.
+    - if: ${{ github.event.pull_request.base.ref != '' && env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }}
+      name: 📝 Comment on PR
+      uses: thollander/actions-comment-pull-request@v3
       with:
-        platform: "macOS"
-        new: ${{ env.NEW_VERSION }}
-        old: ${{ env.OLD_VERSION }}
+        file-path: "${{ github.workspace }}/api_comparison.md"
+        comment-tag: api_changes
+        mode: recreate
