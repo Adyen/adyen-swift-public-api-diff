@@ -62,9 +62,8 @@ jobs:
       run: |
         NEW=${{ env.NEW_VERSION }}
         OLD=${{ env.OLD_VERSION }}
-        PLATFORM=${{ inputs.platform }}
         PROJECT_FOLDER=${{ github.workspace }}
-        BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff"
+        BINARY_PATH="$(swift build --configuration release --show-bin-path)/public-api-diff"
 
         echo "▶️ Running binary at $BINARY_PATH"
         $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
