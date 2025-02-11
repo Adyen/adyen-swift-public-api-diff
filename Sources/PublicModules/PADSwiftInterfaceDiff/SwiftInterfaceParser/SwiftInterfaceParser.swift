@@ -15,10 +15,10 @@ import SwiftSyntax
 class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
 
     // TODO: Handle (Nice to have)
+    // - IfConfigClauseListSyntax
     // - DeinitializerDeclSyntax
     // - PrecedenceGroupDeclSyntax
     // - OperatorDeclSyntax
-    // - IfConfigClauseListSyntax
     // - ... (There are more but not important right now)
 
     private var scope: Scope = .root(elements: [])
