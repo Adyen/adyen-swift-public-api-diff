@@ -263,7 +263,7 @@ extension SwiftPackageDescription.Target: CustomStringConvertible {
 package extension SwiftPackageDescription.Target {
 
     struct Resource: Codable, Equatable {
-        package let path: String
+        package var path: String
         package let rule: Rule
     }
 }
