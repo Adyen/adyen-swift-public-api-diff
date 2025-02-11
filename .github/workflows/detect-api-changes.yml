@@ -54,15 +54,20 @@ jobs:
         target: '${{ github.event.inputs.old || github.event.pull_request.base.ref }}'
         githubRepo: '${{github.server_url}}/${{github.repository}}.git'
         noTargetBranch: 'no target branch'
-        
+    
+    - name: 🧰 Build Swift CLI
+      run: swift build --configuration release
+      
     - name: 🏃 Run Diff
       run: |
-        NEW=${{ inputs.new }}
-        OLD=${{ inputs.old }}
+        NEW=${{ env.NEW_VERSION }}
+        OLD=${{ env.OLD_VERSION }}
         PLATFORM=${{ inputs.platform }}
         PROJECT_FOLDER=${{ github.workspace }}
-        
-        swift run public-api-diff project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff"
+
+        echo "▶️ Running binary at $BINARY_PATH"
+        $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
 
         if [[ ${{ env.HEAD_GITHUB_REPO != env.BASE_GITHUB_REPO }} ]]; then
@@ -74,7 +79,6 @@ jobs:
         fi
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
-      shell: bash
 
       # We only want to comment if we're in a Pull Request and if the Pull Request is not from a forked Repository
       # Forked Repositories have different rights for security reasons and thus it's not possible to comment on PRs without lowering the security
