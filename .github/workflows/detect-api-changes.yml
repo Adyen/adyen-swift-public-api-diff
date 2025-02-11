@@ -62,6 +62,7 @@ jobs:
       run: |
         NEW=${{ env.NEW_VERSION }}
         OLD=${{ env.OLD_VERSION }}
+        PLATFORM="macOS"
         PROJECT_FOLDER=${{ github.workspace }}
         BINARY_PATH="$(swift build --configuration release --show-bin-path)/public-api-diff"
 
