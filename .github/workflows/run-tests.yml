@@ -25,4 +25,4 @@ jobs:
         
     - name: 🛠️ Run All Tests
       run: |
-        swift test | exit ${PIPESTATUS[0]}
+        swift test --enable-swift-testing --enable-xctest | xcpretty --utf --color && exit ${PIPESTATUS[0]}
