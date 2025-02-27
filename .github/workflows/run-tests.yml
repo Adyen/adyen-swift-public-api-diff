@@ -25,4 +25,4 @@ jobs:
         
     - name: 🛠️ Run All Tests
       run: |
-        xcodebuild test -scheme public-api-diff -destination "platform=macOS" -skipPackagePluginValidation | xcpretty --utf --color && exit ${PIPESTATUS[0]}
+        xcodebuild test -scheme public-api-diff -testPlan public-api-diff -destination "platform=macOS" -skipPackagePluginValidation | xcpretty --utf --color && exit ${PIPESTATUS[0]}
