@@ -27,6 +27,7 @@ class OutputGeneratorTests: XCTestCase {
             newVersionName: "new_source",
             warnings: []
         )
+        
         XCTAssertEqual(output, expectedOutput)
     }
 
@@ -57,10 +58,11 @@ class OutputGeneratorTests: XCTestCase {
             newVersionName: "new_source",
             warnings: []
         )
+        
         XCTAssertEqual(output, expectedOutput)
     }
 
-    func test_multipleChanges_multipleModules() {
+    func multipleChanges_multipleModules() {
 
         let expectedOutput = """
         # ⚠️ 4 public changes detected ⚠️
@@ -109,6 +111,60 @@ class OutputGeneratorTests: XCTestCase {
             newVersionName: "new_source",
             warnings: []
         )
+        
+        XCTAssertEqual(output, expectedOutput)
+    }
+    
+    struct AllTargetsExpectation {
+        let allTargets: [String]?
+        let expectedTitle: String
+        let expectedTargetSection: String
+    }
+
+    func test_allTargets_shouldChangeOutputAsExpected() {
+        
+        let testExpectations: [AllTargetsExpectation] = [
+            .init(
+                allTargets: [],
+                expectedTitle: "‼️ No analyzable targets detected",
+                expectedTargetSection: ""
+            ),
+            .init(
+                allTargets: nil,
+                expectedTitle: "✅ No changes detected",
+                expectedTargetSection: ""
+            ),
+            .init(
+                allTargets: ["SomeTarget"],
+                expectedTitle: "✅ No changes detected",
+                expectedTargetSection: "\n**Analyzed targets:** SomeTarget"
+            )
+        ]
+        
+        testExpectations.forEach { argument in
+            allTargets_shouldChangeOutputAsExpected(argument: argument)
+        }
+    }
+    
+    private func allTargets_shouldChangeOutputAsExpected(argument: AllTargetsExpectation) {
+        
+        let expectedOutput = """
+        # \(argument.expectedTitle)
+        _Comparing `new_source` to `old_repository @ old_branch`_
+
+        ---\(argument.expectedTargetSection)
+        """
+        
+        let outputGenerator = MarkdownOutputGenerator()
+        
+        let output = outputGenerator.generate(
+            from: [:],
+            allTargets: argument.allTargets,
+            oldVersionName: "old_repository @ old_branch",
+            newVersionName: "new_source",
+            warnings: []
+        )
+        
         XCTAssertEqual(output, expectedOutput)
     }
 }

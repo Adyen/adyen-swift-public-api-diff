@@ -15,7 +15,7 @@ public protocol OutputGenerating<OutputType> {
     /// Generates an output from input parameters
     /// - Parameters:
     ///   - changesPerTarget: A list of changes per target/module
-    ///   - allTargets: A list of all targets/modules that were analysed in previous steps
+    ///   - allTargets: A list of all targets/modules that were analysed in previous steps - if targets are provided but the list is empty it is treated like a failure
     ///   - oldVersionName: The name of the old/reference version
     ///   - newVersionName: The name of the new/updated version
     ///   - warnings: A list of warnings produced in previous steps
