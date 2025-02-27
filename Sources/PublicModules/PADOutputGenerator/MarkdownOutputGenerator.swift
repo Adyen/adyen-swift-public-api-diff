@@ -25,7 +25,7 @@ public struct MarkdownOutputGenerator: OutputGenerating {
         let changes = Self.changeLines(changesPerModule: changesPerTarget)
 
         var lines = [
-            Self.title(changesPerTarget: changesPerTarget)
+            Self.title(changesPerTarget: changesPerTarget, allTargets: allTargets)
         ]
 
         if let oldVersionName, let newVersionName {
@@ -46,7 +46,7 @@ public struct MarkdownOutputGenerator: OutputGenerating {
             lines += changes + [separator]
         }
 
-        if let allTargets {
+        if let allTargets, !allTargets.isEmpty {
             lines += [
                 Self.analyzedModulesInfo(allTargets: allTargets)
             ]
@@ -60,7 +60,15 @@ public struct MarkdownOutputGenerator: OutputGenerating {
 
 private extension MarkdownOutputGenerator {
 
-    static func title(changesPerTarget: [String: [Change]]) -> String {
+    static func title(
+        changesPerTarget: [String: [Change]],
+        allTargets: [String]?
+    ) -> String {
+        
+        if let allTargets, allTargets.isEmpty {
+            // We got targets but the list is empty -> Show an error
+            return "# ‼️ No analyzable targets detected"
+        }
 
         if changesPerTarget.keys.isEmpty {
             return "# ✅ No changes detected"

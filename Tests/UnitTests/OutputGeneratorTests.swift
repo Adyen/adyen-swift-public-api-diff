@@ -5,11 +5,12 @@
 //
 
 @testable import PADOutputGenerator
-import XCTest
+import Testing
 
-class OutputGeneratorTests: XCTestCase {
+class OutputGeneratorTests {
 
-    func test_noChanges_singleModule() {
+    @Test
+    func noChanges_singleModule() {
 
         let expectedOutput = """
         # ✅ No changes detected
@@ -27,10 +28,12 @@ class OutputGeneratorTests: XCTestCase {
             newVersionName: "new_source",
             warnings: []
         )
-        XCTAssertEqual(output, expectedOutput)
+        
+        #expect(output == expectedOutput)
     }
 
-    func test_oneChange_singleModule() {
+    @Test
+    func oneChange_singleModule() {
 
         let expectedOutput = """
         # 👀 1 public change detected
@@ -57,10 +60,12 @@ class OutputGeneratorTests: XCTestCase {
             newVersionName: "new_source",
             warnings: []
         )
-        XCTAssertEqual(output, expectedOutput)
+        
+        #expect(output == expectedOutput)
     }
 
-    func test_multipleChanges_multipleModules() {
+    @Test
+    func multipleChanges_multipleModules() {
 
         let expectedOutput = """
         # ⚠️ 4 public changes detected ⚠️
@@ -109,6 +114,55 @@ class OutputGeneratorTests: XCTestCase {
             newVersionName: "new_source",
             warnings: []
         )
-        XCTAssertEqual(output, expectedOutput)
+        
+        #expect(output == expectedOutput)
+    }
+    
+    struct AllTargetsExpectation {
+        let allTargets: [String]?
+        let expectedTitle: String
+        let expectedTargetSection: String
+    }
+    
+    @Test(
+        "allTargets should change the output as expected",
+        arguments: [
+            AllTargetsExpectation(
+                allTargets: [],
+                expectedTitle: "‼️ No analyzable targets detected",
+                expectedTargetSection: ""
+            ),
+            AllTargetsExpectation(
+                allTargets: nil,
+                expectedTitle: "✅ No changes detected",
+                expectedTargetSection: ""
+            ),
+            AllTargetsExpectation(
+                allTargets: ["SomeTarget"],
+                expectedTitle: "✅ No changes detected",
+                expectedTargetSection: "\n**Analyzed targets:** SomeTarget"
+            )
+        ]
+    )
+    func allTargets_shouldChangeOutputAsExpected(argument: AllTargetsExpectation) {
+        
+        let expectedOutput = """
+        # \(argument.expectedTitle)
+        _Comparing `new_source` to `old_repository @ old_branch`_
+
+        ---\(argument.expectedTargetSection)
+        """
+        
+        let outputGenerator = MarkdownOutputGenerator()
+        
+        let output = outputGenerator.generate(
+            from: [:],
+            allTargets: argument.allTargets,
+            oldVersionName: "old_repository @ old_branch",
+            newVersionName: "new_source",
+            warnings: []
+        )
+        
+        #expect(output == expectedOutput)
     }
 }
