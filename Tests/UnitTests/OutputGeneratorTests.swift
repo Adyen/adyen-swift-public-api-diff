@@ -5,12 +5,11 @@
 //
 
 @testable import PADOutputGenerator
-import Testing
+import XCTest
 
-class OutputGeneratorTests {
+class OutputGeneratorTests: XCTestCase {
 
-    @Test
-    func noChanges_singleModule() {
+    func test_noChanges_singleModule() {
 
         let expectedOutput = """
         # ✅ No changes detected
@@ -29,11 +28,10 @@ class OutputGeneratorTests {
             warnings: []
         )
         
-        #expect(output == expectedOutput)
+        XCTAssertEqual(output, expectedOutput)
     }
 
-    @Test
-    func oneChange_singleModule() {
+    func test_oneChange_singleModule() {
 
         let expectedOutput = """
         # 👀 1 public change detected
@@ -61,10 +59,9 @@ class OutputGeneratorTests {
             warnings: []
         )
         
-        #expect(output == expectedOutput)
+        XCTAssertEqual(output, expectedOutput)
     }
 
-    @Test
     func multipleChanges_multipleModules() {
 
         let expectedOutput = """
@@ -115,7 +112,7 @@ class OutputGeneratorTests {
             warnings: []
         )
         
-        #expect(output == expectedOutput)
+        XCTAssertEqual(output, expectedOutput)
     }
     
     struct AllTargetsExpectation {
@@ -123,28 +120,33 @@ class OutputGeneratorTests {
         let expectedTitle: String
         let expectedTargetSection: String
     }
-    
-    @Test(
-        "allTargets should change the output as expected",
-        arguments: [
-            AllTargetsExpectation(
+
+    func test_allTargets_shouldChangeOutputAsExpected() {
+        
+        let testExpectations: [AllTargetsExpectation] = [
+            .init(
                 allTargets: [],
                 expectedTitle: "‼️ No analyzable targets detected",
                 expectedTargetSection: ""
             ),
-            AllTargetsExpectation(
+            .init(
                 allTargets: nil,
                 expectedTitle: "✅ No changes detected",
                 expectedTargetSection: ""
             ),
-            AllTargetsExpectation(
+            .init(
                 allTargets: ["SomeTarget"],
                 expectedTitle: "✅ No changes detected",
                 expectedTargetSection: "\n**Analyzed targets:** SomeTarget"
             )
         ]
-    )
-    func allTargets_shouldChangeOutputAsExpected(argument: AllTargetsExpectation) {
+        
+        testExpectations.forEach { argument in
+            allTargets_shouldChangeOutputAsExpected(argument: argument)
+        }
+    }
+    
+    private func allTargets_shouldChangeOutputAsExpected(argument: AllTargetsExpectation) {
         
         let expectedOutput = """
         # \(argument.expectedTitle)
@@ -163,6 +165,6 @@ class OutputGeneratorTests {
             warnings: []
         )
         
-        #expect(output == expectedOutput)
+        XCTAssertEqual(output, expectedOutput)
     }
 }
