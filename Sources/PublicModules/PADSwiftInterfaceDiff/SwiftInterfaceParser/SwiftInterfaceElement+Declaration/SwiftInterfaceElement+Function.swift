@@ -10,6 +10,9 @@ extension SwiftInterfaceFunction {
 
     struct Parameter {
 
+        /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
+        let attributes: [String]
+        
         let firstName: String
 
         /// optional second "internal" name - can be ignored
@@ -20,10 +23,12 @@ extension SwiftInterfaceFunction {
         let defaultValue: String?
 
         var description: String {
-            var description = [
+            let names = [
                 firstName,
                 secondName
-            ].compactMap { $0 }.joined(separator: " ")
+            ].compactMap { $0 }
+            
+            var description = (attributes + names).joined(separator: " ")
 
             if description.isEmpty {
                 description += "\(type)"

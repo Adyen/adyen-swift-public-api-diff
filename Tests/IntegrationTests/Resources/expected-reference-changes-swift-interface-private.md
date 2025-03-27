@@ -1,10 +1,16 @@
-# ⚠️ 54 public changes detected ⚠️
+# ⚠️ 56 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
-<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>21 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>32 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
 #### ❇️ Added
+```javascript
+@resultBuilder
+public struct SomeResultBuilder {
+  public static func buildBlock(_ components: Swift.String) -> Swift.String
+}
+```
 ```javascript
 public enum RawValueEnum: Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {
   case one
@@ -152,6 +158,25 @@ convenience public init!(value: T)
 /**
 Changes:
 - Added optional mark `!`
+*/
+```
+```javascript
+// From
+public init(
+  weakObject: ReferencePackage.CustomClass<T>? = nil,
+  optionalVar: T? = nil
+)
+
+// To
+public init(
+  weakObject: ReferencePackage.CustomClass<T>? = nil,
+  optionalVar: T? = nil,
+  @ReferencePackage.SomeResultBuilder content: () -> Swift.String
+)
+
+/**
+Changes:
+- Added parameter `@ReferencePackage.SomeResultBuilder content: () -> Swift.String`
 */
 ```
 ```javascript

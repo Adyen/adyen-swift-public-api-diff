@@ -31,22 +31,27 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
     /// This can lead to false positive matches in cases where one `removal` could potentially be matched to multiple `additions` or vice versa.
     /// e.g. a second `addition` `init(unrelated: String)` might be matched as a change of `init(foo: Int, bar: Int)`
     /// as they share the same comparison features but might not be an actual change but a genuine addition.
-    /// This is acceptable for now but might be improved in the future (e.g. calculating a matching-percentage)
+    ///
+    /// We try to prevent these false matches by first trying to find a matching the `diffableName` (e.g. function signature)
+    /// and only then trying to find a match by matching based on the `consoldiatableName` (e.g. function name)
+    ///
+    /// False positives are acceptable for now but might be improved in the future (e.g. calculating a matching-percentage)
     func consolidate(_ changes: [IndependentSwiftInterfaceChange]) -> [Change] {
 
-        var independentChanges = changes
+        // Sorting the independent changes to reduce the chance on false positives
+        // as the actually diffable signatures should now be closer together
+        var independentChanges = changes.sorted { $0.element.diffableSignature < $1.element.diffableSignature }
         var consolidatedChanges = [Change]()
 
         while !independentChanges.isEmpty {
             let change = independentChanges.removeFirst()
-
-            // Trying to find 2 independent changes that could actually have been a change instead of an addition/removal
-            guard let nameAndTypeMatchIndex = independentChanges.firstIndex(where: { $0.isConsolidatable(with: change) }) else {
+            
+            guard let matchIndex = findMatchIndex(for: change, in: independentChanges) else {
                 consolidatedChanges.append(change.toConsolidatedChange)
                 continue
             }
 
-            let match = independentChanges.remove(at: nameAndTypeMatchIndex)
+            let match = independentChanges.remove(at: matchIndex)
             let oldDescription = change.oldFirst ? change.element.description : match.element.description
             let newDescription = change.oldFirst ? match.element.description : change.element.description
             let listOfChanges = listOfChanges(between: change, and: match)
@@ -78,6 +83,24 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
         } else {
             lhs.differences(to: rhs)
         }
+    }
+    
+    /// Trying to find a match for an independent change
+    /// that could actually have been a change instead of an addition/removal
+    private func findMatchIndex(
+        for change: IndependentSwiftInterfaceChange,
+        in independentChanges: [IndependentSwiftInterfaceChange]
+    ) -> Int? {
+        
+        if let signatureMatchIndex = independentChanges.firstIndex(where: { $0.element.isDiffable(with: change.element) && $0.changeType.name != change.changeType.name }) {
+            return signatureMatchIndex
+        }
+        
+        if let nameAndTypeMatchIndex = independentChanges.firstIndex(where: { $0.isConsolidatable(with: change) }) {
+            return nameAndTypeMatchIndex
+        }
+        
+        return nil
     }
 }
 

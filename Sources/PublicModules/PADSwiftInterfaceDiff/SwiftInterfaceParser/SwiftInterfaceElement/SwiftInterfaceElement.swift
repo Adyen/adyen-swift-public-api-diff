@@ -111,7 +111,9 @@ extension SwiftInterfaceElement {
     /// If we used the `name` it could cause a false positive with other functions named `init` (e.g. convenience inits) when trying to find matching elements during this finding phase.
     /// In a later consolidation phase removals/additions are compared again based on their `name` to combine them to a `change`
     func isDiffable(with otherElement: any SwiftInterfaceElement) -> Bool {
-        parentPath == otherElement.parentPath && type(of: self) == type(of: otherElement) && diffableSignature == otherElement.diffableSignature
+        diffableSignature == otherElement.diffableSignature &&
+            type(of: self) == type(of: otherElement) &&
+            parentPath == otherElement.parentPath
     }
 }
 
