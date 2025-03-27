@@ -57,6 +57,13 @@ public struct CustomStruct<T: Strideable>: CustomProtocol {
     public func function() -> Int { 0 }
 }
 
+// MARK: - ResultBuilder
+
+@resultBuilder
+public struct SomeResultBuilder {
+    public static func buildBlock(_ components: String) -> String { return components }
+}
+
 // MARK: - Generic public class
 
 public class CustomClass<T: Equatable> {
@@ -75,7 +82,11 @@ public class CustomClass<T: Equatable> {
     public func asyncThrowingFunc<Element>(_ element: Element) async throws where Element: Strideable {}
     public func rethrowingFunc(throwingArg: @escaping () throws -> String) rethrows {}
 
-    public init(weakObject: CustomClass? = nil, optionalVar: T? = nil) {
+    public init(
+        weakObject: CustomClass? = nil,
+        optionalVar: T? = nil,
+        @SomeResultBuilder content: () -> String
+    ) {
         self.weakObject = weakObject
         self.optionalVar = optionalVar
 
@@ -85,7 +96,9 @@ public class CustomClass<T: Equatable> {
     public init?() {}
 
     public convenience init!(value: T) {
-        self.init(optionalVar: value)
+        self.init(optionalVar: value) {
+            "SomeString"
+        }
     }
 
     public subscript(index: Int) -> T? {

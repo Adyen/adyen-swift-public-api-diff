@@ -6,40 +6,6 @@
 
 import Foundation
 
-extension SwiftInterfaceInitializer {
-
-    struct Parameter {
-
-        let firstName: String
-
-        /// optional second "internal" name - can be ignored
-        let secondName: String?
-
-        let type: String
-
-        let defaultValue: String?
-
-        var description: String {
-            var description = [
-                firstName,
-                secondName
-            ].compactMap { $0 }.joined(separator: " ")
-
-            if description.isEmpty {
-                description += "\(type)"
-            } else {
-                description += ": \(type)"
-            }
-
-            if let defaultValue {
-                description += " = \(defaultValue)"
-            }
-
-            return description
-        }
-    }
-}
-
 class SwiftInterfaceInitializer: SwiftInterfaceElement {
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
@@ -50,7 +16,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     /// e.g. <T>
     let genericParameterDescription: String?
 
-    let parameters: [Parameter]
+    let parameters: [SwiftInterfaceFunction.Parameter]
 
     /// e.g. async, throws, rethrows
     let effectSpecifiers: [String]
@@ -83,7 +49,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
         modifiers: [String],
         optionalMark: String?,
         genericParameterDescription: String?,
-        parameters: [Parameter],
+        parameters: [SwiftInterfaceFunction.Parameter],
         effectSpecifiers: [String],
         genericWhereClauseDescription: String?
     ) {

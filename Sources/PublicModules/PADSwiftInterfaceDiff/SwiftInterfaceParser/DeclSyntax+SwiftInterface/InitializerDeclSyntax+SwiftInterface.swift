@@ -23,8 +23,9 @@ extension InitializerDeclSyntax {
             }
         }
 
-        let parameters: [SwiftInterfaceInitializer.Parameter] = self.signature.parameterClause.parameters.map {
+        let parameters: [SwiftInterfaceFunction.Parameter] = self.signature.parameterClause.parameters.map {
             .init(
+                attributes: $0.attributes.sanitizedList,
                 firstName: $0.firstName.trimmedDescription,
                 secondName: $0.secondName?.trimmedDescription,
                 type: $0.type.trimmedDescription,

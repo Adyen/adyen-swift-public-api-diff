@@ -16,6 +16,12 @@ extension SyntaxCollection {
 
 extension AttributeListSyntax {
 
+    private var translationTable: [String: String] {
+        [
+            "@_functionBuilder": "@resultBuilder"
+        ]
+    }
+    
     private var excludedAttributes: Set<String> {
         [
             "@_hasMissingDesignatedInitializers",
@@ -26,7 +32,10 @@ extension AttributeListSyntax {
     /// Produces a description where all elements in the list are mapped to their `trimmedDescription`
     var sanitizedList: [String] {
         self.compactMap {
-            let description = $0.trimmedDescription
+            var description = $0.trimmedDescription
+            if let translation = translationTable[description] {
+                description = translation
+            }
             if excludedAttributes.contains(description) { return nil }
             return description
         }
