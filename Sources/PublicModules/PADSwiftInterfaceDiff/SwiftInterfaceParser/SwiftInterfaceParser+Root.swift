@@ -142,12 +142,11 @@ private extension SwiftInterfaceParser.Root {
         if extendedElementPrefix == extensionElement.extendedType {
             extendedElement.inheritance = (extendedElement.inheritance ?? []) + (extensionElement.inheritance ?? [])
             
-            print(extendedElement.children)
-            print(extensionElement.children)
-            
             extensionElement.children.forEach { child in
                 // Filtering out default implementations with custom modifiers (public/package/...)
-                if extendedElement.children.contains(where: { $0.description(excl: [.modifiers]) == child.description(excl: [.modifiers]) }) {
+                if extendedElement.children.contains(where: {
+                    $0.description(excl: [.modifiers]) == child.description(excl: [.modifiers])
+                }) {
                     return
                 }
                 extendedElement.children += [child]
