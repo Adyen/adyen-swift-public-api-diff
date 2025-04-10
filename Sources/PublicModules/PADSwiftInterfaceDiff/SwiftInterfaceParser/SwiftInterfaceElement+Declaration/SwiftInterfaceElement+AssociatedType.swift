@@ -37,7 +37,9 @@ class SwiftInterfaceAssociatedType: SwiftInterfaceElement {
 
     var consolidatableName: String { name }
 
-    var description: String { compileDescription() }
+    func description(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
+        compileDescription(incl: tokens)
+    }
 
     init(
         attributes: [String],
@@ -72,10 +74,14 @@ extension SwiftInterfaceAssociatedType {
 
 private extension SwiftInterfaceAssociatedType {
 
-    func compileDescription() -> String {
+    func compileDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
         var description = ""
-        description.append(attributes.joined(separator: "\n"), with: "")
-        description.append(modifiers.joined(separator: " "), with: "\n")
+        if tokens.contains(.attributes) {
+            description.append(attributes.joined(separator: "\n"), with: "")
+        }
+        if tokens.contains(.modifiers) {
+            description.append(modifiers.joined(separator: " "), with: "\n")
+        }
         if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
         description.append("associatedtype", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")

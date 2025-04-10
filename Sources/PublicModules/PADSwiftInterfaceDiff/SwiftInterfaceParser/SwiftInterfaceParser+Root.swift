@@ -18,10 +18,10 @@ extension SwiftInterfaceParser {
         var consolidatableName: String { "" }
 
         /// Produces the complete recursive description of the interface
-        var description: String {
+        func description(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
             var description = ""
             children.forEach { child in
-                description.append(child.recursiveDescription())
+                description.append(child.recursiveDescription(incl: tokens))
                 description.append("\n")
             }
             return description
@@ -141,7 +141,18 @@ private extension SwiftInterfaceParser.Root {
         // We found the extended type
         if extendedElementPrefix == extensionElement.extendedType {
             extendedElement.inheritance = (extendedElement.inheritance ?? []) + (extensionElement.inheritance ?? [])
-            extendedElement.children += extensionElement.children
+            
+            print(extendedElement.children)
+            print(extensionElement.children)
+            
+            extensionElement.children.forEach { child in
+                // Filtering out default implementations with custom modifiers (public/package/...)
+                if extendedElement.children.contains(where: { $0.description(excl: [.modifiers]) == child.description(excl: [.modifiers]) }) {
+                    return
+                }
+                extendedElement.children += [child]
+            }
+            
             return true
         }
 

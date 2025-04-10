@@ -36,7 +36,9 @@ class SwiftInterfaceActor: SwiftInterfaceExtendableElement {
 
     var consolidatableName: String { name }
 
-    var description: String { compileDescription() }
+    func description(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
+        compileDescription(incl: tokens)
+    }
 
     var typeName: String { name }
 
@@ -75,10 +77,14 @@ extension SwiftInterfaceActor {
 
 private extension SwiftInterfaceActor {
 
-    func compileDescription() -> String {
+    func compileDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
         var description = ""
-        description.append(attributes.joined(separator: "\n"), with: "")
-        description.append(modifiers.joined(separator: " "), with: "\n")
+        if tokens.contains(.attributes) {
+            description.append(attributes.joined(separator: "\n"), with: "")
+        }
+        if tokens.contains(.modifiers) {
+            description.append(modifiers.joined(separator: " "), with: "\n")
+        }
         if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
         description.append("actor", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
