@@ -1,6 +1,6 @@
-# ⚠️ 56 public changes detected ⚠️
+# ⚠️ 57 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
-<table><tr><td>❇️</td><td><b>32 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>33 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -30,6 +30,11 @@ public protocol ParentProtocol {
 public protocol ParentProtocol<ParentType> {
   associatedtype Iterator: Swift.Collection
   associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
+}
+```
+```javascript
+public protocol ProtocolWithDefaultImplementation {
+  func function() -> Swift.String
 }
 ```
 ```javascript

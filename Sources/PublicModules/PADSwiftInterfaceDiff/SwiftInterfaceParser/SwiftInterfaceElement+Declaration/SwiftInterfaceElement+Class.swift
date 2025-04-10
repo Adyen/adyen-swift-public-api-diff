@@ -36,7 +36,9 @@ class SwiftInterfaceClass: SwiftInterfaceExtendableElement {
 
     var consolidatableName: String { name }
 
-    var description: String { compileDescription() }
+    func description(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
+        compileDescription(incl: tokens)
+    }
 
     var typeName: String { name }
 
@@ -75,8 +77,12 @@ extension SwiftInterfaceClass {
 
 private extension SwiftInterfaceClass {
 
-    func compileDescription() -> String {
+    func compileDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
         var description = ""
+        var modifiers = modifiers
+        if !tokens.contains(.modifiers) { modifiers = [] }
+        var attributes = attributes
+        if !tokens.contains(.attributes) { attributes = [] }
         description.append(attributes.joined(separator: "\n"), with: "")
         description.append(modifiers.joined(separator: " "), with: "\n")
         if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
