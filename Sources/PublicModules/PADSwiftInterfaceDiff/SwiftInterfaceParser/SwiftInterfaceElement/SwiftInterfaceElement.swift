@@ -143,7 +143,7 @@ extension SwiftInterfaceElement {
         incl tokens: Set<SwiftInterfaceElementDescriptionToken> = Set(SwiftInterfaceElementDescriptionToken.allCases)
     ) -> String {
         let spacer = "  "
-        var recursiveDescription = "\(indentedDescription(indentation: indentation))"
+        var recursiveDescription = "\(indentedDescription(indentation: indentation, incl: tokens))"
         if !self.children.isEmpty {
             recursiveDescription.append(" {")
             for child in self.children.sorted(by: { $0.description(incl: tokens) < $1.description(incl: tokens) }) {
@@ -155,8 +155,8 @@ extension SwiftInterfaceElement {
         return recursiveDescription
     }
     
-    func indentedDescription(indentation: Int) -> String {
-        var components = description.components(separatedBy: .newlines)
+    func indentedDescription(indentation: Int, incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
+        var components = description(incl: tokens).components(separatedBy: .newlines)
         for (index, component) in components.enumerated() {
             components[index] = "\(String(repeating: "  ", count: indentation))\(component)"
         }

@@ -72,12 +72,12 @@ private extension SwiftInterfaceExtension {
 
     func compileDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
         var description = ""
-        if tokens.contains(.attributes) {
-            description.append(attributes.joined(separator: "\n"), with: "")
-        }
-        if tokens.contains(.modifiers) {
-            description.append(modifiers.joined(separator: " "), with: "\n")
-        }
+        var modifiers = modifiers
+        if !tokens.contains(.modifiers) { modifiers = [] }
+        var attributes = attributes
+        if !tokens.contains(.attributes) { attributes = [] }
+        description.append(attributes.joined(separator: "\n"), with: "")
+        description.append(modifiers.joined(separator: " "), with: "\n")
         if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
         description.append("extension", with: modifiers.isEmpty ? "" : " ")
         description.append(extendedType, with: " ")

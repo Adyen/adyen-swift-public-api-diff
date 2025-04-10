@@ -19,12 +19,11 @@ extension SwiftInterfaceParser {
 
         /// Produces the complete recursive description of the interface
         func description(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
-            var description = ""
+            var descriptionElements: [String] = []
             children.forEach { child in
-                description.append(child.recursiveDescription(incl: tokens))
-                description.append("\n")
+                descriptionElements.append(child.recursiveDescription(incl: tokens))
             }
-            return description
+            return descriptionElements.joined(separator: "\n")
         }
 
         var pathComponentName: String { moduleName }
