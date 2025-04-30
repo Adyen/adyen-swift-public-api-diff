@@ -19,13 +19,19 @@ protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
     var children: [any SwiftInterfaceElement] { get set }
 }
 
-protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
+enum SwiftInterfaceElementDescriptionToken: CaseIterable {
+    case attributes
+    case modifiers
+    // Add more tokens when needed
+}
 
+protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
+    
     /// The name of the element used to construct the parent path for its children
     var pathComponentName: String { get }
 
     /// The full description of the element (without children)
-    var description: String { get }
+    func description(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String
 
     /// The cildren of the element (e.g. properties/functions of a struct/class/...)
     var children: [any SwiftInterfaceElement] { get }
@@ -46,6 +52,18 @@ protocol SwiftInterfaceElement: CustomStringConvertible, AnyObject {
 
     /// Produces a list of differences between one and another element
     func differences<T: SwiftInterfaceElement>(to otherElement: T) -> [String]
+}
+
+extension SwiftInterfaceElement {
+    
+    var description: String {
+        description(incl: Set(SwiftInterfaceElementDescriptionToken.allCases))
+    }
+    
+    func description(excl: Set<SwiftInterfaceElementDescriptionToken>) -> String {
+        let includedTokens = Set(SwiftInterfaceElementDescriptionToken.allCases).subtracting(excl)
+        return description(incl: includedTokens)
+    }
 }
 
 extension SwiftInterfaceElement {
@@ -120,13 +138,16 @@ extension SwiftInterfaceElement {
 extension SwiftInterfaceElement {
 
     /// Produces the complete recursive description of the element
-    func recursiveDescription(indentation: Int = 0) -> String {
+    func recursiveDescription(
+        indentation: Int = 0,
+        incl tokens: Set<SwiftInterfaceElementDescriptionToken> = Set(SwiftInterfaceElementDescriptionToken.allCases)
+    ) -> String {
         let spacer = "  "
-        var recursiveDescription = "\(indentedDescription(indentation: indentation))"
+        var recursiveDescription = "\(indentedDescription(indentation: indentation, incl: tokens))"
         if !self.children.isEmpty {
             recursiveDescription.append(" {")
-            for child in self.children.sorted(by: { $0.description < $1.description }) {
-                recursiveDescription.append("\n\(child.recursiveDescription(indentation: indentation + 1))")
+            for child in self.children.sorted(by: { $0.description(incl: tokens) < $1.description(incl: tokens) }) {
+                recursiveDescription.append("\n\(child.recursiveDescription(indentation: indentation + 1, incl: tokens))")
             }
             recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))}")
         }
@@ -134,8 +155,8 @@ extension SwiftInterfaceElement {
         return recursiveDescription
     }
     
-    func indentedDescription(indentation: Int) -> String {
-        var components = description.components(separatedBy: .newlines)
+    func indentedDescription(indentation: Int, incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
+        var components = description(incl: tokens).components(separatedBy: .newlines)
         for (index, component) in components.enumerated() {
             components[index] = "\(String(repeating: "  ", count: indentation))\(component)"
         }

@@ -38,6 +38,16 @@ public protocol CustomProtocol<CustomAssociatedType, AnotherAssociatedType>: Par
     func function() -> CustomAssociatedType
 }
 
+public protocol ProtocolWithDefaultImplementation {
+    func function() -> String
+}
+
+extension ProtocolWithDefaultImplementation {
+    public func function() -> String {
+        fatalError()
+    }
+}
+
 public struct CustomStruct<T: Strideable>: CustomProtocol {
     public typealias CustomAssociatedType = Int
     public typealias AnotherAssociatedType = Double
