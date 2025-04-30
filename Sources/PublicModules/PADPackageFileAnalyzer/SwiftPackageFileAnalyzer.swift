@@ -30,14 +30,14 @@ public struct SwiftPackageFileAnalyzer: SwiftPackageFileAnalyzing {
     public init(logger: (any Logging)? = nil) {
         self.init(
             fileHandler: FileManager.default,
-            shell: Shell(),
+            shell: Shell(logger: logger),
             logger: logger
         )
     }
 
     package init(
         fileHandler: FileHandling = FileManager.default,
-        shell: ShellHandling = Shell(),
+        shell: ShellHandling,
         logger: (any Logging)? = nil
     ) {
         self.fileHandler = fileHandler

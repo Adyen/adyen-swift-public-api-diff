@@ -124,6 +124,7 @@ let package = Package(
         ),
         .target(
             name: "ShellModule",
+            dependencies: ["PADLogging"],
             path: "Sources/Shared/Package/ShellModule"
         ),
         .target(

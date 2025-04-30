@@ -31,7 +31,7 @@ struct XcodeTools {
     private let logger: Logging?
 
     init(
-        shell: ShellHandling = Shell(),
+        shell: ShellHandling,
         fileHandler: FileHandling = FileManager.default,
         logger: Logging?
     ) {
@@ -81,7 +81,7 @@ struct XcodeTools {
         }
 
         let command = commandComponents.joined(separator: " ")
-
+        
         return try await Task {
             logger?.log("📦 Archiving \(scheme) from \(projectDirectoryPath)", from: String(describing: Self.self))
 

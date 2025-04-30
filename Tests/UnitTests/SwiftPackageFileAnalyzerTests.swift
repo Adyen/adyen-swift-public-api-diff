@@ -7,6 +7,7 @@
 @testable import PADCore
 @testable import PADPackageFileAnalyzer
 @testable import PADProjectBuilder
+import ShellModule
 
 @testable import SwiftPackageFileHelperModule
 
@@ -261,6 +262,7 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
         }
         let projectAnalyzer = SwiftPackageFileAnalyzer(
             fileHandler: fileHandler,
+            shell: Shell(logger: nil),
             logger: nil
         )
 

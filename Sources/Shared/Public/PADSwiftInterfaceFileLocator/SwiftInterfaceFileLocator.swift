@@ -32,7 +32,7 @@ public struct SwiftInterfaceFileLocator {
     ) {
         self.init(
             fileHandler: FileManager.default,
-            shell: Shell(),
+            shell: Shell(logger: logger),
             logger: logger
         )
     }
