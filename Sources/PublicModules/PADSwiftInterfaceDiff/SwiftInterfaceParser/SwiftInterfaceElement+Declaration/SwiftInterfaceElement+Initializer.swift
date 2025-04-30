@@ -16,7 +16,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     /// e.g. <T>
     let genericParameterDescription: String?
 
-    let parameters: [SwiftInterfaceFunction.Parameter]
+    let parameters: [SwiftInterfaceElementParameter]
 
     /// e.g. async, throws, rethrows
     let effectSpecifiers: [String]
@@ -35,7 +35,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
     var parent: (any SwiftInterfaceElement)?
 
     var diffableSignature: String {
-        "init(\(parameters.map { "\($0.firstName):" }.joined()))"
+        "init(\(parameters.map { $0.valueForDiffableSignature }.joined()))"
     }
 
     var consolidatableName: String { "init" }
@@ -49,7 +49,7 @@ class SwiftInterfaceInitializer: SwiftInterfaceElement {
         modifiers: [String],
         optionalMark: String?,
         genericParameterDescription: String?,
-        parameters: [SwiftInterfaceFunction.Parameter],
+        parameters: [SwiftInterfaceElementParameter],
         effectSpecifiers: [String],
         genericWhereClauseDescription: String?
     ) {
@@ -72,7 +72,7 @@ extension SwiftInterfaceInitializer {
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
         changes += diffDescription(propertyType: "optional mark", oldValue: other.optionalMark, newValue: optionalMark)
         changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
-        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map(\.description), newValues: parameters.map(\.description)) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(oldParameters: other.parameters, newParameters: parameters)
         changes += diffDescription(propertyType: "effect", oldValues: other.effectSpecifiers, newValues: effectSpecifiers)
         changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
         return changes.compactMap { $0 }

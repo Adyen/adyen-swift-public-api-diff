@@ -256,8 +256,7 @@ indirect case recursive(ReferencePackage.CustomEnum<T>)
 
 /**
 Changes:
-- Added parameter `ReferencePackage.CustomEnum<T>`
-- Removed parameter `ReferencePackage.CustomEnum`
+- Modified 1st parameter: Changed type from `ReferencePackage.CustomEnum` to `ReferencePackage.CustomEnum<T>`
 */
 ```
 #### ❌ Removed

@@ -271,8 +271,7 @@ indirect case recursive(ReferencePackage.CustomEnum<T>)
 
 /**
 Changes:
-- Added parameter `ReferencePackage.CustomEnum<T>`
-- Removed parameter `ReferencePackage.CustomEnum`
+- Modified 1st parameter: Changed type from `ReferencePackage.CustomEnum` to `ReferencePackage.CustomEnum<T>`
 */
 ```
 #### ❌ Removed
@@ -444,10 +443,8 @@ public init(
 
 /**
 Changes:
-- Added parameter `getSetVar: T`
-- Added parameter `getVar: T`
-- Removed parameter `getSetVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType`
-- Removed parameter `getVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType`
+- Modified parameter `getSetVar`: Changed type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
+- Modified parameter `getVar`: Changed type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
 */
 ```
 ```javascript
