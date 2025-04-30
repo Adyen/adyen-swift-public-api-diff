@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import PADLogging
 
 package protocol ShellHandling {
 
@@ -14,7 +15,13 @@ package protocol ShellHandling {
 
 package struct Shell: ShellHandling {
 
-    package init() {}
+    private let logger: Logging?
+    
+    package init(
+        logger: Logging?
+    ) {
+        self.logger = logger
+    }
 
     @discardableResult
     package func execute(_ command: String) -> String {
@@ -29,6 +36,8 @@ package struct Shell: ShellHandling {
         task.standardInput = nil
         task.launch()
 
+        logger?.debug("👾 \(command)", from: String(describing: Self.self))
+        
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         return String(data: data, encoding: .utf8) ?? ""
     }

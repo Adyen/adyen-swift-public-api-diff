@@ -50,7 +50,7 @@ public struct ProjectBuilder {
             platform: platform,
             swiftInterfaceType: swiftInterfaceType,
             fileHandler: FileManager.default,
-            shell: Shell(),
+            shell: Shell(logger: logger),
             logger: logger
         )
     }
@@ -60,7 +60,7 @@ public struct ProjectBuilder {
         platform: ProjectPlatform,
         swiftInterfaceType: SwiftInterfaceType,
         fileHandler: any FileHandling = FileManager.default,
-        shell: any ShellHandling = Shell(),
+        shell: any ShellHandling,
         logger: (any Logging)?
     ) {
         self.projectType = projectType

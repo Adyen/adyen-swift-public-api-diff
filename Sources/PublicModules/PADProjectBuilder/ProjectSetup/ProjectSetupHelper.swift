@@ -26,7 +26,7 @@ struct ProjectSetupHelper: ProjectSetupHelping {
     init(
         workingDirectoryPath: String,
         randomStringGenerator: any RandomStringGenerating = RandomStringGenerator(),
-        shell: any ShellHandling = Shell(),
+        shell: any ShellHandling,
         fileHandler: any FileHandling = FileManager.default,
         logger: (any Logging)?
     ) {
@@ -75,6 +75,7 @@ extension ProjectSetupHelper {
     ) async throws -> (old: URL, new: URL) {
         let projectSetupHelper = ProjectSetupHelper(
             workingDirectoryPath: workingDirectoryPath,
+            shell: Shell(logger: logger),
             logger: logger
         )
 

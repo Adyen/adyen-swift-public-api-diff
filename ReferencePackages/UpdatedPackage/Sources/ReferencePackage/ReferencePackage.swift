@@ -234,3 +234,11 @@ public extension CustomEnum where T == String {
         return nil
     }
 }
+
+@available(macOS 14, *)
+public enum NewEnumAvailableInVersion17: String, Codable, Equatable {
+    case case1 = "Case 1"
+    
+    @available(macOS 15, *)
+    public func laterAvailableFunction(){}
+}

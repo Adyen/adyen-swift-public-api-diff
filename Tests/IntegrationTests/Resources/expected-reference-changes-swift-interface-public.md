@@ -1,10 +1,22 @@
-# ⚠️ 48 public changes detected ⚠️
+# ⚠️ 49 public changes detected ⚠️
 _Comparing `new_public` to `old_public`_
-<table><tr><td>❇️</td><td><b>30 Additions</b></td></tr><tr><td>🔀</td><td><b>16 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>16 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
 #### ❇️ Added
+```javascript
+@available(macOS 14, *)
+public enum NewEnumAvailableInVersion17: Swift.Codable, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {
+  @available(macOS 14, *)
+  public typealias RawValue = Swift.String
+  @available(macOS 15, *)
+  public func laterAvailableFunction() -> Swift.Void
+  case case1
+  public init?(rawValue: Swift.String)
+  public var rawValue: Swift.String { get }
+}
+```
 ```javascript
 @resultBuilder
 public struct SomeResultBuilder {

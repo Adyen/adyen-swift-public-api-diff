@@ -8,6 +8,8 @@
 @testable import PADOutputGenerator
 @testable import PADProjectBuilder
 @testable import PADSwiftInterfaceDiff
+@testable import PADLogging
+import ShellModule
 import XCTest
 
 class ReferencePackageTests: XCTestCase {
@@ -24,19 +26,22 @@ class ReferencePackageTests: XCTestCase {
             return // Nothing to build
         }
 
-        let xcodeTools = XcodeTools(logger: nil)
+        let xcodeTools = XcodeTools(
+            shell: Shell(logger: nil),
+            logger: nil
+        )
 
         _ = try await xcodeTools.archive(
             projectDirectoryPath: oldReferencePackageDirectory.path(),
             scheme: "ReferencePackage",
             projectType: .swiftPackage,
-            platform: .iOS
+            platform: .macOS
         )
         _ = try await xcodeTools.archive(
             projectDirectoryPath: newReferencePackageDirectory.path(),
             scheme: "ReferencePackage",
             projectType: .swiftPackage,
-            platform: .iOS
+            platform: .macOS
         )
     }
 
@@ -64,7 +69,7 @@ class ReferencePackageTests: XCTestCase {
             newVersionName: "new_public",
             warnings: []
         )
-
+        
         let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
         let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
         
@@ -131,9 +136,9 @@ private extension ReferencePackageTests {
         var interfaceFilePath: String {
             switch self {
             case .public:
-                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.swiftinterface"
+                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug/ReferencePackage.swiftmodule/arm64-apple-macos.swiftinterface"
             case .private:
-                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug-iphoneos/ReferencePackage.swiftmodule/arm64-apple-ios.private.swiftinterface"
+                "\(XcodeTools.Constants.derivedDataPath)/Build/Products/Debug/ReferencePackage.swiftmodule/arm64-apple-macos.private.swiftinterface"
             }
         }
     }
