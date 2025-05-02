@@ -33,13 +33,13 @@ _Comparing `old` to `new`_
 ---
 ## SomeModule
 #### ❇️ Added
-```javascript
+```swift
 public protocol NewProtocol {
     var property: String { get }
 }
 ```
 #### 🔀 Changed
-```javascript
+```swift
 // From
 open class SomeClass : SomeProtocol, OldProtocol
 
@@ -53,6 +53,6 @@ Changes:
 */
 ```
 #### 😶‍🌫️ Removed
-```javascript
+```swift
 public protocol OldProtocol
 ```

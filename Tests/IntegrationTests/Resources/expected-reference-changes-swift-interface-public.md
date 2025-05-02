@@ -5,7 +5,7 @@ _Comparing `new_public` to `old_public`_
 ---
 ## `ReferencePackage`
 #### ❇️ Added
-```javascript
+```swift
 @available(macOS 14, *)
 public enum NewEnumAvailableInVersion17: Swift.Codable, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {
   @available(macOS 14, *)
@@ -17,13 +17,13 @@ public enum NewEnumAvailableInVersion17: Swift.Codable, Swift.Equatable, Swift.H
   public var rawValue: Swift.String { get }
 }
 ```
-```javascript
+```swift
 @resultBuilder
 public struct SomeResultBuilder {
   public static func buildBlock(_ components: Swift.String) -> Swift.String
 }
 ```
-```javascript
+```swift
 public enum RawValueEnum: Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {
   case one
   case two
@@ -32,28 +32,28 @@ public enum RawValueEnum: Swift.Equatable, Swift.Hashable, Swift.RawRepresentabl
   public var rawValue: Swift.String { get }
 }
 ```
-```javascript
+```swift
 public protocol ParentProtocol {
   associatedtype Iterator: Swift.Collection
   associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
 }
 ```
-```javascript
+```swift
 public protocol ParentProtocol<ParentType> {
   associatedtype Iterator: Swift.Collection
   associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
 }
 ```
-```javascript
+```swift
 public protocol ProtocolWithDefaultImplementation {
   func function() -> Swift.String
 }
 ```
-```javascript
+```swift
 public protocol SimpleProtocol
 ```
 #### 🔀 Modified
-```javascript
+```swift
 // From
 public actor CustomActor
 
@@ -65,7 +65,7 @@ Changes:
 - Added inheritance `ReferencePackage.SimpleProtocol`
 */
 ```
-```javascript
+```swift
 // From
 public enum CustomEnum
 
@@ -78,7 +78,7 @@ Changes:
 - Added inheritance `ReferencePackage.SimpleProtocol`
 */
 ```
-```javascript
+```swift
 // From
 public protocol CustomProtocol
 
@@ -93,7 +93,7 @@ Changes:
 - Added primary associated type `CustomAssociatedType`
 */
 ```
-```javascript
+```swift
 // From
 public struct CustomStruct: ReferencePackage.CustomProtocol
 
@@ -108,33 +108,33 @@ Changes:
 ```
 ### `Array`
 #### ❇️ Added
-```javascript
+```swift
 extension Swift.Array {
   public subscript(safe index: Swift.Int) -> Element? { get }
 }
 ```
 ### `CustomClass`
 #### ❇️ Added
-```javascript
+```swift
 final public let a: Swift.Int { get }
 ```
-```javascript
+```swift
 final public let b: Swift.Int { get }
 ```
-```javascript
+```swift
 final public let c: Swift.Int { get }
 ```
-```javascript
+```swift
 final public let d: Swift.Double { get }
 ```
-```javascript
+```swift
 public subscript(index: Swift.Int) -> T? { get set }
 ```
-```javascript
+```swift
 public var lazyVar: Swift.String { get set }
 ```
 #### 🔀 Modified
-```javascript
+```swift
 // From
 @_Concurrency.MainActor
 public func asyncThrowingFunc() async throws -> Swift.Void
@@ -150,7 +150,7 @@ Changes:
 - Added parameter `_ element: Element`
 */
 ```
-```javascript
+```swift
 // From
 convenience public init(value: T)
 
@@ -162,7 +162,7 @@ Changes:
 - Added optional mark `!`
 */
 ```
-```javascript
+```swift
 // From
 public init(
   weakObject: ReferencePackage.CustomClass<T>? = nil,
@@ -181,7 +181,7 @@ Changes:
 - Added parameter `@ReferencePackage.SomeResultBuilder content: () -> Swift.String`
 */
 ```
-```javascript
+```swift
 // From
 public init()
 
@@ -195,30 +195,30 @@ Changes:
 ```
 ### `CustomEnum`
 #### ❇️ Added
-```javascript
+```swift
 case a
 ```
-```javascript
+```swift
 case b
 ```
-```javascript
+```swift
 case c
 ```
-```javascript
+```swift
 case caseWithNamedString(title: T)
 ```
-```javascript
+```swift
 case d
 ```
-```javascript
+```swift
 case e(ReferencePackage.CustomEnum<T>.NestedStructInExtension)
 ```
-```javascript
+```swift
 extension ReferencePackage.CustomEnum where T == Swift.String {
   public var titleOfCaseWithNamedString: Swift.String? { get }
 }
 ```
-```javascript
+```swift
 public struct NestedStructInExtension: Swift.CustomStringConvertible {
   public init(string: Swift.String = "Hello")
   public let string: Swift.String { get }
@@ -226,7 +226,7 @@ public struct NestedStructInExtension: Swift.CustomStringConvertible {
 }
 ```
 #### 🔀 Modified
-```javascript
+```swift
 // From
 case caseWithTuple(
   Swift.String,
@@ -247,7 +247,7 @@ Changes:
 - Removed parameter `Swift.String`
 */
 ```
-```javascript
+```swift
 // From
 indirect case recursive(ReferencePackage.CustomEnum)
 
@@ -261,25 +261,25 @@ Changes:
 */
 ```
 #### ❌ Removed
-```javascript
+```swift
 case caseWithString(Swift.String)
 ```
 ### `CustomProtocol`
 #### ❇️ Added
-```javascript
+```swift
 associatedtype AnotherAssociatedType: Swift.Strideable
 ```
-```javascript
+```swift
 associatedtype AnotherAssociatedType: Swift.Strideable
 ```
-```javascript
+```swift
 associatedtype CustomAssociatedType: Swift.Equatable
 ```
-```javascript
+```swift
 associatedtype CustomAssociatedType: Swift.Equatable
 ```
 #### 🔀 Modified
-```javascript
+```swift
 // From
 func function() -> any Swift.Equatable
 
@@ -291,7 +291,7 @@ Changes:
 - Modified return type from `any Swift.Equatable` to `Self.CustomAssociatedType`
 */
 ```
-```javascript
+```swift
 // From
 var getSetVar: any Swift.Equatable { get set }
 
@@ -303,7 +303,7 @@ Changes:
 - Modified type from `any Swift.Equatable` to `Self.AnotherAssociatedType`
 */
 ```
-```javascript
+```swift
 // From
 var getVar: any Swift.Equatable { get }
 
@@ -316,12 +316,12 @@ Changes:
 */
 ```
 #### ❌ Removed
-```javascript
+```swift
 typealias CustomAssociatedType = Swift.Equatable
 ```
 ### `CustomStruct`
 #### ❇️ Added
-```javascript
+```swift
 @available(macOS, unavailable, message: "Unavailable on macOS")
 public struct NestedStruct {
   @available(*, deprecated, renamed: "nestedVar")
@@ -330,20 +330,20 @@ public struct NestedStruct {
   public let nestedVar: Swift.String { get }
 }
 ```
-```javascript
+```swift
 public typealias AnotherAssociatedType = Swift.Double
 ```
-```javascript
+```swift
 public typealias CustomAssociatedType = Swift.Int
 ```
-```javascript
+```swift
 public typealias Iterator = [ReferencePackage.CustomStruct<T>.AnotherAssociatedType]
 ```
-```javascript
+```swift
 public typealias ParentType = Swift.Double
 ```
 #### 🔀 Modified
-```javascript
+```swift
 // From
 @discardableResult
 public func function() -> any Swift.Equatable
@@ -357,7 +357,7 @@ Changes:
 - Modified return type from `any Swift.Equatable` to `Swift.Int`
 */
 ```
-```javascript
+```swift
 // From
 public var getSetVar: any Swift.Equatable
 
@@ -369,7 +369,7 @@ Changes:
 - Modified type from `any Swift.Equatable` to `Swift.Double`
 */
 ```
-```javascript
+```swift
 // From
 public var getVar: any Swift.Equatable
 
