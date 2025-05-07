@@ -9,7 +9,7 @@ import Foundation
 
 extension SwiftInterfaceElement {
     func formattedParameterDescription(for parameterDescriptions: [String]) -> String {
-        // We're only doing multiline formatting if we have more than 1 character
+        // We're only doing multiline formatting if we have more than 1 parameter
         guard parameterDescriptions.count > 1 else { return parameterDescriptions.joined(separator: ", ") }
         
         let spacer = "  "

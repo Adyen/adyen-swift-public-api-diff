@@ -12,8 +12,9 @@ extension SubscriptDeclSyntax {
 
     func toInterfaceElement() -> SwiftInterfaceSubscript {
 
-        let parameters: [SwiftInterfaceSubscript.Parameter] = self.parameterClause.parameters.map {
+        let parameters: [SwiftInterfaceElementParameter] = self.parameterClause.parameters.map {
             .init(
+                attributes: $0.attributes.sanitizedList,
                 firstName: $0.firstName.trimmedDescription,
                 secondName: $0.secondName?.trimmedDescription,
                 type: $0.type.trimmedDescription,

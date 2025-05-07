@@ -22,6 +22,7 @@ extension EnumCaseDeclSyntax {
                 name: $0.name.trimmedDescription,
                 parameters: $0.parameterClause?.parameters.map {
                     .init(
+                        attributes: [],
                         firstName: $0.firstName?.trimmedDescription,
                         secondName: $0.secondName?.trimmedDescription,
                         type: $0.type.trimmedDescription,

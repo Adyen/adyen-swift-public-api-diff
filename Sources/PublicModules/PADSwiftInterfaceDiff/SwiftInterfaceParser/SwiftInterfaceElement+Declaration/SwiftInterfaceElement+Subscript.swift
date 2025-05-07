@@ -6,40 +6,6 @@
 
 import Foundation
 
-extension SwiftInterfaceSubscript {
-
-    struct Parameter {
-
-        let firstName: String
-
-        /// optional second "internal" name - can be ignored
-        let secondName: String?
-
-        let type: String
-
-        let defaultValue: String?
-
-        var description: String {
-            var description = [
-                firstName,
-                secondName
-            ].compactMap { $0 }.joined(separator: " ")
-
-            if description.isEmpty {
-                description += "\(type)"
-            } else {
-                description += ": \(type)"
-            }
-
-            if let defaultValue {
-                description += " = \(defaultValue)"
-            }
-
-            return description
-        }
-    }
-}
-
 class SwiftInterfaceSubscript: SwiftInterfaceElement {
 
     let name: String = "subscript"
@@ -53,7 +19,7 @@ class SwiftInterfaceSubscript: SwiftInterfaceElement {
     /// e.g. <T>
     let genericParameterDescription: String?
 
-    let parameters: [Parameter]
+    let parameters: [SwiftInterfaceElementParameter]
 
     let returnType: String
 
@@ -69,7 +35,7 @@ class SwiftInterfaceSubscript: SwiftInterfaceElement {
     var parent: (any SwiftInterfaceElement)?
 
     var diffableSignature: String {
-        "\(name)(\(parameters.map { "\($0.firstName):" }.joined()))"
+        "\(name)(\(parameters.map(\.valueForDiffableSignature).joined()))"
     }
 
     var consolidatableName: String { name }
@@ -82,7 +48,7 @@ class SwiftInterfaceSubscript: SwiftInterfaceElement {
         attributes: [String],
         modifiers: [String],
         genericParameterDescription: String?,
-        parameters: [Parameter],
+        parameters: [SwiftInterfaceElementParameter],
         returnType: String,
         genericWhereClauseDescription: String?,
         accessors: String?
@@ -105,7 +71,7 @@ extension SwiftInterfaceSubscript {
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
         changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
-        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map(\.description), newValues: parameters.map(\.description)) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(oldParameters: other.parameters, newParameters: parameters)
         changes += diffDescription(propertyType: "return type", oldValue: other.returnType, newValue: returnType)
         changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
         changes += diffDescription(propertyType: "accessors", oldValue: other.accessors, newValue: accessors)
