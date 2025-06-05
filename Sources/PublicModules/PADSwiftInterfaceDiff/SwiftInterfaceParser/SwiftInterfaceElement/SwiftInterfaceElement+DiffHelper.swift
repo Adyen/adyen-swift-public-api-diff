@@ -44,29 +44,32 @@ extension SwiftInterfaceElement {
 
     /// Returns a list of change descriptions for changes between the old and new values
     /// - Parameters:
-    ///   - propertyType: The (optional) property type name (e.g. "accessor", "modifier", "generic where clause", ...) for additional information
-    ///   - oldValue: The (optional) old values
-    ///   - newValue: The (optional) new values
+    ///   - propertyType: The property type name (e.g. "accessor", "modifier", "generic where clause", ...)
+    ///                   for additional information
+    ///   - oldValues: The (optional) old values
+    ///   - newValues: The (optional) new values
     /// - Returns: A list of change descriptions caused by a value change
-    func diffDescription(propertyType: String, oldValues: [String]?, newValues: [String]?) -> [String] {
+    func diffDescription(
+        propertyType: String,
+        oldValues: [String]?,
+        newValues: [String]?
+    ) -> [String] {
 
-        if let oldValues, let newValues {
-            let old = Set(oldValues)
-            let new = Set(newValues)
-            return old.symmetricDifference(new).map {
-                "\(new.contains($0) ? "Added" : "Removed") \(propertyType) `\($0)`"
-            }
+        guard let oldValues else {
+            guard let newValues else { return [] }
+            return newValues.map { "Added \(propertyType) `\($0.description)`" }
         }
 
-        if let oldValues {
-            return oldValues.map { "Removed \(propertyType) `\($0)`" }
+        guard let newValues else {
+            return oldValues.map { "Removed \(propertyType) `\($0.description)`" }
         }
-
-        if let newValues {
-            return newValues.map { "Added \(propertyType) `\($0)`" }
+        
+        let old = Set(oldValues)
+        let new = Set(newValues)
+        
+        return old.symmetricDifference(new).map {
+            "\(new.contains($0) ? "Added" : "Removed") \(propertyType) `\($0)`"
         }
-
-        return []
     }
 }
 

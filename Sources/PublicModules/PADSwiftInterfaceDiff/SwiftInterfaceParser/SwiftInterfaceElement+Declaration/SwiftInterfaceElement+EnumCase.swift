@@ -6,39 +6,6 @@
 
 import Foundation
 
-extension SwiftInterfaceEnumCase {
-
-    struct Parameter {
-
-        let firstName: String?
-
-        let secondName: String?
-
-        let type: String
-
-        let defaultValue: String?
-
-        var description: String {
-            var description = [
-                firstName,
-                secondName
-            ].compactMap { $0 }.joined(separator: " ")
-
-            if description.isEmpty {
-                description += "\(type)"
-            } else {
-                description += ": \(type)"
-            }
-
-            if let defaultValue {
-                description += " = \(defaultValue)"
-            }
-
-            return description
-        }
-    }
-}
-
 class SwiftInterfaceEnumCase: SwiftInterfaceElement {
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
@@ -49,7 +16,7 @@ class SwiftInterfaceEnumCase: SwiftInterfaceElement {
 
     let name: String
 
-    let parameters: [Parameter]?
+    let parameters: [SwiftInterfaceElementParameter]?
 
     let rawValue: String?
 
@@ -72,7 +39,7 @@ class SwiftInterfaceEnumCase: SwiftInterfaceElement {
         attributes: [String],
         modifiers: [String],
         name: String,
-        parameters: [Parameter]?,
+        parameters: [SwiftInterfaceElementParameter]?,
         rawValue: String?
     ) {
         self.attributes = attributes
@@ -90,7 +57,7 @@ extension SwiftInterfaceEnumCase {
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
-        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters?.map(\.description), newValues: parameters?.map(\.description))
+        changes += diffDescription(oldParameters: other.parameters, newParameters: parameters)
         changes += diffDescription(propertyType: "raw value", oldValue: other.rawValue, newValue: rawValue)
         return changes.compactMap { $0 }
     }
