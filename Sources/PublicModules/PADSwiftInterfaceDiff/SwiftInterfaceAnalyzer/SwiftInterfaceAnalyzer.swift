@@ -81,7 +81,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
 
             // No matching element was found so either it was removed or added
             let changeType: IndependentSwiftInterfaceChange.ChangeType = oldFirst ?
-                .removal(lhsElement.description) :
+                .removal(lhsElement.recursiveDescription()) :
                 .addition(lhsElement.recursiveDescription())
 
             return [

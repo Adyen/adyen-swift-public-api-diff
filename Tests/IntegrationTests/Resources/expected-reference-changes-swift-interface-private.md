@@ -1,6 +1,6 @@
-# ⚠️ 58 public changes detected ⚠️
+# ⚠️ 57 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
-<table><tr><td>❇️</td><td><b>34 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -30,12 +30,6 @@ public enum RawValueEnum: Swift.Equatable, Swift.Hashable, Swift.RawRepresentabl
   public init?(rawValue: Swift.String)
   public typealias RawValue = Swift.String
   public var rawValue: Swift.String { get }
-}
-```
-```javascript
-public protocol ParentProtocol {
-  associatedtype Iterator: Swift.Collection
-  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
 }
 ```
 ```javascript
@@ -120,6 +114,13 @@ Changes:
 - Added generic parameter description `<T>`
 - Added generic where clause `where T : Swift.Strideable`
 */
+```
+#### ❌ Removed
+```javascript
+public struct PublicStructThatIsOnlyAvailableInTheReferencePackage {
+  public func bar() -> Swift.Void
+  public var foo: Swift.String
+}
 ```
 ### `Array`
 #### ❇️ Added
@@ -278,16 +279,22 @@ Changes:
 ```javascript
 case caseWithString(Swift.String)
 ```
+```javascript
+public enum PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage: Swift.Equatable, Swift.Hashable {
+  case alpha
+  case beta
+  public func hash(into hasher: inout Swift.Hasher) -> Swift.Void
+  public static func ==(
+    a: ReferencePackage.CustomEnum.PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage,
+    b: ReferencePackage.CustomEnum.PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage
+  ) -> Swift.Bool
+  public var hashValue: Swift.Int { get }
+}
+```
 ### `CustomProtocol`
 #### ❇️ Added
 ```javascript
 associatedtype AnotherAssociatedType: Swift.Strideable
-```
-```javascript
-associatedtype AnotherAssociatedType: Swift.Strideable
-```
-```javascript
-associatedtype CustomAssociatedType: Swift.Equatable
 ```
 ```javascript
 associatedtype CustomAssociatedType: Swift.Equatable
