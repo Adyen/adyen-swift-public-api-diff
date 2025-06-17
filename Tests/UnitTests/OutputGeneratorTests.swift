@@ -41,7 +41,7 @@ class OutputGeneratorTests: XCTestCase {
         ---
         ## `Target_1`
         #### ❇️ Added
-        ```javascript
+        ```swift
         Some Addition
         ```
 
@@ -72,20 +72,20 @@ class OutputGeneratorTests: XCTestCase {
         ---
         ## `Target_1`
         #### ❇️ Added
-        ```javascript
+        ```swift
         Some Addition
         ```
         #### ❌ Removed
-        ```javascript
+        ```swift
         Some Removal
         ```
         ## `Target_2`
         #### ❇️ Added
-        ```javascript
+        ```swift
         Another Addition
         ```
         #### ❌ Removed
-        ```javascript
+        ```swift
         Another Removal
         ```
 
