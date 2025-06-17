@@ -1,6 +1,6 @@
-# ⚠️ 58 public changes detected ⚠️
+# ⚠️ 60 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
-<table><tr><td>❇️</td><td><b>34 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>34 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -120,6 +120,13 @@ Changes:
 - Added generic parameter description `<T>`
 - Added generic where clause `where T : Swift.Strideable`
 */
+```
+#### ❌ Removed
+```swift
+public struct PublicStructThatIsOnlyAvailableInTheReferencePackage {
+  public func bar() -> Swift.Void
+  public var foo: Swift.String
+}
 ```
 ### `Array`
 #### ❇️ Added
@@ -271,13 +278,24 @@ indirect case recursive(ReferencePackage.CustomEnum<T>)
 
 /**
 Changes:
-- Added parameter `ReferencePackage.CustomEnum<T>`
-- Removed parameter `ReferencePackage.CustomEnum`
+- Modified 1st parameter: Changed type from `ReferencePackage.CustomEnum` to `ReferencePackage.CustomEnum<T>`
 */
 ```
 #### ❌ Removed
 ```swift
 case caseWithString(Swift.String)
+```
+```swift
+public enum PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage: Swift.Equatable, Swift.Hashable {
+  case alpha
+  case beta
+  public func hash(into hasher: inout Swift.Hasher) -> Swift.Void
+  public static func ==(
+    a: ReferencePackage.CustomEnum.PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage,
+    b: ReferencePackage.CustomEnum.PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage
+  ) -> Swift.Bool
+  public var hashValue: Swift.Int { get }
+}
 ```
 ### `CustomProtocol`
 #### ❇️ Added
@@ -444,10 +462,8 @@ public init(
 
 /**
 Changes:
-- Added parameter `getSetVar: T`
-- Added parameter `getVar: T`
-- Removed parameter `getSetVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType`
-- Removed parameter `getVar: ReferencePackage.OpenSpiConformingClass.CustomAssociatedType`
+- Modified parameter `getSetVar`: Changed type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
+- Modified parameter `getVar`: Changed type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
 */
 ```
 ```swift

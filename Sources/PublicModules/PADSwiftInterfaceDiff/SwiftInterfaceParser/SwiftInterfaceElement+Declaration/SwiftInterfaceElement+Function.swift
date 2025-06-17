@@ -6,45 +6,6 @@
 
 import Foundation
 
-extension SwiftInterfaceFunction {
-
-    struct Parameter {
-
-        /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-        let attributes: [String]
-        
-        let firstName: String
-
-        /// optional second "internal" name - can be ignored
-        let secondName: String?
-
-        let type: String
-
-        let defaultValue: String?
-
-        var description: String {
-            let names = [
-                firstName,
-                secondName
-            ].compactMap { $0 }
-            
-            var description = (attributes + names).joined(separator: " ")
-
-            if description.isEmpty {
-                description += "\(type)"
-            } else {
-                description += ": \(type)"
-            }
-
-            if let defaultValue {
-                description += " = \(defaultValue)"
-            }
-
-            return description
-        }
-    }
-}
-
 class SwiftInterfaceFunction: SwiftInterfaceElement {
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
@@ -55,7 +16,7 @@ class SwiftInterfaceFunction: SwiftInterfaceElement {
     /// e.g. <T>
     let genericParameterDescription: String?
 
-    let parameters: [Parameter]
+    let parameters: [SwiftInterfaceElementParameter]
 
     /// e.g. async, throws, rethrows
     let effectSpecifiers: [String]
@@ -76,7 +37,7 @@ class SwiftInterfaceFunction: SwiftInterfaceElement {
     var parent: (any SwiftInterfaceElement)?
 
     var diffableSignature: String {
-        "\(name)(\(parameters.map { "\($0.firstName):" }.joined()))"
+        "\(name)(\(parameters.map(\.valueForDiffableSignature).joined()))"
     }
 
     var consolidatableName: String { name }
@@ -90,7 +51,7 @@ class SwiftInterfaceFunction: SwiftInterfaceElement {
         modifiers: [String],
         name: String,
         genericParameterDescription: String?,
-        parameters: [Parameter],
+        parameters: [SwiftInterfaceElementParameter],
         effectSpecifiers: [String],
         returnType: String?,
         genericWhereClauseDescription: String?
@@ -114,7 +75,7 @@ extension SwiftInterfaceFunction {
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
         changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
-        changes += diffDescription(propertyType: "parameter", oldValues: other.parameters.map(\.description), newValues: parameters.map(\.description)) // TODO: Maybe have a better way to show changes
+        changes += diffDescription(oldParameters: other.parameters, newParameters: parameters)
         changes += diffDescription(propertyType: "effect", oldValues: other.effectSpecifiers, newValues: effectSpecifiers)
         changes += diffDescription(propertyType: "return type", oldValue: other.returnType, newValue: returnType)
         changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)

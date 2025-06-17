@@ -1,6 +1,6 @@
-# ⚠️ 49 public changes detected ⚠️
+# ⚠️ 51 public changes detected ⚠️
 _Comparing `new_public` to `old_public`_
-<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>16 Modifications</b></td></tr><tr><td>❌</td><td><b>2 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>16 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -105,6 +105,13 @@ Changes:
 - Added generic parameter description `<T>`
 - Added generic where clause `where T : Swift.Strideable`
 */
+```
+#### ❌ Removed
+```swift
+public struct PublicStructThatIsOnlyAvailableInTheReferencePackage {
+  public func bar() -> Swift.Void
+  public var foo: Swift.String
+}
 ```
 ### `Array`
 #### ❇️ Added
@@ -256,13 +263,24 @@ indirect case recursive(ReferencePackage.CustomEnum<T>)
 
 /**
 Changes:
-- Added parameter `ReferencePackage.CustomEnum<T>`
-- Removed parameter `ReferencePackage.CustomEnum`
+- Modified 1st parameter: Changed type from `ReferencePackage.CustomEnum` to `ReferencePackage.CustomEnum<T>`
 */
 ```
 #### ❌ Removed
 ```swift
 case caseWithString(Swift.String)
+```
+```swift
+public enum PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage: Swift.Equatable, Swift.Hashable {
+  case alpha
+  case beta
+  public func hash(into hasher: inout Swift.Hasher) -> Swift.Void
+  public static func ==(
+    a: ReferencePackage.CustomEnum.PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage,
+    b: ReferencePackage.CustomEnum.PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage
+  ) -> Swift.Bool
+  public var hashValue: Swift.Int { get }
+}
 ```
 ### `CustomProtocol`
 #### ❇️ Added

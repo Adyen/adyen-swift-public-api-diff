@@ -103,7 +103,7 @@ private extension XcodeToolsTests {
         var expectedHandleDebugCalls: [(message: String, subsystem: String)] = [
             (archiveResult, "XcodeTools")
         ]
-        var expectedHandleFileExistsCalls = ["PROJECT_DIRECTORY_PATH/.build"]
+        var expectedHandleFileExistsCalls = ["PROJECT_DIRECTORY_PATH/.build/Build"]
 
         var shell = MockShell()
         shell.handleExecute = { command in

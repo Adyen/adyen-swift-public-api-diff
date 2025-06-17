@@ -140,3 +140,20 @@ public enum CustomEnum {
 
     indirect case recursive(CustomEnum)
 }
+
+public struct PublicStructThatIsOnlyAvailableInTheReferencePackage {
+    
+    public var foo: String
+    public func bar() -> Void {
+        print("Hello")
+    }
+}
+
+public extension CustomEnum {
+    enum PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage {
+        case alpha
+        case beta
+    }
+}
+
+public extension CustomEnum {}

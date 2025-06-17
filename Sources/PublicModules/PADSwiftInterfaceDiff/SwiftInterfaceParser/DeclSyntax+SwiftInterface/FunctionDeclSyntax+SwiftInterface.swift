@@ -23,7 +23,7 @@ extension FunctionDeclSyntax {
             }
         }
 
-        let parameters: [SwiftInterfaceFunction.Parameter] = self.signature.parameterClause.parameters.map {
+        let parameters: [SwiftInterfaceElementParameter] = self.signature.parameterClause.parameters.map {
             .init(
                 attributes: $0.attributes.sanitizedList,
                 firstName: $0.firstName.trimmedDescription,
