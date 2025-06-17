@@ -23,6 +23,7 @@ struct XcodeTools {
 
     internal enum Constants {
         static let derivedDataPath: String = ".build"
+        static let buildDirPath: String = ".build/Build"
         static let simulatorSdkCommand = "xcrun --sdk iphonesimulator --show-sdk-path"
     }
 
@@ -87,6 +88,7 @@ struct XcodeTools {
 
             let result = shell.execute(command)
             let derivedDataPath = "\(projectDirectoryPath)/\(Constants.derivedDataPath)"
+            let buildDirPath = "\(projectDirectoryPath)/\(Constants.buildDirPath)"
 
             logger?.debug(result, from: String(describing: Self.self))
 
@@ -94,9 +96,7 @@ struct XcodeTools {
             // so we have to check outside if they exist.
             //
             // Also see: https://github.com/swiftlang/swift/issues/56573
-            guard fileHandler.fileExists(atPath: derivedDataPath) else {
-                print(result)
-
+            guard fileHandler.fileExists(atPath: buildDirPath) else {
                 throw XcodeToolsError(
                     errorDescription: "💥 Building project failed",
                     underlyingError: result
