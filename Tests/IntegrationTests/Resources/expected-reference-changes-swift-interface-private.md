@@ -1,6 +1,6 @@
-# ⚠️ 57 public changes detected ⚠️
+# ⚠️ 60 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
-<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>34 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -30,6 +30,12 @@ public enum RawValueEnum: Swift.Equatable, Swift.Hashable, Swift.RawRepresentabl
   public init?(rawValue: Swift.String)
   public typealias RawValue = Swift.String
   public var rawValue: Swift.String { get }
+}
+```
+```swift
+public protocol ParentProtocol {
+  associatedtype Iterator: Swift.Collection
+  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element
 }
 ```
 ```swift
@@ -295,6 +301,12 @@ public enum PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePa
 #### ❇️ Added
 ```swift
 associatedtype AnotherAssociatedType: Swift.Strideable
+```
+```swift
+associatedtype AnotherAssociatedType: Swift.Strideable
+```
+```swift
+associatedtype CustomAssociatedType: Swift.Equatable
 ```
 ```swift
 associatedtype CustomAssociatedType: Swift.Equatable
