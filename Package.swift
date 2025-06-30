@@ -34,7 +34,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.1"),
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "601.0.1"),
         .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.56.4"),
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.4")
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.5")
     ],
     targets: [
 
