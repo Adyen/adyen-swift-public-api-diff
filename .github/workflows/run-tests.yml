@@ -1,5 +1,8 @@
 name: 🧪 Run Tests
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]
