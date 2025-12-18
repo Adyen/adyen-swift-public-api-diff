@@ -26,7 +26,7 @@ jobs:
       run: |
         swift build --configuration release | xcpretty --utf --color && exit ${PIPESTATUS[0]}
         
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       with:
         name: 'public-api-diff'
         path: '.build/release/public-api-diff'
