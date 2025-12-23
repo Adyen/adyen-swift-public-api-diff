@@ -23,7 +23,7 @@ runs:
         echo "PROJECT_FOLDER=$(pwd)" >> $GITHUB_ENV
       shell: bash
     
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
         ref: ${{ env.VERSION_NUMBER }}

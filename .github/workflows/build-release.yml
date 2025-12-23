@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-14 # Apple Silicon Runner
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: n1hility/cancel-previous-runs@v3
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
