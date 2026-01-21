@@ -10,17 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Cancel 'detect-api-changes'"
-        uses: n1hility/cancel-previous-runs@v3
+        # Pin to v3.0.0 (Security: Use full SHA instead of tag)
+        uses: n1hility/cancel-previous-runs@afd3a17e0821b0689b9423c78d05c08865769747
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           workflow: detect-api.changes.yml
+
       - name: "Cancel 'build-release'"
-        uses: n1hility/cancel-previous-runs@v3
+        # Pin to v3.0.0 (Security: Use full SHA instead of tag)
+        uses: n1hility/cancel-previous-runs@afd3a17e0821b0689b9423c78d05c08865769747
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           workflow: build-release.yml
+
       - name: "Cancel 'run-tests'"
-        uses: n1hility/cancel-previous-runs@v3
+        # Pin to v3.0.0 (Security: Use full SHA instead of tag)
+        uses: n1hility/cancel-previous-runs@afd3a17e0821b0689b9423c78d05c08865769747
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           workflow: run-tests.yml
