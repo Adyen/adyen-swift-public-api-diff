@@ -25,7 +25,7 @@ jobs:
     - name: Select latest Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.4'
+        xcode-version: '26.2.0'
 
     - name: 🚚 Fetch repo
       uses: actions/checkout@v4
@@ -33,26 +33,26 @@ jobs:
         fetch-depth: 0
         
     - name: 👾 Define Diff Versions
+      shell: bash
       run: |
-        NEW="${{ env.source }}~${{ env.headGithubRepo }}"
-        OLD="${{ env.target }}~${{ env.baseGithubRepo }}"
+        NEW_VAL="${SOURCE}~${HEAD_REPO}"
+        OLD_VAL="${TARGET}~${BASE_REPO}"
         
-        if [[ '${{ env.targetBranchName || env.noTargetBranch }}' == release/* ]]
+        if [[ "$TARGET_BRANCH" == release/* ]]
         then
             LATEST_TAG=$(git describe --tags --abbrev=0)
-            OLD="$LATEST_TAG~${{ env.baseGithubRepo }}" 
+            OLD_VAL="$LATEST_TAG~${BASE_REPO}" 
         fi
         
-        # Providing the output to the environment
-        echo "OLD_VERSION=$OLD" >> $GITHUB_ENV
-        echo "NEW_VERSION=$NEW" >> $GITHUB_ENV
+        # Output to GITHUB_ENV for subsequent steps
+        echo "OLD_VERSION=$OLD_VAL" >> "$GITHUB_ENV"
+        echo "NEW_VERSION=$NEW_VAL" >> "$GITHUB_ENV"
       env:
-        source: '${{ github.event.inputs.new || github.head_ref }}'
-        target: '${{ github.event.inputs.old || github.event.pull_request.base.ref }}'
-        headGithubRepo: '${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git'
-        baseGithubRepo: '${{github.server_url}}/${{github.repository}}.git'
-        noTargetBranch: 'no target branch'
-        targetBranchName: '${{ github.head_ref }}'
+        SOURCE: ${{ github.event.inputs.new || github.head_ref }}
+        TARGET: ${{ github.event.inputs.old || github.event.pull_request.base.ref }}
+        HEAD_REPO: ${{ github.server_url }}/${{ github.event.pull_request.head.repo.full_name || github.repository }}.git
+        BASE_REPO: ${{ github.server_url }}/${{ github.repository }}.git
+        TARGET_BRANCH: ${{ github.head_ref || 'no target branch' }}
     
     - name: 🧰 Build Swift CLI
       run: swift build --configuration release
