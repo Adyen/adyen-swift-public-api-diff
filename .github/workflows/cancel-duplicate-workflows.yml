@@ -8,26 +8,19 @@ jobs:
   cancel-multiple-workflow-runs:
     name: "Cancel the self CI workflow run"
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - name: "Cancel 'detect-api-changes'"
-        uses: potiuk/cancel-workflow-runs@master
+        uses: n1hility/cancel-previous-runs@v3
         with:
-          cancelMode: allDuplicates
-          cancelFutureDuplicates: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          workflowFileName: detect-api.changes.yml
+          workflow: detect-api.changes.yml
       - name: "Cancel 'build-release'"
-        uses: potiuk/cancel-workflow-runs@master
+        uses: n1hility/cancel-previous-runs@v3
         with:
-          cancelMode: allDuplicates
-          cancelFutureDuplicates: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          workflowFileName: build-release.yml
+          workflow: build-release.yml
       - name: "Cancel 'run-tests'"
-        uses: potiuk/cancel-workflow-runs@master
+        uses: n1hility/cancel-previous-runs@v3
         with:
-          cancelMode: allDuplicates
-          cancelFutureDuplicates: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          workflowFileName: run-tests.yml
+          workflow: run-tests.yml
