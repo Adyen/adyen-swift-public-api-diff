@@ -84,7 +84,7 @@ jobs:
       # once the tool is merged the base repo rights apply and the script can comment on PRs as expected.
     - if: ${{ github.event.pull_request.base.ref != '' && env.HEAD_GITHUB_REPO == env.BASE_GITHUB_REPO }}
       name: 📝 Comment on PR
-      uses: thollander/actions-comment-pull-request@e2c37e53a7d2227b61585343765f73a9ca57eda9
+      uses: thollander/actions-comment-pull-request@e4a76dd2b0a3c2027c3fd84147a67c22ee4c90fa
       with:
         file-path: "${{ github.workspace }}/api_comparison.md"
         comment-tag: api_changes
