@@ -30,7 +30,7 @@ runs:
         
     - name: 🛻 Restore Binary
       id: cache-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ${{ env.BINARY_PATH }}
         key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
@@ -52,7 +52,7 @@ runs:
       
     - name: 💾 Save Binary
       if: steps.cache-restore.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: ${{ env.BINARY_PATH }}
         key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
