@@ -8,6 +8,7 @@ jobs:
   cancel-multiple-workflow-runs:
     name: "Cancel the self CI workflow run"
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: "Cancel 'detect-api-changes'"
         uses: potiuk/cancel-workflow-runs@master
