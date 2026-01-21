@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    runs-on: macos-14 # Apple Silicon Runner
+    runs-on: macos-15 # Apple Silicon Runner
 
     steps:
     - uses: actions/checkout@v4
