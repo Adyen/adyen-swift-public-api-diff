@@ -18,6 +18,39 @@ We strongly encourage you to contribute to our repository. Find out more in our 
 ## Requirements
 - **Xcode** >= 16.0 (incl. Xcode command line tools)
 - **Swift** >= 5.9
+- **macOS** >= 13.0
+
+## Installation
+
+### Swift Package Manager (as a dependency)
+
+Add the package to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/Adyen/adyen-swift-public-api-diff", from: "0.10.1")
+]
+```
+
+Available library products:
+- **SwiftInterfaceDiff** - Core diffing functionality for `.swiftinterface` files
+- **PublicApiDiff** - Full API including project building, package analysis, and output generation
+
+### Command Line (via Mint)
+
+```bash
+mint install Adyen/adyen-swift-public-api-diff
+```
+
+### Build from Source
+
+```bash
+git clone https://github.com/Adyen/adyen-swift-public-api-diff.git
+cd adyen-swift-public-api-diff
+swift build --configuration release
+```
+
+The binary will be available at `.build/release/public-api-diff`.
 
 ## Usage
  
@@ -174,11 +207,41 @@ swift build --configuration release
     --old "old/path/to/project.framework"
 ```
 
+## Output Format
+
+The tool generates a Markdown report showing all public API changes, organized by module/target:
+
+```markdown
+# 👀 3 public changes detected
+_Comparing `develop` to `5.12.0`_
+
+---
+## `ModuleName`
+#### ❇️ Added
+\`\`\`swift
+public func newFunction()
+\`\`\`
+#### 🔀 Changed
+\`\`\`swift
+// From
+public func existingFunction(param: String)
+
+// To
+public func existingFunction(param: String, newParam: Int)
+\`\`\`
+#### 😶‍🌫️ Removed
+\`\`\`swift
+public func deprecatedFunction()
+\`\`\`
+```
+
+The output can be written to a file using the `--output` flag or printed to stdout.
+
 ## Github Action
 The public-api-diff can be used easily via the provided github action, which creates a comment on a PR (if applicable) and also adds it to the Github step summary.
 ```bash
 - name: 🔍 Detect Changes
-  uses: Adyen/adyen-swift-public-api-diff@0.4.0
+  uses: Adyen/adyen-swift-public-api-diff@0.10.1
   with:
     platform: "iOS"
     new: "develop~https://github.com/Adyen/adyen-ios.git"
