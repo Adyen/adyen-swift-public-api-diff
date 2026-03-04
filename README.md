@@ -36,12 +36,6 @@ Available library products:
 - **SwiftInterfaceDiff** - Core diffing functionality for `.swiftinterface` files
 - **PublicApiDiff** - Full API including project building, package analysis, and output generation
 
-### Command Line (via Mint)
-
-```bash
-mint install Adyen/adyen-swift-public-api-diff
-```
-
 ### Build from Source
 
 ```bash
