@@ -1,4 +1,5 @@
 # ⚠️ 50 public changes detected ⚠️
+Comparing `new_public` to `old_public`
 <table><tr><td>❇️</td><td><b>28 Additions</b></td></tr><tr><td>🔀</td><td><b>18 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
