@@ -242,3 +242,33 @@ public enum NewEnumAvailableInVersion17: String, Codable, Equatable {
     @available(macOS 15, *)
     public func laterAvailableFunction(){}
 }
+
+// MARK: - Integration Test Scenarios
+
+/// Tests extension matching fix: Multiple extensions with same description need child-based matching
+public enum TestExtensionMatching {
+    case initial
+}
+
+public extension TestExtensionMatching {
+    struct Data {
+        public var someValue: String
+    }
+}
+
+public extension TestExtensionMatching {
+    struct DataModel {
+        public var id: String
+        @available(*, deprecated, message: "Use default initializer")
+        public init(id: String) {
+            self.id = id
+        }
+    }
+}
+
+public extension TestExtensionMatching {
+    struct Configuration {
+        public var timeout: Int
+    }
+}
+

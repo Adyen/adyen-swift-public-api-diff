@@ -157,3 +157,31 @@ public extension CustomEnum {
 }
 
 public extension CustomEnum {}
+
+// MARK: - Integration Test Scenarios
+
+/// Tests extension matching fix: Multiple extensions with same description need child-based matching
+public enum TestExtensionMatching {
+    case initial
+}
+
+public extension TestExtensionMatching {
+    struct Data {
+        public let someValue: String
+    }
+}
+
+public extension TestExtensionMatching {
+    struct DataModel {
+        public var id: String
+        public init(id: String) {
+            self.id = id
+        }
+    }
+}
+
+public extension TestExtensionMatching {
+    struct Configuration {
+        public var timeout: Int
+    }
+}
