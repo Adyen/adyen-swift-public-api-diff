@@ -57,8 +57,11 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
             let listOfChanges = listOfChanges(between: change, and: match)
 
             if listOfChanges.isEmpty {
-                print("⚠ We should not end up here - investigate how this happened")
-                break
+                // This happens when the element declaration is the same but recursiveDescription differs
+                // The elements themselves haven't changed, but their children have
+                // Don't consolidate them - this avoids false "modification" reports
+                // Continue processing remaining changes (don't break the loop)
+                continue
             }
 
             consolidatedChanges.append(
