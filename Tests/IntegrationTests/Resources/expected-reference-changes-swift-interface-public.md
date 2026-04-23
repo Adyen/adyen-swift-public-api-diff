@@ -1,6 +1,6 @@
-# ⚠️ 48 public changes detected ⚠️
+# ⚠️ 50 public changes detected ⚠️
 _Comparing `new_public` to `old_public`_
-<table><tr><td>❇️</td><td><b>28 Additions</b></td></tr><tr><td>🔀</td><td><b>16 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>28 Additions</b></td></tr><tr><td>🔀</td><td><b>18 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -385,6 +385,36 @@ public var getVar: Swift.Int
 /**
 Changes:
 - Modified type from `any Swift.Equatable` to `Swift.Int`
+*/
+```
+### `TestExtensionMatching.Data`
+#### 🔀 Modified
+```swift
+// From
+public let someValue: Swift.String { get }
+
+// To
+public var someValue: Swift.String
+
+/**
+Changes:
+- Modified from `let` to `var`
+- Removed accessors `get`
+*/
+```
+### `TestExtensionMatching.DataModel`
+#### 🔀 Modified
+```swift
+// From
+public init(id: Swift.String)
+
+// To
+@available(*, deprecated, message: "Use default initializer")
+public init(id: Swift.String)
+
+/**
+Changes:
+- Added attribute `@available(*, deprecated, message: "Use default initializer")`
 */
 ```
 

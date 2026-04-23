@@ -1,6 +1,6 @@
-# ⚠️ 57 public changes detected ⚠️
+# ⚠️ 59 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
-<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>22 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>24 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -494,6 +494,36 @@ public var getVar: T
 /**
 Changes:
 - Modified type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
+*/
+```
+### `TestExtensionMatching.Data`
+#### 🔀 Modified
+```swift
+// From
+public let someValue: Swift.String { get }
+
+// To
+public var someValue: Swift.String
+
+/**
+Changes:
+- Modified from `let` to `var`
+- Removed accessors `get`
+*/
+```
+### `TestExtensionMatching.DataModel`
+#### 🔀 Modified
+```swift
+// From
+public init(id: Swift.String)
+
+// To
+@available(*, deprecated, message: "Use default initializer")
+public init(id: Swift.String)
+
+/**
+Changes:
+- Added attribute `@available(*, deprecated, message: "Use default initializer")`
 */
 ```
 

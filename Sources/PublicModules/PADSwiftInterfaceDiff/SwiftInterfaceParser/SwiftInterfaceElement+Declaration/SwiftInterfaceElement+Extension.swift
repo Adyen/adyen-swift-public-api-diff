@@ -30,7 +30,10 @@ class SwiftInterfaceExtension: SwiftInterfaceElement {
 
     var parent: (any SwiftInterfaceElement)?
 
-    var diffableSignature: String { extendedType }
+    var diffableSignature: String {
+        // Include where clause to differentiate extensions with different constraints
+        [extendedType, genericWhereClauseDescription.map { "[\($0)]" }].compactMap { $0 }.joined()
+    }
 
     var consolidatableName: String { extendedType }
 

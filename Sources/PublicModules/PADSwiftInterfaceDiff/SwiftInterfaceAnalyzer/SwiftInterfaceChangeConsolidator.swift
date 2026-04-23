@@ -58,7 +58,8 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
 
             if listOfChanges.isEmpty {
                 print("⚠ We should not end up here - investigate how this happened")
-                break
+                // Continue processing remaining changes (don't break the loop)
+                continue
             }
 
             consolidatedChanges.append(
