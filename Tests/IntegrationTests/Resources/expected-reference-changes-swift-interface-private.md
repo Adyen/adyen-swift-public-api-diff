@@ -1,4 +1,5 @@
 # ⚠️ 59 public changes detected ⚠️
+_Comparing `new_private` to `old_private`_
 <table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>24 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
