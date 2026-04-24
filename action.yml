@@ -19,7 +19,6 @@ runs:
     steps:
     - name: 🍱 Compute prerequisites
       run: |
-        echo "ACTION_SHA=${{ github.action_sha }}" >> $GITHUB_ENV
         echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
@@ -32,7 +31,12 @@ runs:
     - uses: actions/checkout@v6
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
-        ref: ${{ env.ACTION_SHA }}
+        ref: ${{ github.action_ref }}
+        
+    - name: 🔍 Get action commit SHA
+      run: |
+        echo "ACTION_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      shell: bash
 
     - name: 🛻 Restore Binary
       id: cache-restore
