@@ -24,11 +24,10 @@ runs:
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
         echo "PROJECT_FOLDER=$(pwd)" >> $GITHUB_ENV
-        echo "COMMENT_TAG=${{ env.input_comment_tag || format('api_changes_{0}', env.input_platform) }}" >> $GITHUB_ENV
+        echo "COMMENT_TAG=$final_comment_tag" >> $GITHUB_ENV
       shell: bash
       env:
-        input_comment_tag: ${{ inputs.comment_tag }}
-        input_platform: ${{ inputs.platform }}
+        final_comment_tag: ${{ inputs.comment_tag || format('api_changes_{0}', inputs.platform) }}
     
     - uses: actions/checkout@v6
       with:
