@@ -10,31 +10,43 @@ inputs:
     old:
         description: 'Specify the old version to compare to'
         required: true
-        
+    comment_tag:
+        description: 'The tag to use for the PR comment (default: api_changes_[PLATFORM])'
+        required: false
+
 runs:
     using: 'composite'
     steps:
     - name: 🍱 Compute prerequisites
       run: |
-        echo "VERSION_NUMBER=0.11.1" >> $GITHUB_ENV
+        echo "ACTION_REF=$action_ref" >> $GITHUB_ENV
         echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
         echo "PROJECT_FOLDER=$(pwd)" >> $GITHUB_ENV
+        echo "COMMENT_TAG=$final_comment_tag" >> $GITHUB_ENV
       shell: bash
+      env:
+        action_ref: ${{ github.action_ref }}
+        final_comment_tag: ${{ inputs.comment_tag || format('api_changes_{0}', inputs.platform) }}
     
     - uses: actions/checkout@v6
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
-        ref: ${{ env.VERSION_NUMBER }}
+        ref: ${{ env.ACTION_REF }}
         
+    - name: 🔍 Get action commit SHA
+      run: |
+        echo "ACTION_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      shell: bash
+
     - name: 🛻 Restore Binary
       id: cache-restore
       uses: actions/cache/restore@v5
       with:
         path: ${{ env.BINARY_PATH }}
-        key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
-    
+        key: build-cache-${{ runner.os }}-${{ env.ACTION_SHA }}
+        
     - name: 🧰 Build Swift CLI
       if: steps.cache-restore.outputs.cache-hit != 'true'
       run: swift build --configuration release
@@ -49,14 +61,14 @@ runs:
           echo "Binary found at ${{ env.BINARY_PATH }}" 
         fi
       shell: bash
-      
+
     - name: 💾 Save Binary
       if: steps.cache-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v5
       with:
         path: ${{ env.BINARY_PATH }}
-        key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
-        
+        key: build-cache-${{ runner.os }}-${{ env.ACTION_SHA }}
+      
     - name: 🏃 Run Diff
       run: |
         NEW=${{ inputs.new }}
@@ -87,5 +99,5 @@ runs:
       uses: thollander/actions-comment-pull-request@v3
       with:
         file-path: "${{ github.workspace }}/api_comparison.md"
-        comment-tag: api_changes
+        comment-tag: ${{ env.COMMENT_TAG }}
         mode: recreate
