@@ -13,7 +13,7 @@ inputs:
     comment_tag:
         description: 'The tag to use for the PR comment (default: api_changes_[PLATFORM])'
         required: false
-        
+
 runs:
     using: 'composite'
     steps:
@@ -33,8 +33,16 @@ runs:
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
         ref: ${{ env.VERSION_NUMBER }}
+
+    - name: 🛻 Restore Binary
+      id: cache-restore
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ env.BINARY_PATH }}
+        key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
         
     - name: 🧰 Build Swift CLI
+      if: steps.cache-restore.outputs.cache-hit != 'true'
       run: swift build --configuration release
       shell: bash
       
@@ -47,6 +55,13 @@ runs:
           echo "Binary found at ${{ env.BINARY_PATH }}" 
         fi
       shell: bash
+
+    - name: 💾 Save Binary
+      if: steps.cache-restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v5
+      with:
+        path: ${{ env.BINARY_PATH }}
+        key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
       
     - name: 🏃 Run Diff
       run: |
