@@ -67,6 +67,7 @@ class ReferencePackageTests: XCTestCase {
             allTargets: ["ReferencePackage"],
             oldVersionName: "old_public",
             newVersionName: "new_public",
+            platform: nil,
             warnings: []
         )
         
@@ -93,6 +94,7 @@ class ReferencePackageTests: XCTestCase {
             allTargets: ["ReferencePackage"],
             oldVersionName: "old_private",
             newVersionName: "new_private",
+            platform: nil,
             warnings: []
         )
 

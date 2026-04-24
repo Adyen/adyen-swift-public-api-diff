@@ -25,6 +25,7 @@ class OutputGeneratorTests: XCTestCase {
             allTargets: ["Target_1"],
             oldVersionName: "old_source",
             newVersionName: "new_source",
+            platform: nil,
             warnings: []
         )
         
@@ -56,6 +57,7 @@ class OutputGeneratorTests: XCTestCase {
             allTargets: ["Target_1"],
             oldVersionName: "old_source",
             newVersionName: "new_source",
+            platform: nil,
             warnings: []
         )
         
@@ -109,6 +111,7 @@ class OutputGeneratorTests: XCTestCase {
             allTargets: ["Target_1", "Target_2"],
             oldVersionName: "old_repository @ old_branch",
             newVersionName: "new_source",
+            platform: nil,
             warnings: []
         )
         
@@ -162,6 +165,31 @@ class OutputGeneratorTests: XCTestCase {
             allTargets: argument.allTargets,
             oldVersionName: "old_repository @ old_branch",
             newVersionName: "new_source",
+            platform: nil,
+            warnings: []
+        )
+        
+        XCTAssertEqual(output, expectedOutput)
+    }
+    
+    func test_platformInfo_shouldBeIncludedWhenProvided() {
+        
+        let expectedOutput = """
+        # ✅ No changes detected
+        _Comparing `new_source` to `old_source`_
+        _Platform: `iOS`_
+
+        ---
+        **Analyzed targets:** Target_1
+        """
+        
+        let outputGenerator = MarkdownOutputGenerator()
+        let output = outputGenerator.generate(
+            from: [:],
+            allTargets: ["Target_1"],
+            oldVersionName: "old_source",
+            newVersionName: "new_source",
+            platform: "iOS",
             warnings: []
         )
         

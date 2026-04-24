@@ -9,4 +9,12 @@ public enum ProjectPlatform {
 
     case macOS
     case iOS
+    
+    /// The display name for the platform
+    public var displayName: String {
+        switch self {
+        case .macOS: return "macOS"
+        case .iOS: return "iOS"
+        }
+    }
 }

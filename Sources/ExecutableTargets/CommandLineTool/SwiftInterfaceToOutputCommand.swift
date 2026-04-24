@@ -118,6 +118,7 @@ private extension SwiftInterfaceToOutputCommand {
             allTargets: allTargets,
             oldVersionName: oldVersionName,
             newVersionName: newVersionName,
+            platform: nil,
             warnings: warnings
         )
     }
