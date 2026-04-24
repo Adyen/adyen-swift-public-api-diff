@@ -10,6 +10,9 @@ inputs:
     old:
         description: 'Specify the old version to compare to'
         required: true
+    comment_tag:
+        description: 'The tag to use for the PR comment (default: api_changes_[PLATFORM])'
+        required: false
         
 runs:
     using: 'composite'
@@ -21,6 +24,7 @@ runs:
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
         echo "PROJECT_FOLDER=$(pwd)" >> $GITHUB_ENV
+        echo "COMMENT_TAG=${{ inputs.comment_tag || format('api_changes_{0}', inputs.platform) }}" >> $GITHUB_ENV
       shell: bash
     
     - uses: actions/checkout@v6
@@ -72,5 +76,5 @@ runs:
       uses: thollander/actions-comment-pull-request@v3
       with:
         file-path: "${{ github.workspace }}/api_comparison.md"
-        comment-tag: api_changes
+        comment-tag: ${{ env.COMMENT_TAG }}
         mode: recreate
