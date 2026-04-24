@@ -19,4 +19,12 @@ public enum SwiftInterfaceType {
         case .package: "package"
         }
     }
+    
+    var fileExtension: String {
+        switch self {
+        case .private: "private.swiftinterface"
+        case .public: "swiftinterface"
+        case .package: "package.swiftinterface"
+        }
+    }
 }
