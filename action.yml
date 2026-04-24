@@ -19,7 +19,7 @@ runs:
     steps:
     - name: 🍱 Compute prerequisites
       run: |
-        echo "VERSION_NUMBER=goergisn-patch-1" >> $GITHUB_ENV
+        echo "ACTION_SHA=${{ github.action_sha }}" >> $GITHUB_ENV
         echo "BINARY_PATH=$(swift build --configuration release --show-bin-path)/public-api-diff" >> $GITHUB_ENV
         echo "HEAD_GITHUB_REPO=${{github.server_url}}/${{ github.event.pull_request.head.repo.full_name || github.repository}}.git" >> $GITHUB_ENV
         echo "BASE_GITHUB_REPO=${{github.server_url}}/${{github.repository}}.git" >> $GITHUB_ENV
@@ -32,14 +32,14 @@ runs:
     - uses: actions/checkout@v6
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
-        ref: ${{ env.VERSION_NUMBER }}
+        ref: ${{ env.ACTION_SHA }}
 
     - name: 🛻 Restore Binary
       id: cache-restore
       uses: actions/cache/restore@v5
       with:
         path: ${{ env.BINARY_PATH }}
-        key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
+        key: build-cache-${{ runner.os }}-${{ env.ACTION_SHA }}
         
     - name: 🧰 Build Swift CLI
       if: steps.cache-restore.outputs.cache-hit != 'true'
@@ -61,7 +61,7 @@ runs:
       uses: actions/cache/save@v5
       with:
         path: ${{ env.BINARY_PATH }}
-        key: build-cache-${{ runner.os }}-${{ env.VERSION_NUMBER }}
+        key: build-cache-${{ runner.os }}-${{ env.ACTION_SHA }}
       
     - name: 🏃 Run Diff
       run: |
