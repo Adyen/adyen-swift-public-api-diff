@@ -49,37 +49,32 @@ public struct SwiftInterfaceFileLocator {
 
         let swiftModulePathsForScheme = shell.execute("cd '\(derivedDataPath)'; find . -type d -name '\(schemeSwiftModuleName)'")
             .components(separatedBy: .newlines)
-            .map { URL(filePath: $0) }
+            .map { URL(filePath: derivedDataPath).appending(path: $0) }
 
         guard let swiftModulePath = swiftModulePathsForScheme.first?.path() else {
             throw FileHandlerError.pathDoesNotExist(path: "find . -type d -name '\(schemeSwiftModuleName)'")
         }
 
-        let completeSwiftModulePath = derivedDataPath + "/" + swiftModulePath
-
-        let swiftModuleContent = try fileHandler.contentsOfDirectory(atPath: completeSwiftModulePath)
+        let swiftModuleContent = try fileHandler.contentsOfDirectory(atPath: swiftModulePath)
 
         let swiftInterfacePaths: [String]
         switch type {
-        case .private:
-            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".private.swiftinterface") }
-        case .package:
-            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".package.swiftinterface") }
+        case .private, .package:
+            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".\(type.fileExtension)") }
         case .public:
-            swiftInterfacePaths = swiftModuleContent.filter { $0.hasSuffix(".swiftinterface") && !$0.hasSuffix(".private.swiftinterface") && !$0.hasSuffix(".package.swiftinterface") }
-        }
-
-        guard let swiftInterfacePath = swiftInterfacePaths.first else {
-            switch type {
-            case .private:
-                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).private.swiftinterface'")
-            case .package:
-                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).package.swiftinterface'")
-            case .public:
-                throw FileHandlerError.pathDoesNotExist(path: "'\(completeSwiftModulePath)/\(scheme).swiftinterface'")
+            swiftInterfacePaths = swiftModuleContent.filter {
+                $0.hasSuffix(".\(SwiftInterfaceType.public.fileExtension)") &&
+                !$0.hasSuffix(".\(SwiftInterfaceType.private.fileExtension)") &&
+                !$0.hasSuffix(".\(SwiftInterfaceType.package.fileExtension)")
             }
         }
 
-        return URL(filePath: "\(completeSwiftModulePath)/\(swiftInterfacePath)")
+        guard let swiftInterfacePath = swiftInterfacePaths.first else {
+            throw FileHandlerError.pathDoesNotExist(
+                path: "'\(swiftModulePath)/\(scheme).\(type.fileExtension)'"
+            )
+        }
+
+        return URL(filePath: swiftModulePath).appending(path: swiftInterfacePath)
     }
 }
