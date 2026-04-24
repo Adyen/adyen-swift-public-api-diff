@@ -159,6 +159,7 @@ private extension FrameworkToOutputCommand {
             allTargets: allTargets,
             oldVersionName: oldVersionName,
             newVersionName: newVersionName,
+            platform: nil,
             warnings: warnings
         )
     }

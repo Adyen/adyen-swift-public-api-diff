@@ -113,7 +113,8 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
                 warnings: warnings,
                 allTargets: projectBuilderResult.swiftInterfaceFiles.map(\.name).sorted(),
                 oldVersionName: oldSource.title,
-                newVersionName: newSource.title
+                newVersionName: newSource.title,
+                platform: platform
             )
 
             // MARK: -
@@ -200,7 +201,8 @@ private extension ProjectToOutputCommand {
         warnings: [String],
         allTargets: [String],
         oldVersionName: String,
-        newVersionName: String
+        newVersionName: String,
+        platform: ProjectPlatform
     ) throws -> String {
         let outputGenerator: any OutputGenerating<String> = MarkdownOutputGenerator()
 
@@ -209,6 +211,7 @@ private extension ProjectToOutputCommand {
             allTargets: allTargets,
             oldVersionName: oldVersionName,
             newVersionName: newVersionName,
+            platform: platform.displayName,
             warnings: warnings
         )
     }

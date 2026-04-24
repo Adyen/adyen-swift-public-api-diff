@@ -18,6 +18,7 @@ public protocol OutputGenerating<OutputType> {
     ///   - allTargets: A list of all targets/modules that were analysed in previous steps - if targets are provided but the list is empty it is treated like a failure
     ///   - oldVersionName: The name of the old/reference version
     ///   - newVersionName: The name of the new/updated version
+    ///   - platform: The platform used during execution (e.g. iOS, macOS)
     ///   - warnings: A list of warnings produced in previous steps
     /// - Returns: An output of type ``OutputType``
     func generate(
@@ -25,6 +26,7 @@ public protocol OutputGenerating<OutputType> {
         allTargets: [String]?,
         oldVersionName: String?,
         newVersionName: String?,
+        platform: String?,
         warnings: [String]
     ) throws -> OutputType
 }

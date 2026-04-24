@@ -18,6 +18,7 @@ public struct MarkdownOutputGenerator: OutputGenerating {
         allTargets: [String]?,
         oldVersionName: String?,
         newVersionName: String?,
+        platform: String?,
         warnings: [String]
     ) -> String {
 
@@ -30,6 +31,10 @@ public struct MarkdownOutputGenerator: OutputGenerating {
 
         if let oldVersionName, let newVersionName {
             lines += [Self.repoInfo(oldVersionName: oldVersionName, newVersionName: newVersionName)]
+        }
+        
+        if let platform {
+            lines += [Self.platformInfo(platform: platform)]
         }
         
         if !changes.isEmpty {
@@ -101,6 +106,10 @@ private extension MarkdownOutputGenerator {
 
     static func repoInfo(oldVersionName: String, newVersionName: String) -> String {
         "_Comparing `\(newVersionName)` to `\(oldVersionName)`_"
+    }
+    
+    static func platformInfo(platform: String) -> String {
+        "_Platform: `\(platform)`_"
     }
 
     static func analyzedModulesInfo(allTargets: [String]) -> String {

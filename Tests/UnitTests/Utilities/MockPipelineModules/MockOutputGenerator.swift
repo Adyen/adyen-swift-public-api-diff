@@ -10,15 +10,16 @@ import XCTest
 
 struct MockOutputGenerator: OutputGenerating {
 
-    var onGenerate: ([String: [Change]], [String]?, String?, String?, [String]) throws -> String
+    var onGenerate: ([String: [Change]], [String]?, String?, String?, String?, [String]) throws -> String
 
     func generate(
         from changesPerTarget: [String: [Change]],
         allTargets: [String]?,
         oldVersionName: String?,
         newVersionName: String?,
+        platform: String?,
         warnings: [String]
     ) throws -> String {
-        try onGenerate(changesPerTarget, allTargets, oldVersionName, newVersionName, warnings)
+        try onGenerate(changesPerTarget, allTargets, oldVersionName, newVersionName, platform, warnings)
     }
 }
