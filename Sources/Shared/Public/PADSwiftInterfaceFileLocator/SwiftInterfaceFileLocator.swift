@@ -55,6 +55,8 @@ public struct SwiftInterfaceFileLocator {
             throw FileHandlerError.pathDoesNotExist(path: "find . -type d -name '\(schemeSwiftModuleName)'")
         }
 
+        logger?.debug("📁 \(swiftModulePath)", from: String(describing: Self.self))
+
         let swiftModuleContent = try fileHandler.contentsOfDirectory(atPath: swiftModulePath)
 
         let swiftInterfacePaths: [String]
