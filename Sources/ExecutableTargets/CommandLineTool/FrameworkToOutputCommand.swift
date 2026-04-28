@@ -41,6 +41,9 @@ struct FrameworkToOutputCommand: AsyncParsableCommand {
     @Option(help: "[Optional] The name of your new version (e.g. v2.0 / develop) to show in the output")
     public var newVersionName: String?
 
+    @Option(help: "[Optional] Output format (markdown/digester)")
+    public var outputFormat: OutputFormat = .markdown
+
     /// The (optional) output file path
     ///
     /// If not defined the output will be printed to the console
@@ -84,7 +87,8 @@ struct FrameworkToOutputCommand: AsyncParsableCommand {
                 warnings: [],
                 allTargets: [targetName],
                 oldVersionName: oldVersionName,
-                newVersionName: newVersionName
+                newVersionName: newVersionName,
+                outputFormat: outputFormat
             )
 
             // MARK: -
@@ -150,9 +154,15 @@ private extension FrameworkToOutputCommand {
         warnings: [String],
         allTargets: [String]?,
         oldVersionName: String?,
-        newVersionName: String?
+        newVersionName: String?,
+        outputFormat: OutputFormat
     ) throws -> String {
-        let outputGenerator: any OutputGenerating<String> = MarkdownOutputGenerator()
+        let outputGenerator: any OutputGenerating<String> = switch outputFormat {
+        case .markdown:
+            MarkdownOutputGenerator()
+        case .digester:
+            DigesterStyleOutputGenerator()
+        }
 
         return try outputGenerator.generate(
             from: changes,

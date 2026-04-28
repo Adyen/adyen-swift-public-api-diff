@@ -10,6 +10,14 @@ import PADLogging
 import PADSwiftInterfaceFileLocator
 import PADProjectBuilder
 
+/// Output format for the generated diff
+enum OutputFormat: String, CaseIterable {
+    /// Markdown format (default) - human-readable with code blocks
+    case markdown
+    /// Digester format - similar to swift-api-digester output
+    case digester
+}
+
 extension SwiftInterfaceType: ExpressibleByArgument {
     public init?(argument: String) {
         let mapping: [String: Self] = [
@@ -47,6 +55,21 @@ extension ProjectPlatform: ExpressibleByArgument {
         let mapping: [String: Self] = [
             "iOS": .iOS,
             "macOS": .macOS
+        ]
+        
+        if let match = mapping.value(forArgument: argument) {
+            self = match
+        } else {
+            return nil
+        }
+    }
+}
+
+extension OutputFormat: ExpressibleByArgument {
+    public init?(argument: String) {
+        let mapping: [String: Self] = [
+            "markdown": .markdown,
+            "digester": .digester
         ]
         
         if let match = mapping.value(forArgument: argument) {

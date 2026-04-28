@@ -41,6 +41,9 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
     @Option(help: "[Optional] Specify the type of .swiftinterface you want to compare (public/private)")
     public var swiftInterfaceType: SwiftInterfaceType = .public
 
+    @Option(help: "[Optional] Output format (markdown/digester)")
+    public var outputFormat: OutputFormat = .markdown
+
     /// The (optional) output file path
     ///
     /// If not defined the output will be printed to the console
@@ -114,7 +117,8 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
                 allTargets: projectBuilderResult.swiftInterfaceFiles.map(\.name).sorted(),
                 oldVersionName: oldSource.title,
                 newVersionName: newSource.title,
-                platform: platform
+                platform: platform,
+                outputFormat: outputFormat
             )
 
             // MARK: -
@@ -202,9 +206,15 @@ private extension ProjectToOutputCommand {
         allTargets: [String],
         oldVersionName: String,
         newVersionName: String,
-        platform: ProjectPlatform
+        platform: ProjectPlatform,
+        outputFormat: OutputFormat
     ) throws -> String {
-        let outputGenerator: any OutputGenerating<String> = MarkdownOutputGenerator()
+        let outputGenerator: any OutputGenerating<String> = switch outputFormat {
+        case .markdown:
+            MarkdownOutputGenerator()
+        case .digester:
+            DigesterStyleOutputGenerator()
+        }
 
         return try outputGenerator.generate(
             from: changes,
