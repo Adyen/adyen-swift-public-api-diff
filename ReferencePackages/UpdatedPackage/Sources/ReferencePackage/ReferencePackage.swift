@@ -272,3 +272,67 @@ public extension TestExtensionMatching {
     }
 }
 
+// MARK: - Ownership Keywords Tests
+
+/// Tests for Swift ownership keywords (borrowing, consuming, inout, sending)
+public struct OwnershipTester {
+    public var value: String
+    
+    public init(value: String) {
+        self.value = value
+    }
+    
+    // Function with borrowing parameter (changed from regular)
+    public func regularFunction(_ param: borrowing String) {
+        _ = param
+    }
+    
+    // Function with regular parameter (changed from inout - removed inout)
+    public func mutatingFunction(_ param: String) {
+        _ = param
+    }
+    
+    // Function with regular parameter (changed from consuming - removed consuming)
+    public func consumingFunction(_ param: String) {
+        _ = param
+    }
+    
+    // New function with consuming parameter
+    public func newConsumingFunction(_ param: consuming String) {
+        _ = param
+    }
+    
+    // Function with sending parameter (changed from regular - added sending)
+    public func processingFunction(_ param: sending String) {
+        _ = param
+    }
+    
+    // New function with inout parameter (tests adding inout)
+    public func newMutatingFunction(_ param: inout String) {
+        param = "new"
+    }
+}
+
+// MARK: - Type Constraint Tests
+
+/// Tests for type constraints like ~Copyable and ~Escapable
+public struct TypeConstraintTester<T> {
+    public var value: T
+    
+    public init(value: T) {
+        self.value = value
+    }
+    
+    // Generic function with ~Copyable constraint (changed from regular)
+    // Note: ~Copyable types require ownership annotations
+    public func processValue<U>(_ value: consuming U) where U: ~Copyable {
+        _ = value
+    }
+    
+    // New function with ~Escapable constraint  
+    // Note: ~Escapable types cannot be returned, only used locally
+    public func processEscapable<U>(_ value: borrowing U) where U: ~Escapable {
+        _ = value
+    }
+}
+

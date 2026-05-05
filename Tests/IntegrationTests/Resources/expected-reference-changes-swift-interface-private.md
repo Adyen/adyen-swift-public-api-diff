@@ -1,6 +1,6 @@
-# ⚠️ 59 public changes detected ⚠️
+# ⚠️ 67 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
-<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>24 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>34 Additions</b></td></tr><tr><td>🔀</td><td><b>29 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -496,6 +496,63 @@ Changes:
 - Modified type from `ReferencePackage.OpenSpiConformingClass.CustomAssociatedType` to `T`
 */
 ```
+### `OwnershipTester`
+#### ❇️ Added
+```swift
+public func newConsumingFunction(_ param: consuming Swift.String) -> Swift.Void
+```
+```swift
+public func newMutatingFunction(_ param: inout Swift.String) -> Swift.Void
+```
+#### 🔀 Modified
+```swift
+// From
+public func consumingFunction(_ param: consuming Swift.String) -> Swift.Void
+
+// To
+public func consumingFunction(_ param: Swift.String) -> Swift.Void
+
+/**
+Changes:
+- Modified parameter `_`: Changed type from `consuming Swift.String` to `Swift.String`
+*/
+```
+```swift
+// From
+public func mutatingFunction(_ param: inout Swift.String) -> Swift.Void
+
+// To
+public func mutatingFunction(_ param: Swift.String) -> Swift.Void
+
+/**
+Changes:
+- Modified parameter `_`: Changed type from `inout Swift.String` to `Swift.String`
+*/
+```
+```swift
+// From
+public func processingFunction(_ param: Swift.String) -> Swift.Void
+
+// To
+public func processingFunction(_ param: sending Swift.String) -> Swift.Void
+
+/**
+Changes:
+- Modified parameter `_`: Changed type from `Swift.String` to `sending Swift.String`
+*/
+```
+```swift
+// From
+public func regularFunction(_ param: Swift.String) -> Swift.Void
+
+// To
+public func regularFunction(_ param: borrowing Swift.String) -> Swift.Void
+
+/**
+Changes:
+- Modified parameter `_`: Changed type from `Swift.String` to `borrowing Swift.String`
+*/
+```
 ### `TestExtensionMatching.Data`
 #### 🔀 Modified
 ```swift
@@ -524,6 +581,25 @@ public init(id: Swift.String)
 /**
 Changes:
 - Added attribute `@available(*, deprecated, message: "Use default initializer")`
+*/
+```
+### `TypeConstraintTester`
+#### ❇️ Added
+```swift
+public func processEscapable<U>(_ value: borrowing U) -> Swift.Void where U : ~Escapable
+```
+#### 🔀 Modified
+```swift
+// From
+public func processValue<U>(_ value: U) -> Swift.Void
+
+// To
+public func processValue<U>(_ value: consuming U) -> Swift.Void where U : ~Copyable
+
+/**
+Changes:
+- Added generic where clause `where U : ~Copyable`
+- Modified parameter `_`: Changed type from `U` to `consuming U`
 */
 ```
 
