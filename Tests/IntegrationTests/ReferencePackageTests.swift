@@ -13,7 +13,7 @@ import ShellModule
 import Testing
 import Foundation
 
-@Suite
+@Suite(.serialized)
 struct ReferencePackageTests {
 
     func setUp() async throws {
@@ -152,9 +152,9 @@ private extension ReferencePackageTests {
     }
 
     func expectedOutput(for source: InterfaceType) throws -> String {
-        let expectedOutputFilePath = try try #require(Bundle.module.path(forResource: source.expectedOutputFileName, ofType: "md"))
-        let expectedOutputData = try try #require(FileManager.default.contents(atPath: expectedOutputFilePath))
-        return try try #require(String(data: expectedOutputData, encoding: .utf8))
+        let expectedOutputFilePath = try #require(Bundle.module.path(forResource: source.expectedOutputFileName, ofType: "md"))
+        let expectedOutputData = try #require(FileManager.default.contents(atPath: expectedOutputFilePath))
+        return try #require(String(data: expectedOutputData, encoding: .utf8))
     }
 
     func swiftInterfaceFilePath(for referencePackagesRoot: URL, packageName: String, interfaceType: InterfaceType) throws -> String {

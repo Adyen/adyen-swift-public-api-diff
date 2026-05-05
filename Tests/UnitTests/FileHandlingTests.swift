@@ -87,7 +87,7 @@ struct FileHandlingTests {
 
         fileHandler.handleLoadData = { path in
             #expect(path == filePath)
-            return try try #require(expectedContent.data(using: .utf8))
+            return try #require(expectedContent.data(using: .utf8))
         }
 
         let content = try fileHandler.loadString(from: filePath)
