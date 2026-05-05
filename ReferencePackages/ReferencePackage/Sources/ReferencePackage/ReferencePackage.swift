@@ -185,3 +185,50 @@ public extension TestExtensionMatching {
         public var timeout: Int
     }
 }
+
+// MARK: - Ownership Keywords Tests
+
+/// Tests for Swift ownership keywords (borrowing, consuming, inout, sending)
+public struct OwnershipTester {
+    public var value: String
+    
+    public init(value: String) {
+        self.value = value
+    }
+    
+    // Function with regular parameter (will add borrowing in new version)
+    public func regularFunction(_ param: String) {
+        _ = param
+    }
+    
+    // Function with inout parameter (will be removed in new version)
+    public func mutatingFunction(_ param: inout String) {
+        param = "modified"
+    }
+    
+    // Function with consuming parameter (will be removed in new version)
+    public func consumingFunction(_ param: consuming String) {
+        _ = param
+    }
+    
+    // Function without sending (will add sending in new version)
+    public func processingFunction(_ param: String) {
+        _ = param
+    }
+}
+
+// MARK: - Type Constraint Tests
+
+/// Tests for type constraints like ~Copyable and ~Escapable
+public struct TypeConstraintTester<T> {
+    public var value: T
+    
+    public init(value: T) {
+        self.value = value
+    }
+    
+    // Regular generic function (will add ~Copyable constraint and change signature in new version)
+    public func processValue<U>(_ value: U) {
+        _ = value
+    }
+}
