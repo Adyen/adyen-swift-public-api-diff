@@ -143,6 +143,9 @@ let package = Package(
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
                 .copy("Resources/expected-reference-changes.md")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("TestingMacros")
             ]
         ),
         .testTarget(
@@ -157,6 +160,9 @@ let package = Package(
                 // Will be at top level in bundle.
                 .copy("Resources/expected-reference-changes-swift-interface-private.md"),
                 .copy("Resources/expected-reference-changes-swift-interface-public.md")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("TestingMacros")
             ]
         )
     ]
