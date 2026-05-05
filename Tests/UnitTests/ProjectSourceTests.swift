@@ -5,20 +5,21 @@
 //
 
 @testable import PADProjectBuilder
-import XCTest
+import Testing
 
-class ProjectSourceTests: XCTestCase {
+@Suite
+struct ProjectSourceTests {
 
     // MARK: - Remote
 
-    func test_remote_validSource() throws {
+    @Test func remoteValidSource() throws {
         let repositoryUrl = "https://github.com/Adyen/adyen-ios.git"
         let separator = ProjectSource.gitSourceSeparator
         let branch = "develop"
         let rawProjectSourceValue = "\(branch)\(separator)\(repositoryUrl)"
 
         let mockFileHandler = MockFileHandler(handleFileExists: {
-            XCTAssertEqual($0, rawProjectSourceValue)
+            #expect($0 == rawProjectSourceValue)
             return false
         })
 
@@ -27,72 +28,56 @@ class ProjectSourceTests: XCTestCase {
             fileHandler: mockFileHandler
         )
 
-        XCTAssertEqual(
-            projectSource,
+        #expect(
+            projectSource ==
             .git(branch: branch, repository: repositoryUrl)
         )
     }
 
-    func test_remote_invalidRepoUrl() throws {
+    @Test func remoteInvalidRepoUrl() throws {
         let repositoryUrl = ""
         let separator = ProjectSource.gitSourceSeparator
         let branch = "develop"
         let rawProjectSourceValue = "\(branch)\(separator)\(repositoryUrl)"
 
         let mockFileHandler = MockFileHandler(handleFileExists: {
-            XCTAssertEqual($0, rawProjectSourceValue)
+            #expect($0 == rawProjectSourceValue)
             return false
         })
 
-        do {
-            let source = try ProjectSource.from(
+        #expect(throws: ProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)) {
+            try ProjectSource.from(
                 rawProjectSourceValue,
                 fileHandler: mockFileHandler
-            )
-            XCTAssertNil(source) // Guard to make sure that we catch if it succeeds
-        } catch {
-            let projectSourceError = try XCTUnwrap(error as? ProjectSource.Error)
-
-            XCTAssertEqual(
-                projectSourceError,
-                ProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
             )
         }
     }
 
-    func test_remote_invalidSeparator() throws {
+    @Test func remoteInvalidSeparator() throws {
         let repositoryUrl = "https://github.com/Adyen/adyen-ios.git"
         let separator = "_"
         let branch = "develop"
         let rawProjectSourceValue = "\(branch)\(separator)\(repositoryUrl)"
 
         let mockFileHandler = MockFileHandler(handleFileExists: {
-            XCTAssertEqual($0, rawProjectSourceValue)
+            #expect($0 == rawProjectSourceValue)
             return false
         })
 
-        do {
-            let source = try ProjectSource.from(
+        #expect(throws: ProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)) {
+            try ProjectSource.from(
                 rawProjectSourceValue,
                 fileHandler: mockFileHandler
-            )
-            XCTAssertNil(source) // Guard to make sure that we catch if it succeeds
-        } catch {
-            let projectSourceError = try XCTUnwrap(error as? ProjectSource.Error)
-
-            XCTAssertEqual(
-                projectSourceError,
-                ProjectSource.Error.invalidSourceValue(value: rawProjectSourceValue)
             )
         }
     }
 
     // MARK: - Local
 
-    func test_local_validSource() throws {
+    @Test func localValidSource() throws {
         let repositoryDirectoryPath = "/Some/Repository/Directory"
         let mockFileHandler = MockFileHandler(handleFileExists: {
-            XCTAssertEqual($0, repositoryDirectoryPath)
+            #expect($0 == repositoryDirectoryPath)
             return true
         })
 
@@ -101,16 +86,16 @@ class ProjectSourceTests: XCTestCase {
             fileHandler: mockFileHandler
         )
 
-        XCTAssertEqual(
-            projectSource,
+        #expect(
+            projectSource ==
             .local(path: repositoryDirectoryPath)
         )
     }
 
-    func test_local_nonExistentDirectory() throws {
+    @Test func localNonExistentDirectory() throws {
         let repositoryDirectoryPath = "/Some/Repository/Directory"
         let mockFileHandler = MockFileHandler(handleFileExists: {
-            XCTAssertEqual($0, repositoryDirectoryPath)
+            #expect($0 == repositoryDirectoryPath)
             return false
         })
 
@@ -119,6 +104,6 @@ class ProjectSourceTests: XCTestCase {
             fileHandler: mockFileHandler
         )
 
-        XCTAssertNil(projectSource)
+        #expect(projectSource == nil)
     }
 }

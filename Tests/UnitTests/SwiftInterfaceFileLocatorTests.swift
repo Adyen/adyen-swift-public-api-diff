@@ -6,24 +6,25 @@
 
 @testable import FileHandlingModule
 @testable import PADSwiftInterfaceFileLocator
-import XCTest
+import Testing
 
-class SwiftInterfaceFileLocatorTests: XCTestCase {
+@Suite
+struct SwiftInterfaceFileLocatorTests {
 
-    func test_locate_public_swiftinterface() throws {
+    @Test func locatePublicSwiftinterface() throws {
         let scheme = "MyModule"
         let derivedDataPath = "/path/to/derived/data"
         let findResult = "./Build/Products/MyModule.swiftmodule"
 
         var mockShell = MockShell()
         mockShell.handleExecute = { command in
-            XCTAssertEqual(command, "cd '\(derivedDataPath)'; find . -type d -name '\(scheme).swiftmodule'")
+            #expect(command == "cd '\(derivedDataPath)'; find . -type d -name '\(scheme).swiftmodule'")
             return findResult
         }
 
         var mockFileHandler = MockFileHandler()
         mockFileHandler.handleContentsOfDirectory = { path in
-            XCTAssertEqual(path, "/path/to/derived/data/./Build/Products/MyModule.swiftmodule")
+            #expect(path == "/path/to/derived/data/./Build/Products/MyModule.swiftmodule")
             return [
                 "arm64-apple-ios.swiftinterface",
                 "arm64-apple-ios.private.swiftinterface",
@@ -39,13 +40,13 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
 
         let result = try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .public)
         
-        XCTAssertEqual(
-            result.path(),
+        #expect(
+            result.path() ==
             "/path/to/derived/data/./Build/Products/MyModule.swiftmodule/arm64-apple-ios.swiftinterface"
         )
     }
 
-    func test_locate_private_swiftinterface() throws {
+    @Test func locatePrivateSwiftinterface() throws {
         let scheme = "MyModule"
         let derivedDataPath = "/path/to/derived/data"
         let findResult = "./Build/Products/MyModule.swiftmodule"
@@ -70,13 +71,13 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
 
         let result = try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .private)
         
-        XCTAssertEqual(
-            result.path(),
+        #expect(
+            result.path() ==
             "/path/to/derived/data/./Build/Products/MyModule.swiftmodule/arm64-apple-ios.private.swiftinterface"
         )
     }
 
-    func test_locate_package_swiftinterface() throws {
+    @Test func locatePackageSwiftinterface() throws {
         let scheme = "MyModule"
         let derivedDataPath = "/path/to/derived/data"
         let findResult = "./Build/Products/MyModule.swiftmodule"
@@ -101,13 +102,13 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
 
         let result = try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .package)
         
-        XCTAssertEqual(
-            result.path(),
+        #expect(
+            result.path() ==
             "/path/to/derived/data/./Build/Products/MyModule.swiftmodule/arm64-apple-ios.package.swiftinterface"
         )
     }
 
-    func test_locate_withTrailingSlashInDerivedDataPath() throws {
+    @Test func locateWithTrailingSlashInDerivedDataPath() throws {
         let scheme = "MyModule"
         let derivedDataPath = "/path/to/derived/data/"
         let findResult = "./Build/Products/MyModule.swiftmodule"
@@ -117,7 +118,7 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
 
         var mockFileHandler = MockFileHandler()
         mockFileHandler.handleContentsOfDirectory = { path in
-            XCTAssertFalse(path.contains("//"), "Path should not contain double slashes: \(path)")
+            #expect(!path.contains("//"), "Path should not contain double slashes: \(path)")
             return ["arm64-apple-ios.swiftinterface"]
         }
 
@@ -130,10 +131,10 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
         let result = try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .public)
         
         let resultPath = result.path()
-        XCTAssertFalse(resultPath.contains("//"), "Result path should not contain double slashes: \(resultPath)")
+        #expect(!resultPath.contains("//"), "Result path should not contain double slashes: \(resultPath)")
     }
 
-    func test_locate_pathConstructionWithoutTrailingSlash() throws {
+    @Test func locatePathConstructionWithoutTrailingSlash() throws {
         let scheme = "MyModule"
         let derivedDataPath = "/Users/test/DerivedData"
         let findResult = "./MyModule.swiftmodule"
@@ -143,7 +144,7 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
 
         var mockFileHandler = MockFileHandler()
         mockFileHandler.handleContentsOfDirectory = { path in
-            XCTAssertEqual(path, "/Users/test/DerivedData/./MyModule.swiftmodule")
+            #expect(path == "/Users/test/DerivedData/./MyModule.swiftmodule")
             return ["arm64-apple-ios.swiftinterface"]
         }
 
@@ -155,13 +156,13 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
 
         let result = try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .public)
         
-        XCTAssertEqual(
-            result.path(),
+        #expect(
+            result.path() ==
             "/Users/test/DerivedData/./MyModule.swiftmodule/arm64-apple-ios.swiftinterface"
         )
     }
 
-    func test_locate_public_excludesPrivateAndPackage() throws {
+    @Test func locatePublicExcludesPrivateAndPackage() throws {
         let scheme = "MyModule"
         let derivedDataPath = "/path/to/derived/data"
         let findResult = "./MyModule.swiftmodule"
@@ -186,12 +187,12 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
 
         let result = try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .public)
         
-        XCTAssertTrue(result.path().hasSuffix("arm64-apple-ios.swiftinterface"))
-        XCTAssertFalse(result.path().hasSuffix(".private.swiftinterface"))
-        XCTAssertFalse(result.path().hasSuffix(".package.swiftinterface"))
+        #expect(result.path().hasSuffix("arm64-apple-ios.swiftinterface"))
+        #expect(!result.path().hasSuffix(".private.swiftinterface"))
+        #expect(!result.path().hasSuffix(".package.swiftinterface"))
     }
 
-    func test_locate_throwsWhenSwiftModuleNotFound() throws {
+    @Test func locateThrowsWhenSwiftModuleNotFound() throws {
         let scheme = "MyModule"
         let derivedDataPath = "/path/to/derived/data"
 
@@ -209,10 +210,12 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
             logger: nil
         )
 
-        XCTAssertThrowsError(try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .public))
+        #expect(throws: (any Error).self) {
+            try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .public)
+        }
     }
 
-    func test_locate_throwsWhenSwiftInterfaceNotFound() throws {
+    @Test func locateThrowsWhenSwiftInterfaceNotFound() throws {
         let scheme = "MyModule"
         let derivedDataPath = "/path/to/derived/data"
         let findResult = "./MyModule.swiftmodule"
@@ -231,6 +234,8 @@ class SwiftInterfaceFileLocatorTests: XCTestCase {
             logger: nil
         )
 
-        XCTAssertThrowsError(try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .public))
+        #expect(throws: (any Error).self) {
+            try locator.locate(for: scheme, derivedDataPath: derivedDataPath, type: .public)
+        }
     }
 }

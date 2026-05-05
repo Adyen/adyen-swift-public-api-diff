@@ -5,13 +5,14 @@
 //
 
 @testable import PADSwiftInterfaceDiff
-import XCTest
+import Testing
 
 /// Tests for Swift ownership keywords, isolation keywords, and type constraints
 /// Covers: borrowing, consuming, inout, sending, isolated, ~Copyable, ~Escapable
-class OwnershipKeywordsTests: XCTestCase {
+@Suite
+struct OwnershipKeywordsTests {
     
-    func testBorrowingKeywordInFunctionParameter() {
+    @Test func borrowingKeywordInFunctionParameter() throws {
         let swiftCode = """
         public func testFunc(_ param: borrowing String) -> String {
             return param
@@ -21,22 +22,19 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "testFunc")
-        XCTAssertEqual(function.parameters.count, 1)
-        XCTAssertEqual(function.parameters[0].type, "borrowing String")
-        XCTAssertEqual(function.parameters[0].firstName, "_")
+        #expect(function.name == "testFunc")
+        #expect(function.parameters.count == 1)
+        #expect(function.parameters[0].type == "borrowing String")
+        #expect(function.parameters[0].firstName == "_")
         
         // Verify the parameter appears in the description
         let description = function.description
-        XCTAssertTrue(description.contains("borrowing String"), "Description should contain 'borrowing String'")
+        #expect(description.contains("borrowing String"), "Description should contain 'borrowing String'")
     }
     
-    func testConsumingKeywordInFunctionParameter() {
+    @Test func consumingKeywordInFunctionParameter() throws {
         let swiftCode = """
         public func consume(_ param: consuming String) -> Void {
         }
@@ -45,21 +43,18 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "consume")
-        XCTAssertEqual(function.parameters.count, 1)
-        XCTAssertEqual(function.parameters[0].type, "consuming String")
+        #expect(function.name == "consume")
+        #expect(function.parameters.count == 1)
+        #expect(function.parameters[0].type == "consuming String")
         
         // Verify the parameter appears in the description
         let description = function.description
-        XCTAssertTrue(description.contains("consuming String"), "Description should contain 'consuming String'")
+        #expect(description.contains("consuming String"), "Description should contain 'consuming String'")
     }
     
-    func testInoutKeywordInFunctionParameter() {
+    @Test func inoutKeywordInFunctionParameter() throws {
         let swiftCode = """
         public func mutate(_ param: inout String) -> Void {
         }
@@ -68,21 +63,18 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "mutate")
-        XCTAssertEqual(function.parameters.count, 1)
-        XCTAssertEqual(function.parameters[0].type, "inout String")
+        #expect(function.name == "mutate")
+        #expect(function.parameters.count == 1)
+        #expect(function.parameters[0].type == "inout String")
         
         // Verify the parameter appears in the description
         let description = function.description
-        XCTAssertTrue(description.contains("inout String"), "Description should contain 'inout String'")
+        #expect(description.contains("inout String"), "Description should contain 'inout String'")
     }
     
-    func testOwnershipKeywordChangeDetection() {
+    @Test func ownershipKeywordChangeDetection() throws {
         let swiftCodeOld = """
         public func testFunc(_ param: String) -> String {
             return param
@@ -99,23 +91,20 @@ class OwnershipKeywordsTests: XCTestCase {
         let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
         let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
         
-        guard let oldFunction = oldRoot.children.first as? SwiftInterfaceFunction,
-              let newFunction = newRoot.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected function elements")
-            return
-        }
+        let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
+        let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         
         // Test that differences are detected
         let differences = newFunction.differences(to: oldFunction)
         
-        XCTAssertFalse(differences.isEmpty, "Should detect parameter type change")
-        XCTAssertTrue(
+        #expect(!differences.isEmpty, "Should detect parameter type change")
+        #expect(
             differences.contains(where: { $0.contains("borrowing") }),
             "Difference should mention 'borrowing' keyword"
         )
     }
     
-    func testConsumingKeywordRemovalDetection() {
+    @Test func consumingKeywordRemovalDetection() throws {
         let swiftCodeOld = """
         public func testFunc(_ param: consuming String) -> String {
             return param
@@ -132,23 +121,20 @@ class OwnershipKeywordsTests: XCTestCase {
         let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
         let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
         
-        guard let oldFunction = oldRoot.children.first as? SwiftInterfaceFunction,
-              let newFunction = newRoot.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected function elements")
-            return
-        }
+        let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
+        let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         
         // Test that differences are detected
         let differences = newFunction.differences(to: oldFunction)
         
-        XCTAssertFalse(differences.isEmpty, "Should detect parameter type change")
-        XCTAssertTrue(
+        #expect(!differences.isEmpty, "Should detect parameter type change")
+        #expect(
             differences.contains(where: { $0.contains("consuming") }),
             "Difference should mention 'consuming' keyword"
         )
     }
     
-    func testMultipleOwnershipKeywordsInFunction() {
+    @Test func multipleOwnershipKeywordsInFunction() throws {
         let swiftCode = """
         public func process(
             _ borrowed: borrowing String,
@@ -161,27 +147,24 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "process")
-        XCTAssertEqual(function.parameters.count, 3)
-        XCTAssertEqual(function.parameters[0].type, "borrowing String")
-        XCTAssertEqual(function.parameters[1].type, "consuming Int")
-        XCTAssertEqual(function.parameters[2].type, "inout Double")
+        #expect(function.name == "process")
+        #expect(function.parameters.count == 3)
+        #expect(function.parameters[0].type == "borrowing String")
+        #expect(function.parameters[1].type == "consuming Int")
+        #expect(function.parameters[2].type == "inout Double")
         
         // Verify all ownership keywords appear in the description
         let description = function.description
-        XCTAssertTrue(description.contains("borrowing String"))
-        XCTAssertTrue(description.contains("consuming Int"))
-        XCTAssertTrue(description.contains("inout Double"))
+        #expect(description.contains("borrowing String"))
+        #expect(description.contains("consuming Int"))
+        #expect(description.contains("inout Double"))
     }
     
     // MARK: - Inout Add/Remove Tests
     
-    func testInoutKeywordAddition() {
+    @Test func inoutKeywordAddition() throws {
         let swiftCodeOld = """
         public func testFunc(_ param: String) -> Void {
         }
@@ -196,22 +179,19 @@ class OwnershipKeywordsTests: XCTestCase {
         let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
         let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
         
-        guard let oldFunction = oldRoot.children.first as? SwiftInterfaceFunction,
-              let newFunction = newRoot.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected function elements")
-            return
-        }
+        let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
+        let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         
         let differences = newFunction.differences(to: oldFunction)
         
-        XCTAssertFalse(differences.isEmpty, "Should detect parameter type change")
-        XCTAssertTrue(
+        #expect(!differences.isEmpty, "Should detect parameter type change")
+        #expect(
             differences.contains(where: { $0.contains("inout") }),
             "Difference should mention 'inout' keyword"
         )
     }
     
-    func testInoutKeywordRemoval() {
+    @Test func inoutKeywordRemoval() throws {
         let swiftCodeOld = """
         public func testFunc(_ param: inout String) -> Void {
         }
@@ -226,16 +206,13 @@ class OwnershipKeywordsTests: XCTestCase {
         let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
         let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
         
-        guard let oldFunction = oldRoot.children.first as? SwiftInterfaceFunction,
-              let newFunction = newRoot.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected function elements")
-            return
-        }
+        let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
+        let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         
         let differences = newFunction.differences(to: oldFunction)
         
-        XCTAssertFalse(differences.isEmpty, "Should detect parameter type change")
-        XCTAssertTrue(
+        #expect(!differences.isEmpty, "Should detect parameter type change")
+        #expect(
             differences.contains(where: { $0.contains("inout") }),
             "Difference should mention 'inout' keyword"
         )
@@ -243,7 +220,7 @@ class OwnershipKeywordsTests: XCTestCase {
     
     // MARK: - Sending Keyword Tests
     
-    func testSendingKeywordInFunctionParameter() {
+    @Test func sendingKeywordInFunctionParameter() throws {
         let swiftCode = """
         public func testFunc(_ param: sending String) -> Void {
         }
@@ -252,20 +229,17 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "testFunc")
-        XCTAssertEqual(function.parameters.count, 1)
-        XCTAssertEqual(function.parameters[0].type, "sending String")
+        #expect(function.name == "testFunc")
+        #expect(function.parameters.count == 1)
+        #expect(function.parameters[0].type == "sending String")
         
         let description = function.description
-        XCTAssertTrue(description.contains("sending String"), "Description should contain 'sending String'")
+        #expect(description.contains("sending String"), "Description should contain 'sending String'")
     }
     
-    func testSendingKeywordAddition() {
+    @Test func sendingKeywordAddition() throws {
         let swiftCodeOld = """
         public func testFunc(_ param: String) -> Void {
         }
@@ -280,16 +254,13 @@ class OwnershipKeywordsTests: XCTestCase {
         let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
         let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
         
-        guard let oldFunction = oldRoot.children.first as? SwiftInterfaceFunction,
-              let newFunction = newRoot.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected function elements")
-            return
-        }
+        let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
+        let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         
         let differences = newFunction.differences(to: oldFunction)
         
-        XCTAssertFalse(differences.isEmpty, "Should detect parameter type change")
-        XCTAssertTrue(
+        #expect(!differences.isEmpty, "Should detect parameter type change")
+        #expect(
             differences.contains(where: { $0.contains("sending") }),
             "Difference should mention 'sending' keyword"
         )
@@ -297,7 +268,7 @@ class OwnershipKeywordsTests: XCTestCase {
     
     // MARK: - Isolated Keyword Tests
     
-    func testIsolatedKeywordInFunctionParameter() {
+    @Test func isolatedKeywordInFunctionParameter() throws {
         let swiftCode = """
         public func testFunc(_ actor: isolated MyActor) -> Void {
         }
@@ -306,22 +277,19 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "testFunc")
-        XCTAssertEqual(function.parameters.count, 1)
-        XCTAssertEqual(function.parameters[0].type, "isolated MyActor")
+        #expect(function.name == "testFunc")
+        #expect(function.parameters.count == 1)
+        #expect(function.parameters[0].type == "isolated MyActor")
         
         let description = function.description
-        XCTAssertTrue(description.contains("isolated MyActor"), "Description should contain 'isolated MyActor'")
+        #expect(description.contains("isolated MyActor"), "Description should contain 'isolated MyActor'")
     }
     
     // MARK: - Type Constraint Tests (~Copyable, ~Escapable)
     
-    func testNonCopyableTypeConstraint() {
+    @Test func nonCopyableTypeConstraint() throws {
         let swiftCode = """
         public func testFunc<T>(_ value: T) -> T where T: ~Copyable {
             return value
@@ -331,23 +299,20 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "testFunc")
-        XCTAssertNotNil(function.genericWhereClauseDescription)
-        XCTAssertTrue(
+        #expect(function.name == "testFunc")
+        #expect(function.genericWhereClauseDescription != nil)
+        #expect(
             function.genericWhereClauseDescription?.contains("~Copyable") ?? false,
             "Should contain ~Copyable constraint"
         )
         
         let description = function.description
-        XCTAssertTrue(description.contains("~Copyable"), "Description should contain '~Copyable'")
+        #expect(description.contains("~Copyable"), "Description should contain '~Copyable'")
     }
     
-    func testNonEscapableTypeConstraint() {
+    @Test func nonEscapableTypeConstraint() throws {
         let swiftCode = """
         public func testFunc<T>(_ value: T) -> T where T: ~Escapable {
             return value
@@ -357,23 +322,20 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "testFunc")
-        XCTAssertNotNil(function.genericWhereClauseDescription)
-        XCTAssertTrue(
+        #expect(function.name == "testFunc")
+        #expect(function.genericWhereClauseDescription != nil)
+        #expect(
             function.genericWhereClauseDescription?.contains("~Escapable") ?? false,
             "Should contain ~Escapable constraint"
         )
         
         let description = function.description
-        XCTAssertTrue(description.contains("~Escapable"), "Description should contain '~Escapable'")
+        #expect(description.contains("~Escapable"), "Description should contain '~Escapable'")
     }
     
-    func testNonCopyableConstraintAddition() {
+    @Test func nonCopyableConstraintAddition() throws {
         let swiftCodeOld = """
         public func testFunc<T>(_ value: T) -> T {
             return value
@@ -390,16 +352,13 @@ class OwnershipKeywordsTests: XCTestCase {
         let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
         let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
         
-        guard let oldFunction = oldRoot.children.first as? SwiftInterfaceFunction,
-              let newFunction = newRoot.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected function elements")
-            return
-        }
+        let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
+        let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         
         let differences = newFunction.differences(to: oldFunction)
         
-        XCTAssertFalse(differences.isEmpty, "Should detect where clause addition")
-        XCTAssertTrue(
+        #expect(!differences.isEmpty, "Should detect where clause addition")
+        #expect(
             differences.contains(where: { $0.contains("~Copyable") }),
             "Difference should mention '~Copyable' constraint"
         )
@@ -407,7 +366,7 @@ class OwnershipKeywordsTests: XCTestCase {
     
     // MARK: - Combined Tests
     
-    func testAllParameterModifiersTogether() {
+    @Test func allParameterModifiersTogether() throws {
         let swiftCode = """
         public func complexFunc<T, U>(
             _ borrowed: borrowing String,
@@ -422,35 +381,32 @@ class OwnershipKeywordsTests: XCTestCase {
         let parser = SwiftInterfaceParser()
         let root = parser.parse(source: swiftCode, moduleName: "TestModule")
         
-        guard let function = root.children.first as? SwiftInterfaceFunction else {
-            XCTFail("Expected a function element")
-            return
-        }
+        let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
-        XCTAssertEqual(function.name, "complexFunc")
-        XCTAssertEqual(function.parameters.count, 5)
+        #expect(function.name == "complexFunc")
+        #expect(function.parameters.count == 5)
         
         // Verify all parameter types
-        XCTAssertEqual(function.parameters[0].type, "borrowing String")
-        XCTAssertEqual(function.parameters[1].type, "consuming Int")
-        XCTAssertEqual(function.parameters[2].type, "inout Double")
-        XCTAssertEqual(function.parameters[3].type, "sending T")
-        XCTAssertEqual(function.parameters[4].type, "isolated MyActor")
+        #expect(function.parameters[0].type == "borrowing String")
+        #expect(function.parameters[1].type == "consuming Int")
+        #expect(function.parameters[2].type == "inout Double")
+        #expect(function.parameters[3].type == "sending T")
+        #expect(function.parameters[4].type == "isolated MyActor")
         
         // Verify where clause
-        XCTAssertNotNil(function.genericWhereClauseDescription)
+        #expect(function.genericWhereClauseDescription != nil)
         let whereClause = function.genericWhereClauseDescription ?? ""
-        XCTAssertTrue(whereClause.contains("~Copyable"))
-        XCTAssertTrue(whereClause.contains("~Escapable"))
+        #expect(whereClause.contains("~Copyable"))
+        #expect(whereClause.contains("~Escapable"))
         
         // Verify description contains all keywords
         let description = function.description
-        XCTAssertTrue(description.contains("borrowing String"))
-        XCTAssertTrue(description.contains("consuming Int"))
-        XCTAssertTrue(description.contains("inout Double"))
-        XCTAssertTrue(description.contains("sending T"))
-        XCTAssertTrue(description.contains("isolated MyActor"))
-        XCTAssertTrue(description.contains("~Copyable"))
-        XCTAssertTrue(description.contains("~Escapable"))
+        #expect(description.contains("borrowing String"))
+        #expect(description.contains("consuming Int"))
+        #expect(description.contains("inout Double"))
+        #expect(description.contains("sending T"))
+        #expect(description.contains("isolated MyActor"))
+        #expect(description.contains("~Copyable"))
+        #expect(description.contains("~Escapable"))
     }
 }

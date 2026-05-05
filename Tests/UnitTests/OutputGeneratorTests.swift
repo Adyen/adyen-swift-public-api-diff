@@ -5,11 +5,12 @@
 //
 
 @testable import PADOutputGenerator
-import XCTest
+import Testing
 
-class OutputGeneratorTests: XCTestCase {
+@Suite
+struct OutputGeneratorTests {
 
-    func test_noChanges_singleModule() {
+    @Test func noChangesSingleModule() throws {
 
         let expectedOutput = """
         # ✅ No changes detected
@@ -29,10 +30,10 @@ class OutputGeneratorTests: XCTestCase {
             warnings: []
         )
         
-        XCTAssertEqual(output, expectedOutput)
+        #expect(output == expectedOutput)
     }
 
-    func test_oneChange_singleModule() {
+    @Test func oneChangeSingleModule() throws {
 
         let expectedOutput = """
         # 👀 1 public change detected
@@ -61,10 +62,10 @@ class OutputGeneratorTests: XCTestCase {
             warnings: []
         )
         
-        XCTAssertEqual(output, expectedOutput)
+        #expect(output == expectedOutput)
     }
 
-    func multipleChanges_multipleModules() {
+    @Test func multipleChangesMultipleModules() throws {
 
         let expectedOutput = """
         # ⚠️ 4 public changes detected ⚠️
@@ -115,7 +116,7 @@ class OutputGeneratorTests: XCTestCase {
             warnings: []
         )
         
-        XCTAssertEqual(output, expectedOutput)
+        #expect(output == expectedOutput)
     }
     
     struct AllTargetsExpectation {
@@ -124,7 +125,7 @@ class OutputGeneratorTests: XCTestCase {
         let expectedTargetSection: String
     }
 
-    func test_allTargets_shouldChangeOutputAsExpected() {
+    @Test func allTargetsShouldChangeOutputAsExpected() throws {
         
         let testExpectations: [AllTargetsExpectation] = [
             .init(
@@ -144,12 +145,12 @@ class OutputGeneratorTests: XCTestCase {
             )
         ]
         
-        testExpectations.forEach { argument in
-            allTargets_shouldChangeOutputAsExpected(argument: argument)
+        for argument in testExpectations {
+            allTargetsShouldChangeOutputAsExpectedHelper(argument: argument)
         }
     }
     
-    private func allTargets_shouldChangeOutputAsExpected(argument: AllTargetsExpectation) {
+    private func allTargetsShouldChangeOutputAsExpectedHelper(argument: AllTargetsExpectation) {
         
         let expectedOutput = """
         # \(argument.expectedTitle)
@@ -169,10 +170,10 @@ class OutputGeneratorTests: XCTestCase {
             warnings: []
         )
         
-        XCTAssertEqual(output, expectedOutput)
+        #expect(output == expectedOutput)
     }
     
-    func test_platformInfo_shouldBeIncludedWhenProvided() {
+    @Test func platformInfoShouldBeIncludedWhenProvided() throws {
         
         let expectedOutput = """
         # ✅ No changes detected
@@ -193,6 +194,6 @@ class OutputGeneratorTests: XCTestCase {
             warnings: []
         )
         
-        XCTAssertEqual(output, expectedOutput)
+        #expect(output == expectedOutput)
     }
 }
