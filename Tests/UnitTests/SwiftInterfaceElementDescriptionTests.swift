@@ -9,11 +9,12 @@
 @testable import PADPackageFileAnalyzer
 @testable import PADSwiftInterfaceDiff
 
-import XCTest
+import Testing
 
-class SwiftInterfaceElementDescriptionTests: XCTestCase {
+@Suite
+struct SwiftInterfaceElementDescriptionTests {
     
-    func testRoot() {
+    @Test func root() throws {
         let root = SwiftInterfaceParser.Root(
             moduleName: "ModuleName",
             elements: [
@@ -38,7 +39,7 @@ class SwiftInterfaceElementDescriptionTests: XCTestCase {
             ]
         )
         
-        XCTAssertEqual(root.description, """
+        #expect(root.description == """
 attribute1
 attribute2
 modifier1 modifier2 class ClassName1<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
@@ -46,11 +47,11 @@ attribute1
 attribute2
 modifier1 modifier2 class ClassName2<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
 """)
-        XCTAssertEqual(root.description(excl:  [.attributes]), """
+        #expect(root.description(excl:  [.attributes]) == """
 modifier1 modifier2 class ClassName1<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
 modifier1 modifier2 class ClassName2<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
 """)
-        XCTAssertEqual(root.description(excl:  [.modifiers]), """
+        #expect(root.description(excl:  [.modifiers]) == """
 attribute1
 attribute2
 class ClassName1<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
@@ -58,13 +59,13 @@ attribute1
 attribute2
 class ClassName2<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
 """)
-        XCTAssertEqual(root.description(excl:  [.attributes, .modifiers]), """
+        #expect(root.description(excl:  [.attributes, .modifiers]) == """
 class ClassName1<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
 class ClassName2<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
 """)
     }
     
-    func testClassDescription() {
+    @Test func classDescription() throws {
         let element = SwiftInterfaceClass(
             attributes: ["attribute1", "attribute2"],
             modifiers: ["modifier1", "modifier2"],
@@ -75,22 +76,22 @@ class ClassName2<GenericParameterDescription>: Inheritance1, Inheritance2 Generi
             children: []
         )
 
-        XCTAssertEqual(element.description, """
+        #expect(element.description == """
 attribute1
 attribute2
 modifier1 modifier2 class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
 """)
-        XCTAssertEqual(element.description(excl: [.attributes]), "modifier1 modifier2 class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause")
-        XCTAssertEqual(element.description(excl: [.modifiers]), """
+        #expect(element.description(excl: [.attributes]) == "modifier1 modifier2 class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause")
+        #expect(element.description(excl: [.modifiers]) == """
 attribute1
 attribute2
 class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause
 """)
-        XCTAssertEqual(element.description(excl: [.attributes, .modifiers]), "class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause")
-        XCTAssertEqual(element.description(incl: [.modifiers]), "modifier1 modifier2 class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause")
+        #expect(element.description(excl: [.attributes, .modifiers]) == "class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause")
+        #expect(element.description(incl: [.modifiers]) == "modifier1 modifier2 class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 GenericWhereClause")
     }
     
-    func testExtensionDescription() {
+    @Test func extensionDescription() throws {
         
         let element = SwiftInterfaceExtension(
             attributes: ["attribute1", "attribute2"],
@@ -101,18 +102,18 @@ class ClassName<GenericParameterDescription>: Inheritance1, Inheritance2 Generic
             children: []
         )
         
-        XCTAssertEqual(element.description, """
+        #expect(element.description == """
 attribute1
 attribute2
 modifier1 modifier2 extension ExtendedType: Inheritance1, Inheritance2 GenericWhereClause
 """)
-        XCTAssertEqual(element.description(excl: [.attributes]), "modifier1 modifier2 extension ExtendedType: Inheritance1, Inheritance2 GenericWhereClause")
-        XCTAssertEqual(element.description(excl: [.modifiers]), """
+        #expect(element.description(excl: [.attributes]) == "modifier1 modifier2 extension ExtendedType: Inheritance1, Inheritance2 GenericWhereClause")
+        #expect(element.description(excl: [.modifiers]) == """
 attribute1
 attribute2
 extension ExtendedType: Inheritance1, Inheritance2 GenericWhereClause
 """)
-        XCTAssertEqual(element.description(excl: [.attributes, .modifiers]), "extension ExtendedType: Inheritance1, Inheritance2 GenericWhereClause")
-        XCTAssertEqual(element.description(incl: [.modifiers]), "modifier1 modifier2 extension ExtendedType: Inheritance1, Inheritance2 GenericWhereClause")
+        #expect(element.description(excl: [.attributes, .modifiers]) == "extension ExtendedType: Inheritance1, Inheritance2 GenericWhereClause")
+        #expect(element.description(incl: [.modifiers]) == "modifier1 modifier2 extension ExtendedType: Inheritance1, Inheritance2 GenericWhereClause")
     }
 }

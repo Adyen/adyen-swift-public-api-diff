@@ -10,11 +10,13 @@
 @testable import PADSwiftInterfaceDiff
 @testable import PADLogging
 import ShellModule
-import XCTest
+import Testing
+import Foundation
 
-class ReferencePackageTests: XCTestCase {
+@Suite(.serialized)
+struct ReferencePackageTests {
 
-    override func setUp() async throws {
+    func setUp() async throws {
 
         let referencePackagesRoot = try Self.referencePackagesPath()
         let oldReferencePackageDirectory = referencePackagesRoot.appending(path: "ReferencePackage")
@@ -45,9 +47,9 @@ class ReferencePackageTests: XCTestCase {
         )
     }
 
-    override static func tearDown() {
+    func tearDown() {
 
-        guard let referencePackagesRoot = try? referencePackagesPath() else { return }
+        guard let referencePackagesRoot = try? Self.referencePackagesPath() else { return }
         let oldReferencePackageDirectory = referencePackagesRoot.appending(path: "ReferencePackage").appending(path: XcodeTools.Constants.derivedDataPath)
         let newReferencePackageDirectory = referencePackagesRoot.appending(path: "UpdatedPackage").appending(path: XcodeTools.Constants.derivedDataPath)
 
@@ -55,7 +57,9 @@ class ReferencePackageTests: XCTestCase {
         try? FileManager.default.removeItem(at: newReferencePackageDirectory)
     }
 
-    func test_swiftInterface_public() async throws {
+    @Test func swiftInterfacePublic() async throws {
+        try await setUp()
+        defer { tearDown() }
 
         let interfaceType: InterfaceType = .public
 
@@ -76,13 +80,15 @@ class ReferencePackageTests: XCTestCase {
         
         for i in 0..<expectedLines.count {
             if expectedLines[i] != markdownOutputLines[i] {
-                XCTAssertEqual(expectedLines[i], markdownOutputLines[i], "Issue in line \(i)")
+                #expect(expectedLines[i] == markdownOutputLines[i], "Issue in line \(i)")
                 return
             }
         }
     }
 
-    func test_swiftInterface_private() async throws {
+    @Test func swiftInterfacePrivate() async throws {
+        try await setUp()
+        defer { tearDown() }
 
         let interfaceType: InterfaceType = .private
 
@@ -103,7 +109,7 @@ class ReferencePackageTests: XCTestCase {
 
         for i in 0..<expectedLines.count {
             if expectedLines[i] != markdownOutputLines[i] {
-                XCTAssertEqual(expectedLines[i], markdownOutputLines[i])
+                #expect(expectedLines[i] == markdownOutputLines[i], "Issue in line \(i)")
                 return
             }
         }
@@ -146,14 +152,14 @@ private extension ReferencePackageTests {
     }
 
     func expectedOutput(for source: InterfaceType) throws -> String {
-        let expectedOutputFilePath = try XCTUnwrap(Bundle.module.path(forResource: source.expectedOutputFileName, ofType: "md"))
-        let expectedOutputData = try XCTUnwrap(FileManager.default.contents(atPath: expectedOutputFilePath))
-        return try XCTUnwrap(String(data: expectedOutputData, encoding: .utf8))
+        let expectedOutputFilePath = try #require(Bundle.module.path(forResource: source.expectedOutputFileName, ofType: "md"))
+        let expectedOutputData = try #require(FileManager.default.contents(atPath: expectedOutputFilePath))
+        return try #require(String(data: expectedOutputData, encoding: .utf8))
     }
 
     func swiftInterfaceFilePath(for referencePackagesRoot: URL, packageName: String, interfaceType: InterfaceType) throws -> String {
         let oldReferencePackageDirectory = referencePackagesRoot.appending(path: packageName)
-        let interfaceFilePath = try XCTUnwrap(oldReferencePackageDirectory.appending(path: interfaceType.interfaceFilePath))
+        let interfaceFilePath = oldReferencePackageDirectory.appending(path: interfaceType.interfaceFilePath)
         return interfaceFilePath.path()
     }
 

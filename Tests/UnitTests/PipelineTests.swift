@@ -6,11 +6,9 @@
 
 @testable import PADCore
 @testable import PADSwiftInterfaceDiff
-import XCTest
+import Testing
 
-class PipelineTests: XCTestCase {
-
-    func test_pipeline() async throws {
+@Test func pipeline() async throws {
 
         let swiftInterfaceFile = SwiftInterfaceFile(
             name: "MODULE_NAME",
@@ -37,31 +35,31 @@ class PipelineTests: XCTestCase {
         var fileHandler = MockFileHandler()
         fileHandler.handleLoadData = { path in
             let expectedInput = expectedHandleLoadDataCalls.removeFirst()
-            XCTAssertEqual(path, expectedInput)
-            return try XCTUnwrap(String("content_for_\(path)").data(using: .utf8))
+            #expect(path == expectedInput)
+            return try #require(String("content_for_\(path)").data(using: .utf8))
         }
 
         var swiftInterfaceParser = MockSwiftInterfaceParser()
         swiftInterfaceParser.handleParseSource = { source, moduleName in
             let expectedInput = expectedHandleParseSourceCalls.removeFirst()
-            XCTAssertEqual(expectedInput.source, source)
-            XCTAssertEqual(expectedInput.moduleName, moduleName)
+            #expect(expectedInput.source == source)
+            #expect(expectedInput.moduleName == moduleName)
             return SwiftInterfaceParser.Root(moduleName: moduleName, elements: [])
         }
 
         var swiftInterfaceAnalyzer = MockSwiftInterfaceAnalyzer()
         swiftInterfaceAnalyzer.handleAnalyze = { old, new in
             let expectedInput = expectedHandleAnalyzeCalls.removeFirst()
-            XCTAssertEqual(old.recursiveDescription(), expectedInput.old.recursiveDescription())
-            XCTAssertEqual(new.recursiveDescription(), expectedInput.new.recursiveDescription())
+            #expect(old.recursiveDescription() == expectedInput.old.recursiveDescription())
+            #expect(new.recursiveDescription() == expectedInput.new.recursiveDescription())
             return expectedChanges
         }
 
         var logger = MockLogger()
         logger.handleLog = { message, subsystem in
             let expectedInput = expectedHandleLogCalls.removeFirst()
-            XCTAssertEqual(message, expectedInput.message)
-            XCTAssertEqual(subsystem, expectedInput.subsystem)
+            #expect(message == expectedInput.message)
+            #expect(subsystem == expectedInput.subsystem)
         }
 
         // Pipeline run
@@ -77,10 +75,9 @@ class PipelineTests: XCTestCase {
 
         // Validation
 
-        XCTAssertEqual(pipelineOutput, expectedPipelineOutput)
-        XCTAssertTrue(expectedHandleLoadDataCalls.isEmpty)
-        XCTAssertTrue(expectedHandleParseSourceCalls.isEmpty)
-        XCTAssertTrue(expectedHandleLogCalls.isEmpty)
-        XCTAssertTrue(expectedHandleAnalyzeCalls.isEmpty)
+        #expect(pipelineOutput == expectedPipelineOutput)
+        #expect(expectedHandleLoadDataCalls.isEmpty)
+        #expect(expectedHandleParseSourceCalls.isEmpty)
+        #expect(expectedHandleLogCalls.isEmpty)
+        #expect(expectedHandleAnalyzeCalls.isEmpty)
     }
-}

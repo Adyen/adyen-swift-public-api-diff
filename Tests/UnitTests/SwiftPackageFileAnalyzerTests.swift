@@ -11,18 +11,16 @@ import ShellModule
 
 @testable import SwiftPackageFileHelperModule
 
-import XCTest
+import Testing
+import Foundation
 
-class SwiftPackageFileAnalyzerTests: XCTestCase {
+@Suite
+struct SwiftPackageFileAnalyzerTests {
 
-    func test_noPackageLibraryDifferences_causeNoChanges() throws {
-
-        let handleFileExpectation = expectation(description: "handleFileExists is called twice")
-        handleFileExpectation.expectedFulfillmentCount = 2
+    @Test func noPackageLibraryDifferencesCauseNoChanges() throws {
 
         var fileHandler = MockFileHandler()
         fileHandler.handleFileExists = { _ in
-            handleFileExpectation.fulfill()
             return true
         }
         var shell = MockShell()
@@ -48,19 +46,13 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
         )
 
         let expectedChanges: [Change] = []
-        XCTAssertEqual(changes.changes, expectedChanges)
-
-        waitForExpectations(timeout: 1)
+        #expect(changes.changes == expectedChanges)
     }
 
-    func test_packageLibraryDifferences_causeChanges() throws {
-
-        let handleFileExpectation = expectation(description: "handleFileExists is called twice")
-        handleFileExpectation.expectedFulfillmentCount = 2
+    @Test func packageLibraryDifferencesCauseChanges() throws {
 
         var fileHandler = MockFileHandler()
         fileHandler.handleFileExists = { _ in
-            handleFileExpectation.fulfill()
             return true
         }
 
@@ -246,18 +238,13 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
             )
         ]
         
-        XCTAssertEqual(changes.changes, expectedChanges)
-
-        waitForExpectations(timeout: 1)
+        #expect(changes.changes == expectedChanges)
     }
 
-    func test_project_causesNoChanges() throws {
-
-        let handleFileExpectation = expectation(description: "handleFileExists is called once")
+    @Test func projectCausesNoChanges() throws {
 
         var fileHandler = MockFileHandler()
         fileHandler.handleFileExists = { _ in
-            handleFileExpectation.fulfill()
             return false // Package.swift file does not exist
         }
         let projectAnalyzer = SwiftPackageFileAnalyzer(
@@ -272,8 +259,6 @@ class SwiftPackageFileAnalyzerTests: XCTestCase {
         )
 
         let expectedChanges: [Change] = []
-        XCTAssertEqual(changes.changes, expectedChanges)
-
-        waitForExpectations(timeout: 1)
+        #expect(changes.changes == expectedChanges)
     }
 }

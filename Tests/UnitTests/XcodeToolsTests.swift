@@ -5,11 +5,12 @@
 //
 
 @testable import PADProjectBuilder
-import XCTest
+import Testing
 
-class XcodeToolsTests: XCTestCase {
+@Suite
+struct XcodeToolsTests {
 
-    func test_archive_swiftPackage_iOS() async throws {
+    @Test func archiveSwiftPackageiOS() async throws {
 
         let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
 
@@ -20,7 +21,7 @@ class XcodeToolsTests: XCTestCase {
         )
     }
 
-    func test_archive_xcodeProject_iOS() async throws {
+    @Test func archiveXcodeProjectiOS() async throws {
 
         let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
 
@@ -31,7 +32,7 @@ class XcodeToolsTests: XCTestCase {
         )
     }
     
-    func test_archive_swiftPackage_macOS() async throws {
+    @Test func archiveSwiftPackagemacOS() async throws {
 
         let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
 
@@ -42,7 +43,7 @@ class XcodeToolsTests: XCTestCase {
         )
     }
     
-    func test_archive_xcodeProject_macOS() async throws {
+    @Test func archiveXcodeProjectmacOS() async throws {
 
         let projectDirectoryPath = "PROJECT_DIRECTORY_PATH"
 
@@ -108,25 +109,25 @@ private extension XcodeToolsTests {
         var shell = MockShell()
         shell.handleExecute = { command in
             let expectedInput = expectedHandleExecuteCalls.removeFirst()
-            XCTAssertEqual(command, expectedInput)
+            #expect(command == expectedInput)
             return archiveResult
         }
         var fileHandler = MockFileHandler()
         fileHandler.handleFileExists = { path in
             let expectedInput = expectedHandleFileExistsCalls.removeFirst()
-            XCTAssertEqual(path, expectedInput)
+            #expect(path == expectedInput)
             return true
         }
         var logger = MockLogger()
         logger.handleLog = { message, subsystem in
             let expectedInput = expectedHandleLogCalls.removeFirst()
-            XCTAssertEqual(message, expectedInput.message)
-            XCTAssertEqual(subsystem, expectedInput.subsystem)
+            #expect(message == expectedInput.message)
+            #expect(subsystem == expectedInput.subsystem)
         }
         logger.handleDebug = { message, subsystem in
             let expectedInput = expectedHandleDebugCalls.removeFirst()
-            XCTAssertEqual(message, expectedInput.message)
-            XCTAssertEqual(subsystem, expectedInput.subsystem)
+            #expect(message == expectedInput.message)
+            #expect(subsystem == expectedInput.subsystem)
         }
 
         let xcodeTools = XcodeTools(
@@ -142,10 +143,10 @@ private extension XcodeToolsTests {
             platform: platform
         )
 
-        XCTAssertEqual(derivedDataPath, expectedDerivedDataPath)
-        XCTAssertTrue(expectedHandleExecuteCalls.isEmpty)
-        XCTAssertTrue(expectedHandleLogCalls.isEmpty)
-        XCTAssertTrue(expectedHandleDebugCalls.isEmpty)
-        XCTAssertTrue(expectedHandleFileExistsCalls.isEmpty)
+        #expect(derivedDataPath == expectedDerivedDataPath)
+        #expect(expectedHandleExecuteCalls.isEmpty)
+        #expect(expectedHandleLogCalls.isEmpty)
+        #expect(expectedHandleDebugCalls.isEmpty)
+        #expect(expectedHandleFileExistsCalls.isEmpty)
     }
 }

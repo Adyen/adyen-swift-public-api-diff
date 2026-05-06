@@ -32,9 +32,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.7.1"),
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "603.0.1"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", .upToNextMajor(from: "603.0.0")),
         .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.61.0"),
-        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.6")
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.6"),
+        .package(url: "https://github.com/apple/swift-testing", exact: "6.3.1")
     ],
     targets: [
 
@@ -134,24 +135,34 @@ let package = Package(
         .testTarget(
             name: "UnitTests",
             dependencies: [
-                "public-api-diff"
+                "public-api-diff",
+                .product(name: "Testing", package: "swift-testing")
             ],
             resources: [
                 // Copy Tests/ExampleTests/Resources directories as-is.
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
                 .copy("Resources/expected-reference-changes.md")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("TestingMacros")
             ]
         ),
         .testTarget(
             name: "IntegrationTests",
-            dependencies: ["public-api-diff"],
+            dependencies: [
+                "public-api-diff",
+                .product(name: "Testing", package: "swift-testing")
+            ],
             resources: [
                 // Copy Tests/ExampleTests/Resources directories as-is.
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
                 .copy("Resources/expected-reference-changes-swift-interface-private.md"),
                 .copy("Resources/expected-reference-changes-swift-interface-public.md")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("TestingMacros")
             ]
         )
     ]

@@ -5,25 +5,26 @@
 //
 
 @testable import FileHandlingModule
-import XCTest
+import Testing
 
-class FileHandlingTests: XCTestCase {
+@Suite
+struct FileHandlingTests {
 
-    func test_write() throws {
+    @Test func write() throws {
 
         let output = "output"
         let filePath = "output/file/path.txt"
 
         var fileHandler = MockFileHandler()
         fileHandler.handleRemoveItem = { path in
-            XCTAssertEqual(path, filePath)
+            #expect(path == filePath)
         }
 
         // Success scenario
 
         fileHandler.handleCreateFile = { path, data in
-            XCTAssertEqual(path, filePath)
-            XCTAssertEqual(String(data: data, encoding: .utf8), output)
+            #expect(path == filePath)
+            #expect(String(data: data, encoding: .utf8) == output)
             return true
         }
 
@@ -35,56 +36,47 @@ class FileHandlingTests: XCTestCase {
             false
         }
 
-        do {
+        #expect(throws: FileHandlerError.couldNotCreateFile(outputFilePath: filePath)) {
             try fileHandler.write(output, to: filePath)
-            XCTFail("Write should have thrown an error")
-        } catch {
-            let fileHandlerError = try XCTUnwrap(error as? FileHandlerError)
-            XCTAssertEqual(fileHandlerError, FileHandlerError.couldNotCreateFile(outputFilePath: filePath))
         }
     }
 
-    func test_createCleanRepository_success() throws {
+    @Test func createCleanRepositorySuccess() throws {
 
         let filePath = "directory/path"
 
         var fileHandler = MockFileHandler()
         fileHandler.handleRemoveItem = { path in
-            XCTAssertEqual(path, filePath)
+            #expect(path == filePath)
             throw FileHandlerError.pathDoesNotExist(path: path) // This error should not cause an exception and "fail" gracefully
         }
         fileHandler.handleCreateDirectory = { path in
-            XCTAssertEqual(path, filePath)
+            #expect(path == filePath)
         }
 
         try fileHandler.createCleanDirectory(atPath: filePath)
     }
 
-    func test_createCleanRepository_failure() throws {
+    @Test func createCleanRepositoryFailure() throws {
 
         let filePath = "directory/path"
 
         var fileHandler = MockFileHandler()
         fileHandler.handleRemoveItem = { path in
-            XCTAssertEqual(path, filePath)
+            #expect(path == filePath)
             throw FileHandlerError.pathDoesNotExist(path: path) // This error should not cause an exception and "fail" gracefully
         }
         fileHandler.handleCreateDirectory = { path in
-            XCTAssertEqual(path, filePath)
+            #expect(path == filePath)
             throw FileHandlerError.couldNotCreateFile(outputFilePath: path)
         }
 
-        do {
+        #expect(throws: FileHandlerError.couldNotCreateFile(outputFilePath: filePath)) {
             try fileHandler.createCleanDirectory(atPath: filePath)
-            XCTFail("createCleanDirectory should have thrown an error")
-        } catch {
-            let fileHandlerError = try XCTUnwrap(error as? FileHandlerError)
-            XCTAssertEqual(fileHandlerError, .couldNotCreateFile(outputFilePath: filePath))
         }
-
     }
 
-    func test_load() throws {
+    @Test func load() throws {
 
         let filePath = "input/file/path.txt"
         let expectedContent = "content"
@@ -94,12 +86,12 @@ class FileHandlingTests: XCTestCase {
         // Success scenario
 
         fileHandler.handleLoadData = { path in
-            XCTAssertEqual(path, filePath)
-            return try XCTUnwrap(expectedContent.data(using: .utf8))
+            #expect(path == filePath)
+            return try #require(expectedContent.data(using: .utf8))
         }
 
         let content = try fileHandler.loadString(from: filePath)
-        XCTAssertEqual(expectedContent, content)
+        #expect(expectedContent == content)
 
         // Fail scenario
 
@@ -107,12 +99,8 @@ class FileHandlingTests: XCTestCase {
             throw FileHandlerError.couldNotLoadFile(filePath: path)
         }
 
-        do {
+        #expect(throws: FileHandlerError.couldNotLoadFile(filePath: filePath)) {
             _ = try fileHandler.loadString(from: filePath)
-            XCTFail("Load should have thrown an error")
-        } catch {
-            let fileHandlerError = try XCTUnwrap(error as? FileHandlerError)
-            XCTAssertEqual(fileHandlerError, FileHandlerError.couldNotLoadFile(filePath: filePath))
         }
     }
 }
