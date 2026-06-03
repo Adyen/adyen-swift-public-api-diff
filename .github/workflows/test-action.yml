@@ -28,12 +28,12 @@ jobs:
       with:
         fetch-depth: 0
 
-    - uses: n1hility/cancel-previous-runs@v3
+    - uses: n1hility/cancel-previous-runs@e709d8e41b16d5d0b8d529d293c5e126c57dc022 # v3
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Select latest Xcode
-      uses: maxim-lobanov/setup-xcode@v1
+      uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
       with:
         xcode-version: '26.2.0'
 
