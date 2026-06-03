@@ -10,6 +10,9 @@ on:
     - cron: '0 0 * * *'  # Run every day at midnight
   workflow_dispatch:
 
+permissions:
+  issues: write
+
 jobs:
   close_stale_prs:
     runs-on: ubuntu-latest
