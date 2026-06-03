@@ -29,4 +29,4 @@ public enum SwiftInterfaceType {
     }
 }
 
-public enum ChangeToTestMergingBehavior {}
+public enum SomeChangeToTestMergingBehavior {}
