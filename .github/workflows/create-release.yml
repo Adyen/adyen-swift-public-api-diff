@@ -22,10 +22,12 @@ jobs:
     steps:
     - name: ✅ Validate version format
       run: |
-        if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "Invalid version format: '${{ inputs.version }}'. Expected X.Y.Z"
+        if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Invalid version format: '$VERSION'. Expected X.Y.Z"
           exit 1
         fi
+      env:
+        VERSION: ${{ inputs.version }}
 
     - uses: actions/checkout@v6
       with:
@@ -34,20 +36,26 @@ jobs:
 
     - name: 🌿 Create and push release branch
       run: |
-        git checkout -b release/${{ inputs.version }}
-        git push origin release/${{ inputs.version }}
+        git checkout -b "release/$VERSION"
+        git push origin "release/$VERSION"
+      env:
+        VERSION: ${{ inputs.version }}
 
     - name: 📝 Update version in Examples/github-workflow.yml
       run: |
-        sed -i "s|uses: Adyen/adyen-swift-public-api-diff@[0-9]*\.[0-9]*\.[0-9]*|uses: Adyen/adyen-swift-public-api-diff@${{ inputs.version }}|g" Examples/github-workflow.yml
+        sed -i "s|uses: Adyen/adyen-swift-public-api-diff@[0-9]*\.[0-9]*\.[0-9]*|uses: Adyen/adyen-swift-public-api-diff@${VERSION}|g" Examples/github-workflow.yml
+      env:
+        VERSION: ${{ inputs.version }}
 
     - name: 💾 Commit version bump
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add Examples/github-workflow.yml
-        git commit -m "Bump version to ${{ inputs.version }}"
-        git push origin release/${{ inputs.version }}
+        git diff --cached --quiet || git commit -m "Bump version to $VERSION"
+        git push origin "release/$VERSION"
+      env:
+        VERSION: ${{ inputs.version }}
 
     - name: 🚀 Create draft release and tag
       env:
