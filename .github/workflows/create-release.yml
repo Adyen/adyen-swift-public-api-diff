@@ -60,19 +60,22 @@ jobs:
     - name: 🚀 Create draft release and tag
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: ${{ inputs.version }}
       run: |
-        gh release create ${{ inputs.version }} \
+        gh release create "$VERSION" \
           --draft \
           --generate-notes \
-          --target release/${{ inputs.version }} \
-          --title "${{ inputs.version }}"
+          --target "release/$VERSION" \
+          --title "$VERSION"
 
     - name: 📬 Open PR to merge release branch back to main
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: ${{ inputs.version }}
+        SOURCE_BRANCH: ${{ inputs.source_branch }}
       run: |
         gh pr create \
-          --base ${{ inputs.source_branch }} \
-          --head release/${{ inputs.version }} \
-          --title "Release ${{ inputs.version }}" \
-          --body "Merges the version bump from the \`${{ inputs.version }}\` release back into \`${{ inputs.source_branch }}\`."
+          --base "$SOURCE_BRANCH" \
+          --head "release/$VERSION" \
+          --title "Release $VERSION" \
+          --body "Merges the version bump from the \`${VERSION}\` release back into \`${SOURCE_BRANCH}\`."
