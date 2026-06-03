@@ -28,3 +28,4 @@ public enum SwiftInterfaceType {
         }
     }
 }
+
