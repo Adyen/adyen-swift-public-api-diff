@@ -1,4 +1,4 @@
-name: 🏷️ Create Release
+name: 🛫 Create Release
 
 on:
   workflow_dispatch:
@@ -62,11 +62,12 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         VERSION: ${{ inputs.version }}
       run: |
-        gh release create "$VERSION" \
+        RELEASE_URL=$(gh release create "$VERSION" \
           --draft \
           --generate-notes \
           --target "release/$VERSION" \
-          --title "$VERSION"
+          --title "$VERSION")
+        echo "RELEASE_URL=$RELEASE_URL" >> $GITHUB_ENV
 
     - name: 📬 Open PR to merge release branch back to main
       env:
@@ -78,4 +79,14 @@ jobs:
           --base "$SOURCE_BRANCH" \
           --head "release/$VERSION" \
           --title "Release $VERSION" \
-          --body "Merges the version bump from the \`${VERSION}\` release back into \`${SOURCE_BRANCH}\`."
+          --body "$(cat <<EOF
+        ## Release $VERSION
+
+        Merges the version bump from the \`$VERSION\` release back into \`$SOURCE_BRANCH\`.
+
+        ### Next steps
+        1. Review and edit the draft release notes: $RELEASE_URL
+        2. Approve and merge this PR
+        3. Publish the release
+        EOF
+        )"
