@@ -54,13 +54,15 @@ runs:
       
     - name: 🪪 Verify binary exists
       run: |
-        if [ ! -f ${{ env.BINARY_PATH }} ]; then 
-          echo "Binary not found at ${{ env.BINARY_PATH }} after build" 
+        if [ ! -f "$BINARY_PATH" ]; then 
+          echo "Binary not found at $BINARY_PATH after build" 
           exit 1
         else 
-          echo "Binary found at ${{ env.BINARY_PATH }}" 
+          echo "Binary found at $BINARY_PATH" 
         fi
       shell: bash
+      env:
+        BINARY_PATH: ${{ env.BINARY_PATH }}
 
     - name: 💾 Save Binary
       if: steps.cache-restore.outputs.cache-hit != 'true'
@@ -71,16 +73,11 @@ runs:
       
     - name: 🏃 Run Diff
       run: |
-        NEW=${{ inputs.new }}
-        OLD=${{ inputs.old }}
-        PLATFORM=${{ inputs.platform }}
-        BINARY_PATH=${{ env.BINARY_PATH }}
-        
         echo "▶️ Running binary at $BINARY_PATH" 
-        $BINARY_PATH project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
+        "$BINARY_PATH" project --new "$NEW" --old "$OLD" --platform "$PLATFORM" --output "$PROJECT_FOLDER/api_comparison.md" --log-output "$PROJECT_FOLDER/logs.txt"
         cat "$PROJECT_FOLDER/logs.txt"
 
-        if [[ ${{ env.HEAD_GITHUB_REPO != env.BASE_GITHUB_REPO }} ]]; then
+        if [[ "$HEAD_GITHUB_REPO" != "$BASE_GITHUB_REPO" ]]; then
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "> [!IMPORTANT]" >> $GITHUB_STEP_SUMMARY
           echo "> **Commenting on pull requests from forks is not possible** due to insufficient permissions." >> $GITHUB_STEP_SUMMARY
@@ -90,6 +87,13 @@ runs:
         
         cat "$PROJECT_FOLDER/api_comparison.md" >> $GITHUB_STEP_SUMMARY
       shell: bash
+      env:
+        NEW: ${{ inputs.new }}
+        OLD: ${{ inputs.old }}
+        PLATFORM: ${{ inputs.platform }}
+        BINARY_PATH: ${{ env.BINARY_PATH }}
+        HEAD_GITHUB_REPO: ${{ env.HEAD_GITHUB_REPO }}
+        BASE_GITHUB_REPO: ${{ env.BASE_GITHUB_REPO }}
 
       # We only want to comment if we're in a Pull Request and if the Pull Request is not from a forked Repository
       # Forked Repositories have different rights for security reasons and thus it's not possible to comment on PRs without lowering the security
