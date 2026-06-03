@@ -28,7 +28,7 @@ Add the package to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Adyen/adyen-swift-public-api-diff", from: "0.10.1")
+    .package(url: "https://github.com/Adyen/adyen-swift-public-api-diff", from: "0.12.0")
 ]
 ```
 
@@ -240,7 +240,7 @@ The output can be written to a file using the `--output` flag or printed to stdo
 The public-api-diff can be used easily via the provided github action, which creates a comment on a PR (if applicable) and also adds it to the Github step summary.
 ```bash
 - name: 🔍 Detect Changes
-  uses: Adyen/adyen-swift-public-api-diff@0.10.1
+  uses: Adyen/adyen-swift-public-api-diff@0.12.0
   with:
     platform: "iOS"
     new: "develop~https://github.com/Adyen/adyen-ios.git"
