@@ -72,7 +72,7 @@ extension ProjectSetupHelper {
         oldSource: ProjectSource,
         newSource: ProjectSource,
         projectType: ProjectType
-    ) async throws -> (old: URL, new: URL) {
+    ) async throws -> (oldDirectory: URL, newDirectory: URL, warnings: [String]) {
         let projectSetupHelper = ProjectSetupHelper(
             workingDirectoryPath: workingDirectoryPath,
             shell: Shell(logger: logger),
@@ -83,7 +83,24 @@ extension ProjectSetupHelper {
         async let newProjectDirectoryPath = try projectSetupHelper.setup(newSource, projectType: projectType)
         async let oldProjectDirectoryPath = try projectSetupHelper.setup(oldSource, projectType: projectType)
 
-        return try await (oldProjectDirectoryPath, newProjectDirectoryPath)
+        let directories = try await (old: oldProjectDirectoryPath, new: newProjectDirectoryPath)
+
+        // Merge the old branch into the new clone so the diff only reflects the source
+        // branch's actual changes, avoiding misleading inverse diffs when the source is
+        // out of date with the target.
+        var warnings = [String]()
+        if case let .git(oldBranch, oldRepository) = oldSource,
+           case let .git(_, newRepository) = newSource,
+           oldRepository == newRepository {
+            let git = Git(shell: shell, fileHandler: fileHandler, logger: logger)
+            do {
+                try git.merge(oldBranch, from: oldRepository, into: directories.new.path)
+            } catch let error as GitError {
+                warnings.append(error.localizedDescription)
+            }
+        }
+
+        return (oldDirectory: directories.old, newDirectory: directories.new, warnings: warnings)
     }
 }
 

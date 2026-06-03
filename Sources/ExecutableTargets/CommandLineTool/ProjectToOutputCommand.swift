@@ -82,6 +82,8 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
                 logger: logger
             )
 
+            warnings += projectBuilderResult.warnings
+
             // MARK: - Analyzing .swiftinterface files
 
             let swiftInterfaceChanges = try await Self.analyzeSwiftInterfaceFiles(

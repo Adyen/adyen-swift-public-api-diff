@@ -30,6 +30,8 @@ public struct ProjectBuilder {
         public let swiftInterfaceFiles: [SwiftInterfaceFile]
         /// The project directories for the setup projects
         public let projectDirectories: (old: URL, new: URL)
+        /// Warnings produced during project setup (e.g. merge conflicts)
+        public let warnings: [String]
     }
 
     private let projectType: ProjectType
@@ -93,7 +95,7 @@ public struct ProjectBuilder {
             logger: logger
         )
 
-        let projectDirectories = try await projectSetupHelper.setupProjects(
+        let setupResult = try await projectSetupHelper.setupProjects(
             oldSource: oldSource,
             newSource: newSource,
             projectType: projectType
@@ -112,13 +114,14 @@ public struct ProjectBuilder {
         )
 
         let swiftInterfaceFiles = try await producer.produceInterfaceFiles(
-            oldProjectDirectory: projectDirectories.old,
-            newProjectDirectory: projectDirectories.new
+            oldProjectDirectory: setupResult.oldDirectory,
+            newProjectDirectory: setupResult.newDirectory
         )
 
         return .init(
             swiftInterfaceFiles: swiftInterfaceFiles,
-            projectDirectories: projectDirectories
+            projectDirectories: (old: setupResult.oldDirectory, new: setupResult.newDirectory),
+            warnings: setupResult.warnings
         )
     }
 }
