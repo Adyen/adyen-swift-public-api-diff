@@ -514,7 +514,7 @@ public func consumingFunction(_ param: Swift.String) -> Swift.Void
 
 /**
 Changes:
-- Modified parameter `_`: Changed type from `consuming Swift.String` to `Swift.String`
+- Modified parameter `param`: Changed type from `consuming Swift.String` to `Swift.String`
 */
 ```
 ```swift
@@ -526,7 +526,7 @@ public func mutatingFunction(_ param: Swift.String) -> Swift.Void
 
 /**
 Changes:
-- Modified parameter `_`: Changed type from `inout Swift.String` to `Swift.String`
+- Modified parameter `param`: Changed type from `inout Swift.String` to `Swift.String`
 */
 ```
 ```swift
@@ -538,7 +538,7 @@ public func processingFunction(_ param: sending Swift.String) -> Swift.Void
 
 /**
 Changes:
-- Modified parameter `_`: Changed type from `Swift.String` to `sending Swift.String`
+- Modified parameter `param`: Changed type from `Swift.String` to `sending Swift.String`
 */
 ```
 ```swift
@@ -550,7 +550,7 @@ public func regularFunction(_ param: borrowing Swift.String) -> Swift.Void
 
 /**
 Changes:
-- Modified parameter `_`: Changed type from `Swift.String` to `borrowing Swift.String`
+- Modified parameter `param`: Changed type from `Swift.String` to `borrowing Swift.String`
 */
 ```
 ### `TestExtensionMatching.Data`
@@ -599,7 +599,7 @@ public func processValue<U>(_ value: consuming U) -> Swift.Void where U : ~Copya
 /**
 Changes:
 - Added generic where clause `where U : ~Copyable`
-- Modified parameter `_`: Changed type from `U` to `consuming U`
+- Modified parameter `value`: Changed type from `U` to `consuming U`
 */
 ```
 

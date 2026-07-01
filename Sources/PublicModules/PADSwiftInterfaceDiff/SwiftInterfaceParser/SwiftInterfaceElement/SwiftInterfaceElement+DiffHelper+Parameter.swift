@@ -58,7 +58,7 @@ extension SwiftInterfaceElement {
             
             let modificationDiffPrefix = modificationDiffDescriptionPrefix(
                 propertyType: propertyType,
-                firstName: oldParameter.firstName,
+                firstName: oldParameter.displayName,
                 index: index
             )
             
