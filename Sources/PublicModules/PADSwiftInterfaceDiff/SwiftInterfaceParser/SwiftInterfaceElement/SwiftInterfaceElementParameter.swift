@@ -47,4 +47,13 @@ extension SwiftInterfaceElementParameter {
     var valueForDiffableSignature: String {
         "\(firstName ?? "_"):"
     }
+    
+    /// A human-readable name for the parameter used in change descriptions.
+    ///
+    /// Prefers the external argument label, but falls back to the internal name
+    /// when the label is omitted (`_`), e.g. `_ action: ...` is reported as `action`.
+    var displayName: String? {
+        if let firstName, firstName != "_" { return firstName }
+        return secondName ?? firstName
+    }
 }
