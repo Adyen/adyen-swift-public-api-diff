@@ -135,6 +135,24 @@ extension SwiftInterfaceElement {
     }
 }
 
+/// A key uniquely identifying a memoized recursive description
+private struct RecursiveDescriptionCacheKey: Hashable {
+    let id: ObjectIdentifier
+    let tokens: Set<SwiftInterfaceElementDescriptionToken>
+}
+
+/// A process-wide memoization cache for `recursiveDescription`.
+///
+/// The diffing algorithm requests the recursive description of the same elements many times.
+/// Recomputing it (which rebuilds and re-sorts the entire subtree on every call) makes diffing
+/// large modules (e.g. `SwiftUI`, `Foundation`) effectively hang. Elements are reference types
+/// that are not mutated during analysis, so their description can safely be cached by identity.
+///
+/// - Note: Access is not synchronized. Analysis runs on a single thread.
+private enum RecursiveDescriptionCache {
+    static var storage: [RecursiveDescriptionCacheKey: String] = [:]
+}
+
 extension SwiftInterfaceElement {
 
     /// Produces the complete recursive description of the element
@@ -142,24 +160,48 @@ extension SwiftInterfaceElement {
         indentation: Int = 0,
         incl tokens: Set<SwiftInterfaceElementDescriptionToken> = Set(SwiftInterfaceElementDescriptionToken.allCases)
     ) -> String {
-        let spacer = "  "
-        var recursiveDescription = "\(indentedDescription(indentation: indentation, incl: tokens))"
+        let canonicalDescription = canonicalRecursiveDescription(incl: tokens)
+        guard indentation > 0 else { return canonicalDescription }
+        return canonicalDescription.indented(by: indentation)
+    }
+
+    /// The recursive description at indentation `0`, memoized per element + token set.
+    ///
+    /// Any indented variant is derived from this by prefixing each line, since
+    /// `recursiveDescription(indentation: n)` is exactly this value with every line prefixed
+    /// by `n` levels of indentation.
+    private func canonicalRecursiveDescription(
+        incl tokens: Set<SwiftInterfaceElementDescriptionToken>
+    ) -> String {
+        let cacheKey = RecursiveDescriptionCacheKey(id: ObjectIdentifier(self), tokens: tokens)
+        if let cached = RecursiveDescriptionCache.storage[cacheKey] { return cached }
+
+        var recursiveDescription = description(incl: tokens)
         if !self.children.isEmpty {
             recursiveDescription.append(" {")
             for child in self.children.sorted(by: { $0.description(incl: tokens) < $1.description(incl: tokens) }) {
-                recursiveDescription.append("\n\(child.recursiveDescription(indentation: indentation + 1, incl: tokens))")
+                recursiveDescription.append("\n\(child.canonicalRecursiveDescription(incl: tokens).indented(by: 1))")
             }
-            recursiveDescription.append("\n\(String(repeating: spacer, count: indentation))}")
+            recursiveDescription.append("\n}")
         }
 
+        RecursiveDescriptionCache.storage[cacheKey] = recursiveDescription
         return recursiveDescription
     }
     
     func indentedDescription(indentation: Int, incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
-        var components = description(incl: tokens).components(separatedBy: .newlines)
-        for (index, component) in components.enumerated() {
-            components[index] = "\(String(repeating: "  ", count: indentation))\(component)"
-        }
-        return components.joined(separator: "\n")
+        description(incl: tokens).indented(by: indentation)
+    }
+}
+
+private extension String {
+
+    /// Prefixes every line with `indentation` levels (2 spaces each) of indentation
+    func indented(by indentation: Int) -> String {
+        guard indentation > 0 else { return self }
+        let prefix = String(repeating: "  ", count: indentation)
+        return components(separatedBy: .newlines)
+            .map { "\(prefix)\($0)" }
+            .joined(separator: "\n")
     }
 }
