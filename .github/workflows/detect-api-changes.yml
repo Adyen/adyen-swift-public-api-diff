@@ -22,7 +22,7 @@ jobs:
     runs-on: macos-15 # Apple Silicon Runner
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: n1hility/cancel-previous-runs@e709d8e41b16d5d0b8d529d293c5e126c57dc022 # v3
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -33,7 +33,7 @@ jobs:
         xcode-version: '26.2.0'
 
     - name: 🚚 Fetch repo
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
         
