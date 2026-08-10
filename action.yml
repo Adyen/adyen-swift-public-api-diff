@@ -30,7 +30,7 @@ runs:
         action_ref: ${{ github.action_ref }}
         final_comment_tag: ${{ inputs.comment_tag || format('api_changes_{0}', inputs.platform) }}
     
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         repository: "Adyen/adyen-swift-public-api-diff"
         ref: ${{ env.ACTION_REF }}
