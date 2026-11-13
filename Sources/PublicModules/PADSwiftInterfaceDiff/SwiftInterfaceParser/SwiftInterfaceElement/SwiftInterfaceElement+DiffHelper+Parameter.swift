@@ -37,6 +37,10 @@ extension SwiftInterfaceElement {
         let oldParametersByKey = Dictionary(uniqueKeysWithValues: zip(oldKeys, oldParameters))
 
         var changes = [String]()
+        let oldKeySet = Set(oldKeys)
+        if oldKeys.filter(newKeySet.contains) != newKeys.filter(oldKeySet.contains) {
+            changes.append("Reordered parameters")
+        }
 
         for (key, parameter) in zip(oldKeys, oldParameters) where !newKeySet.contains(key) {
             changes.append("Removed \(propertyType) `\(parameter.description)`")
