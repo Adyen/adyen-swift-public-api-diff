@@ -1,8 +1,7 @@
 //
-//  SwiftInterfaceElement+DiffHelper+Parameter.swift
-//  public-api-diff
+// Copyright (c) 2026 Adyen N.V.
 //
-//  Created by Alexander Guretzki on 30/04/2025.
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
 import Foundation
@@ -32,30 +31,24 @@ extension SwiftInterfaceElement {
             return oldParameters.map { "Removed \(propertyType) `\($0.description)`" }
         }
         
-        let oldParametersByName = oldParameters.indexedByFirstName
-        let newParametersByName = newParameters.indexedByFirstName
+        let oldKeys = oldParameters.matchKeys
+        let newKeys = newParameters.matchKeys
+        let newKeySet = Set(newKeys)
+        let oldParametersByKey = Dictionary(uniqueKeysWithValues: zip(oldKeys, oldParameters))
 
         var changes = [String]()
-        
-        // Check for removed parameters
-        oldParameters.enumerated().forEach { index, oldParameter in
-            let oldFirstName = oldParameter.firstName ?? "Parameter \(index)"
-            if newParametersByName[oldFirstName] == nil {
-                changes.append("Removed \(propertyType) `\(oldParameter.description)`")
-            }
+
+        for (key, parameter) in zip(oldKeys, oldParameters) where !newKeySet.contains(key) {
+            changes.append("Removed \(propertyType) `\(parameter.description)`")
         }
-        
-        // Check for added and modified parameters
-        newParameters.enumerated().forEach { index, newParameter in
-            
-            let newFirstName = newParameter.firstName ?? "Parameter \(index)"
-            
-            guard let oldParameter = oldParametersByName[newFirstName] else {
-                // Parameter was added
+
+        for (index, pair) in zip(newKeys, newParameters).enumerated() {
+            let (key, newParameter) = pair
+            guard let oldParameter = oldParametersByKey[key] else {
                 changes.append("Added \(propertyType) `\(newParameter.description)`")
-                return
+                continue
             }
-            
+
             let modificationDiffPrefix = modificationDiffDescriptionPrefix(
                 propertyType: propertyType,
                 firstName: oldParameter.displayName,
@@ -104,13 +97,22 @@ fileprivate extension SwiftInterfaceElement {
     }
 }
 
+private struct ParameterMatchKey: Hashable {
+    let label: String?
+    let occurrence: Int
+}
+
 private extension [SwiftInterfaceElementParameter] {
-    
-    var indexedByFirstName: [String: SwiftInterfaceElementParameter] {
-        Dictionary(
-            uniqueKeysWithValues: self.enumerated().map {
-                ($0.element.firstName ?? "Parameter \($0.offset)", $0.element)
+
+    var matchKeys: [ParameterMatchKey] {
+        var occurrences: [String: Int] = [:]
+        return enumerated().map { index, parameter in
+            guard let label = parameter.firstName else {
+                return ParameterMatchKey(label: nil, occurrence: index)
             }
-        )
+            let occurrence = occurrences[label, default: 0]
+            occurrences[label] = occurrence + 1
+            return ParameterMatchKey(label: label, occurrence: occurrence)
+        }
     }
 }

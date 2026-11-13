@@ -1,6 +1,12 @@
 // swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
+//
+// Copyright (c) 2026 Adyen N.V.
+//
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
+//
+
 import PackageDescription
 
 let package = Package(
@@ -32,10 +38,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.8.2"),
-        .package(url: "https://github.com/swiftlang/swift-syntax", .upToNextMajor(from: "603.0.2")),
+        .package(url: "https://github.com/swiftlang/swift-syntax", .upToNextMajor(from: "604.0.0")),
         .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.62.1"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.5.0"),
-        .package(url: "https://github.com/apple/swift-testing", exact: "6.3.2")
+        .package(url: "https://github.com/apple/swift-testing", exact: "6.4.1")
     ],
     targets: [
 
