@@ -17,7 +17,12 @@ final class ModuleSelectorNormalizer: SyntaxRewriter {
         names.walk(source)
         guard names.hasTypeSelector else { return Syntax(source) }
 
-        let modules = names.imports.union([moduleName]).subtracting(names.declarations)
+        var modules = names.imports.union([moduleName])
+        // SDK overlays can refer to modules imported transitively by the underlying framework.
+        if names.reexportedModules.contains(moduleName) {
+            modules.formUnion(names.selectorModules)
+        }
+        modules.subtract(names.declarations)
         return ModuleSelectorNormalizer(moduleName: moduleName, modules: modules).rewrite(source)
     }
 
@@ -60,6 +65,8 @@ final class ModuleSelectorNormalizer: SyntaxRewriter {
 private final class ModuleNames: SyntaxAnyVisitor {
 
     var imports: Set<String> = []
+    var reexportedModules: Set<String> = []
+    var selectorModules: Set<String> = []
     var declarations: Set<String> = []
     var hasTypeSelector = false
 
@@ -67,6 +74,7 @@ private final class ModuleNames: SyntaxAnyVisitor {
         if node.parent?.is(IdentifierTypeSyntax.self) == true ||
             node.parent?.is(MemberTypeSyntax.self) == true {
             hasTypeSelector = true
+            selectorModules.insert(node.moduleName.text)
         }
         return .skipChildren
     }
@@ -74,6 +82,12 @@ private final class ModuleNames: SyntaxAnyVisitor {
     override func visit(_ node: ImportDeclSyntax) -> SyntaxVisitorContinueKind {
         if let name = node.path.first?.name.text {
             imports.insert(name)
+            if node.attributes.contains(where: {
+                guard case let .attribute(attribute) = $0 else { return false }
+                return attribute.attributeName.trimmedDescription == "_exported"
+            }) {
+                reexportedModules.insert(name)
+            }
         }
         return .skipChildren
     }
