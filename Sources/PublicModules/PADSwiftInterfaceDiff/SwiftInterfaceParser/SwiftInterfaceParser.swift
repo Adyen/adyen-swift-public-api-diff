@@ -25,13 +25,26 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     /// The conditions of the `#if` clauses that are currently visited, outermost first
     private var conditionStack = [String]()
 
+    /// The syntax of every parsed extension, to produce new instances of it (see ``Root/init(moduleName:elements:copyExtension:)``)
+    private var extensionNodes = [ObjectIdentifier: ExtensionDeclSyntax]()
+
     func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
         let visitor = Self()
         let syntax = Parser.parse(source: source)
         visitor.walk(ModuleSelectorNormalizer.normalize(syntax, moduleName: moduleName))
+        let extensionNodes = visitor.extensionNodes
         return Root(
             moduleName: moduleName,
-            elements: visitor.scope.elements
+            elements: visitor.scope.elements,
+            copyExtension: { original in
+                guard let node = extensionNodes[ObjectIdentifier(original)] else { return nil }
+                let copyVisitor = Self()
+                copyVisitor.walk(node)
+                guard let copy = copyVisitor.scope.elements.first as? SwiftInterfaceExtension else { return nil }
+                // Including the conditions of the `#if` clauses around the extension
+                copy.attributes = original.attributes
+                return copy
+            }
         )
     }
 
@@ -169,7 +182,11 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     }
 
     override open func visitPost(_ node: ExtensionDeclSyntax) {
-        endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
+        endScopeAndAddSymbol { children in
+            let extensionElement = node.toInterfaceElement(children: children)
+            extensionNodes[ObjectIdentifier(extensionElement)] = node
+            return [extensionElement]
+        }
     }
 
     // MARK: - Initializer

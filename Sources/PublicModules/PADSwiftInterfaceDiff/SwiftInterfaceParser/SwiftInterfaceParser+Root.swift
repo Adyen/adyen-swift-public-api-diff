@@ -8,6 +8,9 @@ import Foundation
 
 extension SwiftInterfaceParser {
 
+    /// Produces a new instance of an extension (see ``Root/init(moduleName:elements:copyExtension:)``)
+    typealias ExtensionCopier = (SwiftInterfaceExtension) -> SwiftInterfaceExtension?
+
     /// The root element returned as the result of parsing the interface
     class Root: SwiftInterfaceElement {
 
@@ -31,10 +34,16 @@ extension SwiftInterfaceParser {
         private let moduleName: String
         private(set) var children: [any SwiftInterfaceElement]
 
-        init(moduleName: String, elements: [any SwiftInterfaceElement]) {
+        /// - Parameter copyExtension: Produces a new instance of an extension (with new instances of its members),
+        ///   used to merge an extension into several variants of a type (see ``ConditionalCompilation``)
+        init(
+            moduleName: String,
+            elements: [any SwiftInterfaceElement],
+            copyExtension: @escaping ExtensionCopier = { _ in nil }
+        ) {
             self.moduleName = moduleName
 
-            self.children = Self.mergeExtensions(for: elements, moduleName: moduleName)
+            self.children = Self.mergeExtensions(for: elements, moduleName: moduleName, copy: copyExtension)
             self.children.forEach { $0.setupParentRelationships(parent: self) }
         }
 
@@ -71,7 +80,11 @@ private extension SwiftInterfaceParser.Root {
     ///    var b: Int { 1 }
     /// }
     /// ```
-    static func mergeExtensions(for elements: [any SwiftInterfaceElement], moduleName: String) -> [any SwiftInterfaceElement] {
+    static func mergeExtensions(
+        for elements: [any SwiftInterfaceElement],
+        moduleName: String,
+        copy: SwiftInterfaceParser.ExtensionCopier
+    ) -> [any SwiftInterfaceElement] {
 
         // Shallower extensions first (stable within a depth): `extension M.A { struct B }` must be merged
         // before `extension M.A.B` can find `B`, regardless of where either appears in the file.
@@ -97,7 +110,7 @@ private extension SwiftInterfaceParser.Root {
                 return
             }
 
-            if merge(extensionElement: extensionElement, with: extendableElements, prefix: moduleName) {
+            if merge(extensionElement: extensionElement, with: extendableElements, prefix: moduleName, copy: copy) {
                 return // We found the matching extended element
             }
 
@@ -232,19 +245,38 @@ private extension SwiftInterfaceParser.Root {
     static func merge(
         extensionElement: SwiftInterfaceExtension,
         with extendableElements: [any SwiftInterfaceExtendableElement],
-        prefix: String
+        prefix: String,
+        copy: SwiftInterfaceParser.ExtensionCopier
     ) -> Bool {
 
         // Matching on whole path components so that e.g. `extension M.TabContent`
         // is never routed into `struct M.Tab` (a plain `hasPrefix` made the merge
         // depend on declaration order). Every candidate is tried, not just the first.
         let extendedType = extensionElement.extendedType
-        for extendedElement in preferringSameConditions(extendableElements, as: extensionElement) {
+        let candidates = extendableElements.filter { extendedElement in
             let extendedElementPrefix = "\(prefix).\(extendedElement.typeName)"
-            guard extendedType == extendedElementPrefix || extendedType.hasPrefix("\(extendedElementPrefix).") else {
-                continue
+            return extendedType == extendedElementPrefix || extendedType.hasPrefix("\(extendedElementPrefix).")
+        }
+
+        // Variants of the type declared in different `#if` clauses (see `ConditionalCompilation`)
+        // that don't match the extension's conditions: the extension applies to all of them
+        // (e.g. `extension S: Sendable` for `#if $TildeSendable struct S: ~Sendable #else struct S #endif`)
+        let extensionConditions = Set(extensionElement.conditions)
+        if candidates.count > 1, !candidates.contains(where: { Set($0.conditions).isSubset(of: extensionConditions) }) {
+            var isMerged = false
+            for (index, extendedElement) in candidates.enumerated() {
+                guard let extensionInstance = index == 0 ? extensionElement : copy(extensionElement) else { continue }
+                let extendedElementPrefix = "\(prefix).\(extendedElement.typeName)"
+                if merge(extensionElement: extensionInstance, into: extendedElement, prefix: extendedElementPrefix, copy: copy) {
+                    isMerged = true
+                }
             }
-            if merge(extensionElement: extensionElement, into: extendedElement, prefix: extendedElementPrefix) {
+            return isMerged
+        }
+
+        for extendedElement in preferringSameConditions(candidates, as: extensionElement) {
+            let extendedElementPrefix = "\(prefix).\(extendedElement.typeName)"
+            if merge(extensionElement: extensionElement, into: extendedElement, prefix: extendedElementPrefix, copy: copy) {
                 return true
             }
         }
@@ -253,7 +285,7 @@ private extension SwiftInterfaceParser.Root {
 
     /// Variants of a type declared in different `#if` clauses (see ``ConditionalCompilation``):
     /// an extension is merged into the variant declared under (a subset of) the extension's conditions,
-    /// preferring the one sharing most conditions, otherwise into the first variant.
+    /// preferring the one sharing most conditions. If none matches, it's merged into every variant (see above).
     static func preferringSameConditions(
         _ extendableElements: [any SwiftInterfaceExtendableElement],
         as extensionElement: SwiftInterfaceExtension
@@ -276,7 +308,8 @@ private extension SwiftInterfaceParser.Root {
     static func merge(
         extensionElement: SwiftInterfaceExtension,
         into extendedElement: any SwiftInterfaceExtendableElement,
-        prefix extendedElementPrefix: String
+        prefix extendedElementPrefix: String,
+        copy: SwiftInterfaceParser.ExtensionCopier
     ) -> Bool {
 
         // We found the extended type
@@ -321,6 +354,6 @@ private extension SwiftInterfaceParser.Root {
 
         // We're looking for the extended type inside of the children
         let extendableChildren = extendedElement.children.compactMap { $0 as? SwiftInterfaceExtendableElement }
-        return merge(extensionElement: extensionElement, with: extendableChildren, prefix: extendedElementPrefix)
+        return merge(extensionElement: extensionElement, with: extendableChildren, prefix: extendedElementPrefix, copy: copy)
     }
 }

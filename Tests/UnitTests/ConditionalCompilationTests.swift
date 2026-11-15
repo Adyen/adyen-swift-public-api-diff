@@ -176,6 +176,27 @@ struct ConditionalCompilationTests {
         #expect(root.children.map(\.conditions) == [["compiler(>=5.3) && $Macros"]])
     }
 
+    @Test func extensionMatchingNoVariantIsMergedIntoEveryVariant() throws {
+        let root = parse("""
+        #if $TildeSendable
+        public struct Shape: ~Swift.Sendable {}
+        #else
+        public struct Shape {}
+        #endif
+        extension Example.Shape: Swift.Sendable {
+          public func describe() -> Swift.String
+        }
+        """)
+
+        let shapes = root.children.compactMap { $0 as? SwiftInterfaceStruct }
+        #expect(root.children.count == 2)
+        #expect(shapes.map(\.inheritance) == [["~Swift.Sendable", "Swift.Sendable"], ["Swift.Sendable"]])
+        #expect(shapes.map { $0.children.map(\.consolidatableName) } == [["describe"], ["describe"]])
+        // Every variant has its own instance
+        #expect(shapes[0].children.first !== shapes[1].children.first)
+        #expect(shapes.map { $0.children.first?.parent === $0 } == [true, true])
+    }
+
     // MARK: - Changes
 
     @Test func unchangedClausesDoNotProduceChanges() {
@@ -333,6 +354,41 @@ struct ConditionalCompilationTests {
         #expect(changes.count == 1, "\(changes)")
         #expect(change.listOfChanges == ["Added attribute `@nonexhaustive` (`#if $NonexhaustiveAttribute`)"])
         #expect(change.conditions.isEmpty)
+    }
+
+    @Test func extensionMembersOfASplitTypeAreNotReportedAsRemoved() throws {
+        let changes = changes(
+            from: """
+            public struct Shape {}
+            #if !$Embedded
+            extension Example.Shape {
+              public func describe() -> Swift.String
+            }
+            #endif
+            """,
+            to: """
+            #if compiler(>=5.3) && $TildeSendable
+            public struct Shape: ~Swift.Sendable {}
+            #else
+            public struct Shape {}
+            #endif
+            #if !$Embedded
+            extension Example.Shape {
+              public func describe() -> Swift.String
+              public func area() -> Swift.Double
+            }
+            #endif
+            """
+        )
+
+        #expect(!changes.contains { $0.changeType.isRemoval }, "\(changes)")
+        let area = try #require(changes.first { $0.changeType == .addition(description: """
+        #if !(compiler(>=5.3) && $TildeSendable) && !$Embedded
+        public func area() -> Swift.Double
+        #endif
+        """) }, "\(changes)")
+        #expect(area.parentPath == "Shape")
+        #expect(changes.count == 3, "\(changes)")
     }
 
     // MARK: - Rendering
