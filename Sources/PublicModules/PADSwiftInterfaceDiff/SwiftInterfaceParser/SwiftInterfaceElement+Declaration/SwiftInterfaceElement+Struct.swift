@@ -67,7 +67,7 @@ extension SwiftInterfaceStruct {
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
         changes += diffDescription(propertyType: "generic parameter description", oldValue: other.genericParameterDescription, newValue: genericParameterDescription)
-        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance)
+        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance, oldTypeAttributes: other.attributes, newTypeAttributes: attributes)
         changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
         return changes.compactMap { $0 }
     }

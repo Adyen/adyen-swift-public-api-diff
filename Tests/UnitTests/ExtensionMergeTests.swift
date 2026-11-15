@@ -89,7 +89,7 @@ struct ExtensionMergeTests {
         let change = try #require(changes.first)
         #expect(changes.count == 1)
         #expect(change.changeType.isModification)
-        #expect(change.listOfChanges.contains("Added attribute `@available(iOS 26.0, tvOS 27.0, *)`"))
+        #expect(change.listOfChanges == ["Availability added: tvOS 27.0"])
     }
 
     /// Mirrors `FoundationModels.SystemLanguageModel` (iOS 27.2 → 27.3): the extension header changes
@@ -126,7 +126,7 @@ struct ExtensionMergeTests {
         #expect(changes.count == 1)
         #expect(change.changeType.isModification)
         #expect(change.parentPath == "Model")
-        #expect(change.listOfChanges.contains("Removed attribute `@available(tvOS, unavailable)`"))
+        #expect(change.listOfChanges == ["Availability added: tvOS 27.3"])
     }
 
     /// Mirrors `HomeExtensions.HomeAccessoryRangeSetting.SliderStyle` (iOS 27.2 → 27.3)
@@ -149,7 +149,7 @@ struct ExtensionMergeTests {
         #expect(changes.count == 1)
         #expect(change.changeType.isModification)
         #expect(change.listOfChanges == [
-            "Changed availability of conformance `Swift.Hashable` from `@available(iOS 27.0, *)` to `@available(iOS 27.2, *)`"
+            "Conformance `Swift.Hashable`: Availability changed: iOS 27.0 → 27.2"
         ])
     }
 
@@ -172,7 +172,7 @@ struct ExtensionMergeTests {
         let change = try #require(changes.first)
         #expect(changes.count == 1)
         #expect(change.listOfChanges == [
-            "Changed availability of conformance `Swift.Hashable` from `availability of the type` to `@available(iOS 16.1, macOS 27.3, *)`"
+            "Conformance `Swift.Hashable`: Availability added: macOS 27.3"
         ])
     }
 

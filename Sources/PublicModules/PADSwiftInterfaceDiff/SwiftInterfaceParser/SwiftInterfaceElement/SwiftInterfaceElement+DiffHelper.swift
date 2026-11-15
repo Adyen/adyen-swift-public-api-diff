@@ -48,28 +48,36 @@ extension SwiftInterfaceElement {
     ///                   for additional information
     ///   - oldValues: The (optional) old values
     ///   - newValues: The (optional) new values
+    ///   - oldTypeAttributes: For inheritance: the old attributes of the type (the availability of its conformances)
+    ///   - newTypeAttributes: For inheritance: the new attributes of the type
     /// - Returns: A list of change descriptions caused by a value change
     func diffDescription(
         propertyType: String,
         oldValues: [String]?,
-        newValues: [String]?
+        newValues: [String]?,
+        oldTypeAttributes: [String] = [],
+        newTypeAttributes: [String] = []
     ) -> [String] {
+
+        if propertyType == "attribute" {
+            return Self.attributeDiffDescription(oldValues: oldValues ?? [], newValues: newValues ?? [])
+        }
 
         guard let oldValues else {
             guard let newValues else { return [] }
-            return newValues.map { "Added \(propertyType) `\($0.description)`" }
+            return newValues.map { Self.listEntryDescription("Added", propertyType, $0) }
         }
 
         guard let newValues else {
-            return oldValues.map { "Removed \(propertyType) `\($0.description)`" }
+            return oldValues.map { Self.listEntryDescription("Removed", propertyType, $0) }
         }
-        
+
         let old = Set(oldValues)
         let new = Set(newValues)
         let removed = old.subtracting(new)
         let added = new.subtracting(old)
 
-        // A conformance whose only difference is its availability annotation is a changed availability,
+        // A conformance whose only difference is its availability is a changed availability,
         // not a removal + addition (see `AvailabilityInheritance.conformance`)
         let removedByConformance = Dictionary(grouping: removed, by: Self.conformanceName)
         let addedByConformance = Dictionary(grouping: added, by: Self.conformanceName)
@@ -80,21 +88,62 @@ extension SwiftInterfaceElement {
         let availabilityChanges = changedAvailability.sorted().compactMap { conformance -> String? in
             guard let oldValue = removedByConformance[conformance]?.first,
                   let newValue = addedByConformance[conformance]?.first else { return nil }
-            return "Changed availability of conformance `\(conformance)` from `\(Self.conformanceAvailability(oldValue))` to `\(Self.conformanceAvailability(newValue))`"
+            let oldAvailability = Self.conformanceAvailability(oldValue, typeAttributes: oldTypeAttributes)
+            let newAvailability = Self.conformanceAvailability(newValue, typeAttributes: newTypeAttributes)
+            guard let descriptions = AvailabilityChange.describe(old: oldAvailability, new: newAvailability) else {
+                return "Changed availability of conformance `\(conformance)` from `\(oldAvailability.joined(separator: " "))` to `\(newAvailability.joined(separator: " "))`"
+            }
+            guard !descriptions.isEmpty else { return nil }
+            return "Conformance `\(conformance)`: \(descriptions.joined(separator: "; "))"
         }
 
         return availabilityChanges + old.symmetricDifference(new)
             .filter { !changedAvailability.contains(Self.conformanceName($0)) }
-            .map { "\(new.contains($0) ? "Added" : "Removed") \(propertyType) `\($0)`" }
+            .map { Self.listEntryDescription(new.contains($0) ? "Added" : "Removed", propertyType, $0) }
+    }
+
+    /// Availability attributes are described per platform (e.g. `Availability added: macOS 27.3`),
+    /// other attributes as added/removed
+    private static func attributeDiffDescription(oldValues: [String], newValues: [String]) -> [String] {
+        let isAvailability: (String) -> Bool = { $0.hasPrefix("@available(") }
+        let oldAvailability = oldValues.filter(isAvailability)
+        let newAvailability = newValues.filter(isAvailability)
+
+        var descriptions = [String]()
+        if Set(oldAvailability) != Set(newAvailability) {
+            descriptions += AvailabilityChange.describe(old: oldAvailability, new: newAvailability)
+                ?? listDiffDescription(propertyType: "attribute", old: oldAvailability, new: newAvailability)
+        }
+        return descriptions + listDiffDescription(
+            propertyType: "attribute",
+            old: oldValues.filter { !isAvailability($0) },
+            new: newValues.filter { !isAvailability($0) }
+        )
+    }
+
+    private static func listDiffDescription(propertyType: String, old: [String], new: [String]) -> [String] {
+        let old = Set(old), new = Set(new)
+        return old.symmetricDifference(new).map {
+            "\(new.contains($0) ? "Added" : "Removed") \(propertyType) `\($0)`"
+        }
+    }
+
+    /// e.g. "Added inheritance `Swift.Hashable` (available on iOS 27.3)" for a conformance with own availability
+    private static func listEntryDescription(_ change: String, _ propertyType: String, _ value: String) -> String {
+        let (conformance, availability) = AvailabilityInheritance.splitConformance(value)
+        guard !availability.isEmpty else { return "\(change) \(propertyType) `\(value)`" }
+        let summary = AvailabilityChange.summary(availability) ?? availability.joined(separator: " ")
+        return "\(change) \(propertyType) `\(conformance)` (\(summary))"
     }
 
     private static func conformanceName(_ value: String) -> String {
         AvailabilityInheritance.splitConformance(value).conformance
     }
 
-    private static func conformanceAvailability(_ value: String) -> String {
+    /// The conformance's own availability, or the type's when it has none
+    private static func conformanceAvailability(_ value: String, typeAttributes: [String]) -> [String] {
         let availability = AvailabilityInheritance.splitConformance(value).availability
-        return availability.isEmpty ? "availability of the type" : availability.joined(separator: " ")
+        return availability.isEmpty ? typeAttributes.filter { $0.hasPrefix("@available(") } : availability
     }
 }
 
