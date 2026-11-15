@@ -149,7 +149,8 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     
     /// Pairs each element of `lhsElements` with at most one comparable element of `rhsElements`
     ///
-    /// Elements with the same description are paired first, then elements that only differ in their attributes
+    /// Elements declared under the same `#if` conditions are paired first (see `ConditionalCompilation`).
+    /// Within that, elements with the same description are paired first, then elements that only differ in their attributes
     /// or modifiers (e.g. availability), then other comparable elements (see `isDiffable(with:)`).
     /// Within each group the most similar pairs (fewest differences, most matching children) are formed first,
     /// so the result does not depend on the order of declarations. Remaining ties keep the declaration order.
@@ -173,7 +174,9 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
                 } else {
                     group = 2
                 }
-                let rank = [group] + similarityScore(of: lhsElement, to: rhsElement) + [lhsIndex, rhsIndex]
+                // Variants declared under the same `#if` conditions first (see `ConditionalCompilation`)
+                let conditionRank = rhsElement.conditions == lhsElement.conditions ? 0 : 1
+                let rank = [conditionRank, group] + similarityScore(of: lhsElement, to: rhsElement) + [lhsIndex, rhsIndex]
                 candidatePairs.append((lhsIndex, rhsIndex, rank))
             }
         }
@@ -221,7 +224,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
         }
         
         // Calculate similarity scores for each candidate:
-        // same conformances first, then shared conformances, then matching children
+        // same `#if` conditions first, then same conformances, then shared conformances, then matching children
         let lhsConformances = Set((lhsElement as? SwiftInterfaceExtension)?.inheritance ?? [])
         let candidatesWithScores = candidates.map { candidate -> (element: any SwiftInterfaceElement, score: [Int]) in
             let candidateConformances = Set((candidate as? SwiftInterfaceExtension)?.inheritance ?? [])
@@ -233,6 +236,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
                 }
             }
             return (element: candidate, score: [
+                candidate.conditions == lhsElement.conditions ? 1 : 0,
                 lhsConformances == candidateConformances ? 1 : 0,
                 lhsConformances.intersection(candidateConformances).count,
                 matchingChildren.count

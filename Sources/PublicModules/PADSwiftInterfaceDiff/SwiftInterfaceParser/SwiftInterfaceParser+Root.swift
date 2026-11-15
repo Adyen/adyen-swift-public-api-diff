@@ -239,7 +239,7 @@ private extension SwiftInterfaceParser.Root {
         // is never routed into `struct M.Tab` (a plain `hasPrefix` made the merge
         // depend on declaration order). Every candidate is tried, not just the first.
         let extendedType = extensionElement.extendedType
-        for extendedElement in extendableElements {
+        for extendedElement in preferringSameConditions(extendableElements, as: extensionElement) {
             let extendedElementPrefix = "\(prefix).\(extendedElement.typeName)"
             guard extendedType == extendedElementPrefix || extendedType.hasPrefix("\(extendedElementPrefix).") else {
                 continue
@@ -249,6 +249,28 @@ private extension SwiftInterfaceParser.Root {
             }
         }
         return false
+    }
+
+    /// Variants of a type declared in different `#if` clauses (see ``ConditionalCompilation``):
+    /// an extension is merged into the variant declared under (a subset of) the extension's conditions,
+    /// preferring the one sharing most conditions, otherwise into the first variant.
+    static func preferringSameConditions(
+        _ extendableElements: [any SwiftInterfaceExtendableElement],
+        as extensionElement: SwiftInterfaceExtension
+    ) -> [any SwiftInterfaceExtendableElement] {
+        let extensionConditions = Set(extensionElement.conditions)
+        guard extendableElements.contains(where: { !$0.conditions.isEmpty }) else { return extendableElements }
+        return extendableElements.enumerated().sorted { lhs, rhs in
+            func rank(_ element: any SwiftInterfaceExtendableElement, _ offset: Int) -> [Int] {
+                let conditions = Set(element.conditions)
+                return [
+                    conditions.isSubset(of: extensionConditions) ? 0 : 1,
+                    -conditions.intersection(extensionConditions).count,
+                    offset
+                ]
+            }
+            return rank(lhs.element, lhs.offset).lexicographicallyPrecedes(rank(rhs.element, rhs.offset))
+        }.map(\.element)
     }
 
     static func merge(
@@ -283,6 +305,12 @@ private extension SwiftInterfaceParser.Root {
                     attributedChild.attributes = AvailabilityInheritance.attributes(
                         attributedChild.attributes,
                         inheriting: extensionElement.attributes
+                    )
+                    // Same for the conditions of `#if` clauses the extension is declared in
+                    let typeConditions = Set(extendedElement.conditions)
+                    attributedChild.attributes = ConditionalCompilation.attributes(
+                        attributedChild.attributes,
+                        adding: extensionElement.conditions.filter { !typeConditions.contains($0) }
                     )
                 }
                 extendedElement.children += [child]

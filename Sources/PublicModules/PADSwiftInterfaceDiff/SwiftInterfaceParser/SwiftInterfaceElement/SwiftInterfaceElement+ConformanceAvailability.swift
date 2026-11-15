@@ -61,8 +61,12 @@ extension SwiftInterfaceConformingElement {
 
         let whereClause = conformanceGenericWhereClause.map { " \($0)" } ?? ""
         return conformances.map { conformance in
-            let attributes = tokens.contains(.attributes) ? conformance.availability : []
-            return (attributes + ["extension \(conformingTypeName): \(conformance.conformance)\(whereClause)"]).joined(separator: "\n")
+            // Conditions of an `#if` the conformance is declared in wrap the extension (see `ConditionalCompilation`)
+            let conditions = ConditionalCompilation.conditions(of: conformance.availability)
+            let availability = conformance.availability.filter { ConditionalCompilation.condition(of: $0) == nil }
+            let attributes = tokens.contains(.attributes) ? availability : []
+            let extensionDescription = (attributes + ["extension \(conformingTypeName): \(conformance.conformance)\(whereClause)"]).joined(separator: "\n")
+            return ConditionalCompilation.wrapped(extensionDescription, in: conditions)
         }
         .map { "\n\n\($0)" }
         .joined()

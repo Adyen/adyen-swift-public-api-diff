@@ -123,8 +123,13 @@ extension SwiftInterfaceElement {
 
     private static func listDiffDescription(propertyType: String, old: [String], new: [String]) -> [String] {
         let old = Set(old), new = Set(new)
-        return old.symmetricDifference(new).map {
-            "\(new.contains($0) ? "Added" : "Removed") \(propertyType) `\($0)`"
+        return old.symmetricDifference(new).map { value in
+            let title = new.contains(value) ? "Added" : "Removed"
+            // The condition of an `#if` clause the element is declared in (see `ConditionalCompilation`)
+            if let condition = ConditionalCompilation.condition(of: value) {
+                return "\(title) condition `#if \(condition)`"
+            }
+            return "\(title) \(propertyType) \(ConditionalCompilation.describedAttribute(value))"
         }
     }
 

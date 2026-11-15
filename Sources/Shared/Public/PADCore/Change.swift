@@ -19,14 +19,22 @@ public struct Change: Equatable {
 
     public private(set) var listOfChanges: [String] = []
 
+    /// The conditions of the `#if` clauses the changed element is declared in (including the ones
+    /// of its enclosing declarations), outermost first. Empty if the element is declared unconditionally.
+    ///
+    /// e.g. `["compiler(>=5.3) && $TildeSendable"]` or `["!$Embedded"]`
+    public private(set) var conditions: [String] = []
+
     public init(
         changeType: ChangeType,
         parentPath: String? = nil,
-        listOfChanges: [String] = []
+        listOfChanges: [String] = [],
+        conditions: [String] = []
     ) {
         self.changeType = changeType
         self.parentPath = parentPath
         self.listOfChanges = listOfChanges.sorted()
+        self.conditions = conditions
     }
 }
 

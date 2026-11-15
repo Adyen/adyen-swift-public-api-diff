@@ -15,13 +15,15 @@ import SwiftSyntax
 class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
 
     // TODO: Handle (Nice to have)
-    // - IfConfigClauseListSyntax
     // - DeinitializerDeclSyntax
     // - PrecedenceGroupDeclSyntax
     // - OperatorDeclSyntax
     // - ... (There are more but not important right now)
 
     private var scope: Scope = .root(elements: [])
+
+    /// The conditions of the `#if` clauses that are currently visited, outermost first
+    private var conditionStack = [String]()
 
     func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
         let visitor = Self()
@@ -40,7 +42,11 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
 
     /// Starts a new scope which can contain zero or more nested symbols
     func startScope() -> SyntaxVisitorContinueKind {
-        scope.start()
+        // The conditions of `#if` clauses entered since the enclosing scope started apply to the new element
+        scope.start(
+            conditions: Array(conditionStack.dropFirst(scope.conditionDepth)),
+            conditionDepth: conditionStack.count
+        )
         return .visitChildren
     }
 
@@ -50,6 +56,20 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     /// Call in `visitPost(_ node:)` methods
     func endScopeAndAddSymbol(makeElementsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
         scope.end(makeElementsWithChildrenInScope: makeElementsWithChildrenInScope)
+    }
+
+    // MARK: - Conditional compilation
+
+    /// Visits every clause of an `#if`, tagging the declarations with the clause's condition
+    /// (see ``ConditionalCompilation``)
+    override open func visit(_ node: IfConfigDeclSyntax) -> SyntaxVisitorContinueKind {
+        for (clause, condition) in ConditionalCompilation.clauses(of: node) {
+            guard let elements = clause.elements else { continue }
+            conditionStack.append(condition)
+            walk(elements)
+            conditionStack.removeLast()
+        }
+        return .skipChildren
     }
 
     // MARK: - Class
@@ -201,11 +221,14 @@ private indirect enum Scope {
     case root(elements: [any SwiftInterfaceElement])
 
     /// A nested scope, within a parent scope
-    case nested(parent: Scope, elements: [any SwiftInterfaceElement])
+    ///
+    /// - `conditions`: The conditions of the `#if` clauses the element of the scope is declared in
+    /// - `conditionDepth`: The number of `#if` clauses entered when the scope started
+    case nested(parent: Scope, elements: [any SwiftInterfaceElement], conditions: [String], conditionDepth: Int)
 
     /// Starts a new nested scope
-    mutating func start() {
-        self = .nested(parent: self, elements: [])
+    mutating func start(conditions: [String], conditionDepth: Int) {
+        self = .nested(parent: self, elements: [], conditions: conditions, conditionDepth: conditionDepth)
     }
 
     /// Ends the current scope by adding new elements to the scope tree.
@@ -213,22 +236,42 @@ private indirect enum Scope {
     mutating func end(makeElementsWithChildrenInScope: (_ children: [any SwiftInterfaceElement]) -> [any SwiftInterfaceElement]) {
         let newElements = makeElementsWithChildrenInScope(elements)
 
-        switch self {
-        case .root:
+        guard case let .nested(parent, _, conditions, _) = self else {
             fatalError("Unbalanced calls to start() and end(_:)")
+        }
 
-        case let .nested(.root(rootElements), _):
+        if !conditions.isEmpty {
+            newElements.compactMap { $0 as? SwiftInterfaceAttributedElement }.forEach {
+                $0.attributes = ConditionalCompilation.attributes($0.attributes, adding: conditions)
+            }
+        }
+
+        switch parent {
+        case let .root(rootElements):
             self = .root(elements: rootElements + newElements)
 
-        case let .nested(.nested(parent, parentElements), _):
-            self = .nested(parent: parent, elements: parentElements + newElements)
+        case let .nested(grandParent, parentElements, parentConditions, parentConditionDepth):
+            self = .nested(
+                parent: grandParent,
+                elements: parentElements + newElements,
+                conditions: parentConditions,
+                conditionDepth: parentConditionDepth
+            )
         }
     }
 
     var elements: [any SwiftInterfaceElement] {
         switch self {
         case let .root(elements): return elements // All child elements recursive from the root
-        case let .nested(_, elements): return elements // All child elements recursive from a nested element
+        case let .nested(_, elements, _, _): return elements // All child elements recursive from a nested element
+        }
+    }
+
+    /// The number of `#if` clauses entered when the scope started
+    var conditionDepth: Int {
+        switch self {
+        case .root: return 0
+        case let .nested(_, _, _, conditionDepth): return conditionDepth
         }
     }
 }
