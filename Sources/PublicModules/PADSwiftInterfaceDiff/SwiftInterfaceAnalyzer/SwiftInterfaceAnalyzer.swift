@@ -59,6 +59,9 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
         }
 
         let exactMatches = Set(rhs.children.map { $0.recursiveDescription(incl: comparisonTokens) })
+        // Elements of `rhs` that are an exact counterpart of an element of `lhs` are accounted for
+        // and must not be paired with another element as well
+        let exactCounterparts = Set(lhs.children.map { $0.recursiveDescription(incl: comparisonTokens) })
         changes += lhs.children.flatMap { lhsElement in
 
             // Trying to find a matching element
@@ -76,7 +79,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             // For extensions, we need special handling to find the best match based on child similarity
             if lhsElement is SwiftInterfaceExtension {
                 let allDescriptionMatches = rhs.children.filter { $0.description(incl: comparisonTokens) == lhsElement.description(incl: comparisonTokens) }
-                if let bestMatch = findBestExtensionMatch(for: lhsElement, among: allDescriptionMatches) {
+                if let bestMatch = findBestExtensionMatch(for: lhsElement, among: allDescriptionMatches, excluding: exactCounterparts) {
                     return Self.recursiveCompare(element: lhsElement, to: bestMatch, oldFirst: oldFirst)
                 }
                 // No good match found, will fall through to isDiffable check or report as removal/addition
@@ -86,7 +89,14 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             }
 
             // ... then losening the criteria to find a comparable element
-            if let rhsChildForName = rhs.children.first(where: { $0.isDiffable(with: lhsElement) }) {
+            // Extensions of the same type are all comparable, so pick the one declaring the same
+            // conformances / members instead of the first (e.g. after an availability change)
+            if lhsElement is SwiftInterfaceExtension {
+                let comparableExtensions = rhs.children.filter { $0.isDiffable(with: lhsElement) }
+                if let bestMatch = findBestExtensionMatch(for: lhsElement, among: comparableExtensions, excluding: exactCounterparts) {
+                    return Self.recursiveCompare(element: lhsElement, to: bestMatch, oldFirst: oldFirst)
+                }
+            } else if let rhsChildForName = rhs.children.first(where: { $0.isDiffable(with: lhsElement) }) {
                 // We found a comparable element so we check if the children changed
                 return Self.recursiveCompare(element: lhsElement, to: rhsChildForName, oldFirst: oldFirst)
             }
@@ -131,8 +141,10 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
     /// Returns nil if no good match is found
     private static func findBestExtensionMatch(
         for lhsElement: any SwiftInterfaceElement,
-        among candidates: [any SwiftInterfaceElement]
+        among candidates: [any SwiftInterfaceElement],
+        excluding exactCounterparts: Set<String>
     ) -> (any SwiftInterfaceElement)? {
+        let candidates = candidates.filter { !exactCounterparts.contains($0.recursiveDescription(incl: comparisonTokens)) }
         guard !candidates.isEmpty else { return nil }
         
         // If only one candidate, return it
@@ -140,8 +152,11 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             return candidates.first
         }
         
-        // Calculate similarity score for each candidate based on matching children
-        let candidatesWithScores = candidates.map { candidate -> (element: any SwiftInterfaceElement, score: Int) in
+        // Calculate similarity scores for each candidate:
+        // same conformances first, then shared conformances, then matching children
+        let lhsConformances = Set((lhsElement as? SwiftInterfaceExtension)?.inheritance ?? [])
+        let candidatesWithScores = candidates.map { candidate -> (element: any SwiftInterfaceElement, score: [Int]) in
+            let candidateConformances = Set((candidate as? SwiftInterfaceExtension)?.inheritance ?? [])
             let matchingChildren = lhsElement.children.filter { lhsChild in
                 candidate.children.contains { rhsChild in
                     // Check if children match by diffableSignature
@@ -149,11 +164,15 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
                     type(of: rhsChild) == type(of: lhsChild)
                 }
             }
-            return (element: candidate, score: matchingChildren.count)
+            return (element: candidate, score: [
+                lhsConformances == candidateConformances ? 1 : 0,
+                lhsConformances.intersection(candidateConformances).count,
+                matchingChildren.count
+            ])
         }
-        
+
         // Return the candidate with the highest score
-        // If all scores are 0 (no matching children), return the first candidate as fallback
-        return candidatesWithScores.max(by: { $0.score < $1.score })?.element
+        // If all scores are equal, return the first candidate as fallback
+        return candidatesWithScores.max(by: { $0.score.lexicographicallyPrecedes($1.score) })?.element
     }
 }
