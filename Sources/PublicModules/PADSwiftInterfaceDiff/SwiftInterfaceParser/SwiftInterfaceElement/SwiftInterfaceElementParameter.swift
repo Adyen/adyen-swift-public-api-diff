@@ -1,10 +1,8 @@
 //
-//  SwiftInterfaceElementParameter.swift
-//  public-api-diff
+// Copyright (c) 2026 Adyen N.V.
 //
-//  Created by Alexander Guretzki on 30/04/2025.
+// This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
-
 
 struct SwiftInterfaceElementParameter {
 
@@ -21,9 +19,13 @@ struct SwiftInterfaceElementParameter {
     let defaultValue: String?
 
     var description: String {
+        description(includingInternalName: true)
+    }
+
+    func description(includingInternalName: Bool) -> String {
         let names = [
             firstName,
-            secondName
+            includingInternalName ? secondName : nil
         ].compactMap { $0 }
         
         var description = (attributes + names).joined(separator: " ")

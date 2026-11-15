@@ -9,6 +9,8 @@ import PADCore
 
 struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
 
+    private static let comparisonTokens: Set<SwiftInterfaceElementDescriptionToken> = [.attributes, .modifiers]
+
     let changeConsolidator: SwiftInterfaceChangeConsolidating
 
     init(changeConsolidator: SwiftInterfaceChangeConsolidating = SwiftInterfaceChangeConsolidator()) {
@@ -50,13 +52,13 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
 
         var changes = [IndependentSwiftInterfaceChange]()
 
-        if lhs.recursiveDescription() == rhs.recursiveDescription() { return changes }
+        if lhs.recursiveDescription(incl: comparisonTokens) == rhs.recursiveDescription(incl: comparisonTokens) { return changes }
 
-        if !isRoot, oldFirst, lhs.description != rhs.description {
+        if !isRoot, oldFirst, lhs.description(incl: comparisonTokens) != rhs.description(incl: comparisonTokens) {
             changes += independentChanges(from: lhs, and: rhs, oldFirst: oldFirst)
         }
 
-        let exactMatches = Set(rhs.children.map { $0.recursiveDescription() })
+        let exactMatches = Set(rhs.children.map { $0.recursiveDescription(incl: comparisonTokens) })
         changes += lhs.children.flatMap { lhsElement in
 
             // Trying to find a matching element
@@ -66,19 +68,19 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             //
             // This is especially important for extensions where the description might
             // be the same for a lot of different extensions but the body might be completely different
-            if exactMatches.contains(lhsElement.recursiveDescription()) {
+            if exactMatches.contains(lhsElement.recursiveDescription(incl: comparisonTokens)) {
                 return [IndependentSwiftInterfaceChange]()
             }
 
             // First checking if we found a match based on the description
             // For extensions, we need special handling to find the best match based on child similarity
             if lhsElement is SwiftInterfaceExtension {
-                let allDescriptionMatches = rhs.children.filter { $0.description == lhsElement.description }
+                let allDescriptionMatches = rhs.children.filter { $0.description(incl: comparisonTokens) == lhsElement.description(incl: comparisonTokens) }
                 if let bestMatch = findBestExtensionMatch(for: lhsElement, among: allDescriptionMatches) {
                     return Self.recursiveCompare(element: lhsElement, to: bestMatch, oldFirst: oldFirst)
                 }
                 // No good match found, will fall through to isDiffable check or report as removal/addition
-            } else if let descriptionMatch = rhs.children.first(where: { $0.description == lhsElement.description }) {
+            } else if let descriptionMatch = rhs.children.first(where: { $0.description(incl: comparisonTokens) == lhsElement.description(incl: comparisonTokens) }) {
                 // so we check if the children changed
                 return Self.recursiveCompare(element: lhsElement, to: descriptionMatch, oldFirst: oldFirst)
             }

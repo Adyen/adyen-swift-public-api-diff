@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Adyen N.V.
+// Copyright (c) 2026 Adyen N.V.
 //
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
@@ -65,9 +65,9 @@ extension SwiftInterfaceEnumCase {
 
 private extension SwiftInterfaceEnumCase {
 
-    var parameterDescription: String? {
+    func parameterDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String? {
         guard let parameters else { return nil }
-        return formattedParameterDescription(for: parameters.map(\.description))
+        return formattedParameterDescription(for: parameters.map { $0.description(includingInternalName: tokens.contains(.internalParameterNames)) })
     }
     
     func compileDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
@@ -81,7 +81,7 @@ private extension SwiftInterfaceEnumCase {
         if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
         description.append("case", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
-        description.append(parameterDescription, with: "") { "(\($0))" }
+        description.append(parameterDescription(incl: tokens), with: "") { "(\($0))" }
         return description
     }
 }

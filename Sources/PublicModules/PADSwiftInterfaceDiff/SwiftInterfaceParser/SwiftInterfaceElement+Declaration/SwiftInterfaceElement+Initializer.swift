@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Adyen N.V.
+// Copyright (c) 2026 Adyen N.V.
 //
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
@@ -81,8 +81,8 @@ extension SwiftInterfaceInitializer {
 
 private extension SwiftInterfaceInitializer {
 
-    var parameterDescription: String {
-        formattedParameterDescription(for: parameters.map(\.description))
+    func parameterDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
+        formattedParameterDescription(for: parameters.map { $0.description(includingInternalName: tokens.contains(.internalParameterNames)) })
     }
     
     func compileDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
@@ -97,7 +97,7 @@ private extension SwiftInterfaceInitializer {
         description.append("init", with: modifiers.isEmpty ? "" : " ")
         description.append(optionalMark, with: "")
         description.append(genericParameterDescription, with: "")
-        description.append("(\(parameterDescription))", with: "")
+        description.append("(\(parameterDescription(incl: tokens)))", with: "")
         description.append(effectSpecifiers.joined(separator: " "), with: " ")
         description.append(genericWhereClauseDescription, with: " ")
         return description
