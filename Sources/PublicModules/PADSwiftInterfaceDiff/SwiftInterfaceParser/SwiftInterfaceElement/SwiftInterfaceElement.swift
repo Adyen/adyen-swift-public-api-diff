@@ -6,7 +6,7 @@
 
 import Foundation
 
-protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
+protocol SwiftInterfaceExtendableElement: SwiftInterfaceConformingElement {
 
     /// Name of the type
     ///
@@ -188,7 +188,7 @@ extension SwiftInterfaceElement {
 
         var recursiveDescription = description(incl: tokens)
         // Conformance extensions (see `conformanceExtensionsDescription`) follow the type's body
-        let conformanceExtensions = (self as? any SwiftInterfaceExtendableElement)?.conformanceExtensionsDescription(incl: tokens)
+        let conformanceExtensions = (self as? any SwiftInterfaceConformingElement)?.conformanceExtensionsDescription(incl: tokens)
         if let conformanceExtensions, recursiveDescription.hasSuffix(conformanceExtensions) {
             recursiveDescription.removeLast(conformanceExtensions.count)
         }

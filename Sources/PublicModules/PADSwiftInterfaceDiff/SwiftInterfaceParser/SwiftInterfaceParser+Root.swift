@@ -87,13 +87,13 @@ private extension SwiftInterfaceParser.Root {
         let extendableElements = elements.compactMap { $0 as? SwiftInterfaceExtendableElement }
         let nonExtensions = elements.filter { !($0 is SwiftInterfaceExtension) }
 
-        var adjustedElements: [any SwiftInterfaceElement] = nonExtensions
+        var standaloneExtensions = [SwiftInterfaceExtension]()
 
         extensions.forEach { extensionElement in
 
             // We want to merge all extensions that don't have a where clause into the extended type
             guard extensionElement.genericWhereClauseDescription == nil else {
-                adjustedElements.append(extensionElement)
+                standaloneExtensions.append(extensionElement)
                 return
             }
 
@@ -101,11 +101,106 @@ private extension SwiftInterfaceParser.Root {
                 return // We found the matching extended element
             }
 
-            // We could not find the extended type so we add the extension to the list
-            adjustedElements.append(extensionElement)
+            // We could not find the extended type (e.g. it's declared in another module)
+            standaloneExtensions.append(extensionElement)
         }
 
-        return adjustedElements
+        return nonExtensions + combine(standaloneExtensions: standaloneExtensions)
+    }
+
+    /// Combines the extensions that can't be merged into their extended type (e.g. extensions of types
+    /// of other modules or extensions with a where clause) into one extension per extended type,
+    /// generic where clause and (non-availability) attributes and modifiers
+    ///
+    /// Interfaces split and merge extension blocks between versions (e.g. one block per availability),
+    /// so comparing them block by block reports members that only moved to another block as changed.
+    /// As with extensions merged into their type, an extension's `@available` attributes are applied
+    /// to its members and conformances (see ``AvailabilityInheritance``).
+    ///
+    /// Example:
+    /// ```
+    /// @available(iOS 17.0, *)
+    /// extension Other.View: Other.Hoverable {
+    ///     func hover()
+    /// }
+    ///
+    /// extension Other.View {
+    ///     func tap()
+    /// }
+    /// ```
+    ///
+    /// ... Is turned into ...
+    /// ```
+    /// extension Other.View {
+    ///     @available(iOS 17.0, *)
+    ///     func hover()
+    ///     func tap()
+    /// }
+    ///
+    /// @available(iOS 17.0, *)
+    /// extension Other.View: Other.Hoverable
+    /// ```
+    static func combine(standaloneExtensions: [SwiftInterfaceExtension]) -> [SwiftInterfaceExtension] {
+
+        struct GroupKey: Hashable {
+            let extendedType: String
+            let genericWhereClause: String?
+            let attributes: [String]
+            let modifiers: [String]
+        }
+
+        func headerAttributes(of extensionElement: SwiftInterfaceExtension) -> [String] {
+            extensionElement.attributes.filter { !$0.hasPrefix("@available(") }
+        }
+
+        var groupKeys = [GroupKey]()
+        var groups = [GroupKey: [SwiftInterfaceExtension]]()
+        for extensionElement in standaloneExtensions {
+            let key = GroupKey(
+                extendedType: extensionElement.extendedType,
+                genericWhereClause: extensionElement.genericWhereClauseDescription,
+                attributes: headerAttributes(of: extensionElement).sorted(),
+                modifiers: extensionElement.modifiers.sorted()
+            )
+            if groups[key] == nil { groupKeys.append(key) }
+            groups[key, default: []].append(extensionElement)
+        }
+
+        return groupKeys.compactMap { key in
+            guard let extensionElements = groups[key], let first = extensionElements.first else { return nil }
+            let attributes = headerAttributes(of: first)
+
+            var inheritance = [String]()
+            var children = [any SwiftInterfaceElement]()
+            for extensionElement in extensionElements {
+                for conformance in extensionElement.inheritance ?? [] {
+                    let conformance = AvailabilityInheritance.conformance(
+                        conformance,
+                        declaredWith: extensionElement.attributes,
+                        on: attributes
+                    )
+                    if !inheritance.contains(conformance) { inheritance.append(conformance) }
+                }
+                for child in extensionElement.children {
+                    if let attributedChild = child as? SwiftInterfaceAttributedElement {
+                        attributedChild.attributes = AvailabilityInheritance.attributes(
+                            attributedChild.attributes,
+                            inheriting: extensionElement.attributes
+                        )
+                    }
+                    children.append(child)
+                }
+            }
+
+            return SwiftInterfaceExtension(
+                attributes: attributes,
+                modifiers: first.modifiers,
+                extendedType: key.extendedType,
+                inheritance: inheritance.isEmpty ? nil : inheritance,
+                genericWhereClauseDescription: key.genericWhereClause,
+                children: children
+            )
+        }
     }
 
     /// Attempting to recursively merge an extension element with potential matches of extendable elements
