@@ -87,8 +87,9 @@ private extension SwiftInterfaceStruct {
         description.append("struct", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
         description.append(genericParameterDescription, with: "")
-        description.append(inheritance?.sorted().joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(inheritanceClauseDescription, with: "") { ": \($0)" }
         description.append(genericWhereClauseDescription, with: " ")
+        description.append(conformanceExtensionsDescription(incl: tokens), with: "")
         return description
     }
 }

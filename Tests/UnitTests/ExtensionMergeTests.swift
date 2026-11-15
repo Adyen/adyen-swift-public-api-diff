@@ -189,6 +189,41 @@ struct ExtensionMergeTests {
         #expect(element.inheritance == ["Swift.Hashable", "Swift.Sendable /* @available(iOS 27.0, *) */"])
     }
 
+    @Test func conformanceWithOwnAvailabilityIsRenderedAsExtension() throws {
+        let root = SwiftInterfaceParser().parse(source: """
+        public struct Configuration {
+          @available(iOS 16.1, *)
+          public enum ActivityStyle { case standard }
+        }
+        @available(iOS 16.1, *)
+        extension Example.Configuration.ActivityStyle: Swift.Sendable {}
+        @available(iOS 16.1, macOS 27.3, *)
+        @available(tvOS, unavailable)
+        extension Example.Configuration.ActivityStyle: Swift.Equatable {}
+        """, moduleName: "Example")
+        let configuration = try #require(root.children.first as? SwiftInterfaceStruct)
+        let style = try #require(configuration.children.first as? SwiftInterfaceEnum)
+
+        #expect(style.description == """
+        @available(iOS 16.1, *)
+        public enum ActivityStyle: Swift.Sendable
+
+        @available(iOS 16.1, macOS 27.3, *)
+        @available(tvOS, unavailable)
+        extension Configuration.ActivityStyle: Swift.Equatable
+        """)
+        #expect(style.recursiveDescription() == """
+        @available(iOS 16.1, *)
+        public enum ActivityStyle: Swift.Sendable {
+          case standard
+        }
+
+        @available(iOS 16.1, macOS 27.3, *)
+        @available(tvOS, unavailable)
+        extension Configuration.ActivityStyle: Swift.Equatable
+        """)
+    }
+
     @Test func memberAvailabilityTakesPrecedencePerPlatform() {
         let attributes = AvailabilityInheritance.attributes(
             ["@available(iOS 26.0, tvOS 27.3, *)", "@MainActor"],

@@ -89,13 +89,12 @@ extension SwiftInterfaceElement {
     }
 
     private static func conformanceName(_ value: String) -> String {
-        value.components(separatedBy: AvailabilityInheritance.conformanceAvailabilitySeparator).first ?? value
+        AvailabilityInheritance.splitConformance(value).conformance
     }
 
     private static func conformanceAvailability(_ value: String) -> String {
-        let parts = value.components(separatedBy: AvailabilityInheritance.conformanceAvailabilitySeparator)
-        guard parts.count > 1 else { return "availability of the type" }
-        return String(parts.dropFirst().joined(separator: AvailabilityInheritance.conformanceAvailabilitySeparator).dropLast(" */".count))
+        let availability = AvailabilityInheritance.splitConformance(value).availability
+        return availability.isEmpty ? "availability of the type" : availability.joined(separator: " ")
     }
 }
 

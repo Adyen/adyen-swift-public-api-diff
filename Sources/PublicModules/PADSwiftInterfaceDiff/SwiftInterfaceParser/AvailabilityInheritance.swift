@@ -71,7 +71,16 @@ enum AvailabilityInheritance {
               Set(extensionAvailability) != Set(typeAttributes.filter { $0.hasPrefix("@available(") }) else {
             return conformance
         }
-        return "\(conformance)\(conformanceAvailabilitySeparator)\(extensionAvailability.joined(separator: " ")) */"
+        return "\(conformance)\(conformanceAvailabilitySeparator)\(extensionAvailability.joined(separator: "\n")) */"
+    }
+
+    /// Splits an inheritance entry into the conformance and its own availability (empty when it has the type's)
+    static func splitConformance(_ entry: String) -> (conformance: String, availability: [String]) {
+        guard let range = entry.range(of: conformanceAvailabilitySeparator), entry.hasSuffix(" */") else {
+            return (entry, [])
+        }
+        let availability = entry[range.upperBound...].dropLast(" */".count)
+        return (String(entry[..<range.lowerBound]), availability.components(separatedBy: "\n"))
     }
 
     /// The platforms an attribute makes a statement about (empty for non-availability attributes)
@@ -82,7 +91,7 @@ enum AvailabilityInheritance {
     }
 
     /// The top level, comma separated arguments of an `@available(...)` attribute
-    private static func availabilityArguments(_ attribute: String) -> [String]? {
+    static func availabilityArguments(_ attribute: String) -> [String]? {
         guard attribute.hasPrefix("@available("), attribute.hasSuffix(")") else { return nil }
         let body = attribute.dropFirst("@available(".count).dropLast()
 
@@ -105,7 +114,7 @@ enum AvailabilityInheritance {
     }
 
     /// `@available(iOS 26.0, macOS 26.0, *)` (as opposed to `@available(iOS, introduced: 26.0)`)
-    private static func isShorthand(_ arguments: [String]) -> Bool {
+    static func isShorthand(_ arguments: [String]) -> Bool {
         guard arguments.count >= 2, arguments.last == "*" else { return false }
         return arguments.dropLast().allSatisfy { argument in
             let parts = argument.split(separator: " ")
@@ -113,7 +122,7 @@ enum AvailabilityInheritance {
         }
     }
 
-    private static func platformName(_ argument: String) -> String {
+    static func platformName(_ argument: String) -> String {
         String(argument.split(separator: " ").first ?? "")
     }
 
