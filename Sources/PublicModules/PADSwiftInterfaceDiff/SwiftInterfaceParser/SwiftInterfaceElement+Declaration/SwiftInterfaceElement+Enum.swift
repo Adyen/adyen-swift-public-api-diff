@@ -9,7 +9,7 @@ import Foundation
 class SwiftInterfaceEnum: SwiftInterfaceExtendableElement {
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let attributes: [String]
+    var attributes: [String]
 
     /// e.g. public, private, package, open, internal
     let modifiers: [String]

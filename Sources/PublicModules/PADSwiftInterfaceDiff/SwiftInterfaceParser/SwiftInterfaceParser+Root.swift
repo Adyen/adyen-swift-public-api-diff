@@ -73,7 +73,17 @@ private extension SwiftInterfaceParser.Root {
     /// ```
     static func mergeExtensions(for elements: [any SwiftInterfaceElement], moduleName: String) -> [any SwiftInterfaceElement] {
 
-        let extensions = elements.compactMap { $0 as? SwiftInterfaceExtension }
+        // Shallower extensions first (stable within a depth): `extension M.A { struct B }` must be merged
+        // before `extension M.A.B` can find `B`, regardless of where either appears in the file.
+        let extensions = elements
+            .compactMap { $0 as? SwiftInterfaceExtension }
+            .enumerated()
+            .sorted { lhs, rhs in
+                let lhsDepth = lhs.element.extendedType.split(separator: ".").count
+                let rhsDepth = rhs.element.extendedType.split(separator: ".").count
+                return lhsDepth == rhsDepth ? lhs.offset < rhs.offset : lhsDepth < rhsDepth
+            }
+            .map(\.element)
         let extendableElements = elements.compactMap { $0 as? SwiftInterfaceExtendableElement }
         let nonExtensions = elements.filter { !($0 is SwiftInterfaceExtension) }
 
@@ -130,12 +140,27 @@ private extension SwiftInterfaceParser.Root {
         prefix: String
     ) -> Bool {
 
-        // Finding the first extendable element that has the same prefix as the extension
-        guard let extendedElement = extendableElements.first(where: { extensionElement.extendedType.hasPrefix("\(prefix).\($0.typeName)") }) else {
-            return false
+        // Matching on whole path components so that e.g. `extension M.TabContent`
+        // is never routed into `struct M.Tab` (a plain `hasPrefix` made the merge
+        // depend on declaration order). Every candidate is tried, not just the first.
+        let extendedType = extensionElement.extendedType
+        for extendedElement in extendableElements {
+            let extendedElementPrefix = "\(prefix).\(extendedElement.typeName)"
+            guard extendedType == extendedElementPrefix || extendedType.hasPrefix("\(extendedElementPrefix).") else {
+                continue
+            }
+            if merge(extensionElement: extensionElement, into: extendedElement, prefix: extendedElementPrefix) {
+                return true
+            }
         }
+        return false
+    }
 
-        let extendedElementPrefix = "\(prefix).\(extendedElement.typeName)"
+    static func merge(
+        extensionElement: SwiftInterfaceExtension,
+        into extendedElement: any SwiftInterfaceExtendableElement,
+        prefix extendedElementPrefix: String
+    ) -> Bool {
 
         // We found the extended type
         if extendedElementPrefix == extensionElement.extendedType {
@@ -147,6 +172,14 @@ private extension SwiftInterfaceParser.Root {
                     $0.description(excl: [.modifiers]) == child.description(excl: [.modifiers])
                 }) {
                     return
+                }
+                // The extension's `@available` applies to its members; keep it on them
+                // so availability changes of the extension stay visible after merging.
+                if let attributedChild = child as? SwiftInterfaceAttributedElement {
+                    attributedChild.attributes = AvailabilityInheritance.attributes(
+                        attributedChild.attributes,
+                        inheriting: extensionElement.attributes
+                    )
                 }
                 extendedElement.children += [child]
             }
