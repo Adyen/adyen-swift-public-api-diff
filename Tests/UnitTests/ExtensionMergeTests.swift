@@ -129,6 +129,66 @@ struct ExtensionMergeTests {
         #expect(change.listOfChanges.contains("Removed attribute `@available(tvOS, unavailable)`"))
     }
 
+    /// Mirrors `HomeExtensions.HomeAccessoryRangeSetting.SliderStyle` (iOS 27.2 → 27.3)
+    @Test func conformanceAvailabilityChangeIsReported() throws {
+        let changes = compare(
+            """
+            @available(iOS 26.0, *)
+            public enum SliderStyle { case linear }
+            @available(iOS 27.0, *)
+            extension Example.SliderStyle: Swift.Hashable {}
+            """,
+            """
+            @available(iOS 26.0, *)
+            public enum SliderStyle { case linear }
+            @available(iOS 27.2, *)
+            extension Example.SliderStyle: Swift.Hashable {}
+            """
+        )
+        let change = try #require(changes.first)
+        #expect(changes.count == 1)
+        #expect(change.changeType.isModification)
+        #expect(change.listOfChanges == [
+            "Changed availability of conformance `Swift.Hashable` from `@available(iOS 27.0, *)` to `@available(iOS 27.2, *)`"
+        ])
+    }
+
+    /// Mirrors `ActivityKit.ActivityStyle`: the conformance's availability diverges from the type's
+    @Test func conformanceAvailabilityDivergingFromTypeIsReported() throws {
+        let changes = compare(
+            """
+            @available(iOS 16.1, *)
+            public enum Style { case standard }
+            @available(iOS 16.1, *)
+            extension Example.Style: Swift.Hashable {}
+            """,
+            """
+            @available(iOS 16.1, *)
+            public enum Style { case standard }
+            @available(iOS 16.1, macOS 27.3, *)
+            extension Example.Style: Swift.Hashable {}
+            """
+        )
+        let change = try #require(changes.first)
+        #expect(changes.count == 1)
+        #expect(change.listOfChanges == [
+            "Changed availability of conformance `Swift.Hashable` from `availability of the type` to `@available(iOS 16.1, macOS 27.3, *)`"
+        ])
+    }
+
+    @Test func conformanceWithTypeAvailabilityIsNotAnnotated() throws {
+        let root = SwiftInterfaceParser().parse(source: """
+        @available(iOS 26.0, *)
+        public enum E { case a }
+        @available(iOS 26.0, *)
+        extension Example.E: Swift.Hashable {}
+        @available(iOS 27.0, *)
+        extension Example.E: Swift.Sendable {}
+        """, moduleName: "Example")
+        let element = try #require(root.children.first as? SwiftInterfaceEnum)
+        #expect(element.inheritance == ["Swift.Hashable", "Swift.Sendable /* @available(iOS 27.0, *) */"])
+    }
+
     @Test func memberAvailabilityTakesPrecedencePerPlatform() {
         let attributes = AvailabilityInheritance.attributes(
             ["@available(iOS 26.0, tvOS 27.3, *)", "@MainActor"],

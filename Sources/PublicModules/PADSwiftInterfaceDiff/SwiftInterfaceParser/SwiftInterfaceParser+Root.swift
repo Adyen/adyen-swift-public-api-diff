@@ -164,8 +164,17 @@ private extension SwiftInterfaceParser.Root {
 
         // We found the extended type
         if extendedElementPrefix == extensionElement.extendedType {
-            extendedElement.inheritance = (extendedElement.inheritance ?? []) + (extensionElement.inheritance ?? [])
-            
+            // Conformances declared in an extension with its own availability keep it,
+            // so e.g. a `Hashable` conformance arriving on a new platform stays visible.
+            let conformances = (extensionElement.inheritance ?? []).map {
+                AvailabilityInheritance.conformance(
+                    $0,
+                    declaredWith: extensionElement.attributes,
+                    on: (extendedElement as? SwiftInterfaceAttributedElement)?.attributes ?? []
+                )
+            }
+            extendedElement.inheritance = (extendedElement.inheritance ?? []) + conformances
+
             extensionElement.children.forEach { child in
                 // Filtering out default implementations with custom modifiers (public/package/...)
                 if extendedElement.children.contains(where: {

@@ -66,10 +66,36 @@ extension SwiftInterfaceElement {
         
         let old = Set(oldValues)
         let new = Set(newValues)
-        
-        return old.symmetricDifference(new).map {
-            "\(new.contains($0) ? "Added" : "Removed") \(propertyType) `\($0)`"
+        let removed = old.subtracting(new)
+        let added = new.subtracting(old)
+
+        // A conformance whose only difference is its availability annotation is a changed availability,
+        // not a removal + addition (see `AvailabilityInheritance.conformance`)
+        let removedByConformance = Dictionary(grouping: removed, by: Self.conformanceName)
+        let addedByConformance = Dictionary(grouping: added, by: Self.conformanceName)
+        let changedAvailability = Set(removedByConformance.keys).intersection(addedByConformance.keys).filter {
+            removedByConformance[$0]?.count == 1 && addedByConformance[$0]?.count == 1
         }
+
+        let availabilityChanges = changedAvailability.sorted().compactMap { conformance -> String? in
+            guard let oldValue = removedByConformance[conformance]?.first,
+                  let newValue = addedByConformance[conformance]?.first else { return nil }
+            return "Changed availability of conformance `\(conformance)` from `\(Self.conformanceAvailability(oldValue))` to `\(Self.conformanceAvailability(newValue))`"
+        }
+
+        return availabilityChanges + old.symmetricDifference(new)
+            .filter { !changedAvailability.contains(Self.conformanceName($0)) }
+            .map { "\(new.contains($0) ? "Added" : "Removed") \(propertyType) `\($0)`" }
+    }
+
+    private static func conformanceName(_ value: String) -> String {
+        value.components(separatedBy: AvailabilityInheritance.conformanceAvailabilitySeparator).first ?? value
+    }
+
+    private static func conformanceAvailability(_ value: String) -> String {
+        let parts = value.components(separatedBy: AvailabilityInheritance.conformanceAvailabilitySeparator)
+        guard parts.count > 1 else { return "availability of the type" }
+        return String(parts.dropFirst().joined(separator: AvailabilityInheritance.conformanceAvailabilitySeparator).dropLast(" */".count))
     }
 }
 

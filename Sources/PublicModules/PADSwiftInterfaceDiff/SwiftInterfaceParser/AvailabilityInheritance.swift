@@ -57,6 +57,23 @@ enum AvailabilityInheritance {
         return sortedAvailability(inherited.filter { !own.contains($0) } + own)
     }
 
+    /// Separates a conformance from its availability annotation, see ``conformance(_:declaredWith:on:)``
+    static let conformanceAvailabilitySeparator = " /* "
+
+    /// Annotates a conformance with the availability of the extension declaring it,
+    /// when that availability differs from the extended type's own.
+    ///
+    /// e.g. `@available(iOS 27.2, *) extension E: Swift.Hashable {}` on `@available(iOS 27.0, *) enum E`
+    /// → `Swift.Hashable /* @available(iOS 27.2, *) */`
+    static func conformance(_ conformance: String, declaredWith extensionAttributes: [String], on typeAttributes: [String]) -> String {
+        let extensionAvailability = extensionAttributes.filter { $0.hasPrefix("@available(") }
+        guard !extensionAvailability.isEmpty,
+              Set(extensionAvailability) != Set(typeAttributes.filter { $0.hasPrefix("@available(") }) else {
+            return conformance
+        }
+        return "\(conformance)\(conformanceAvailabilitySeparator)\(extensionAvailability.joined(separator: " ")) */"
+    }
+
     /// The platforms an attribute makes a statement about (empty for non-availability attributes)
     private static func platforms(of attribute: String) -> [String] {
         guard let arguments = availabilityArguments(attribute) else { return [] }
