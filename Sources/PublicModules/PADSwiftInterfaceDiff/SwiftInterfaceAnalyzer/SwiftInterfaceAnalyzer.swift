@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Adyen N.V.
+// Copyright (c) 2026 Adyen N.V.
 //
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
@@ -20,23 +20,25 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
         new: some SwiftInterfaceElement
     ) -> [Change] {
 
-        // Very naive diff from both sides
-        // There is room for improvement here but it's "performant enough" for now
+        RecursiveDescriptionCache.withCache {
+            // Very naive diff from both sides
+            // There is room for improvement here but it's "performant enough" for now
 
-        let individualChanges = Self.recursiveCompare(
-            element: old,
-            to: new,
-            oldFirst: true,
-            isRoot: true
-        ) + Self.recursiveCompare(
-            element: new,
-            to: old,
-            oldFirst: false,
-            isRoot: true
-        )
+            let individualChanges = Self.recursiveCompare(
+                element: old,
+                to: new,
+                oldFirst: true,
+                isRoot: true
+            ) + Self.recursiveCompare(
+                element: new,
+                to: old,
+                oldFirst: false,
+                isRoot: true
+            )
 
-        // Matching removals/additions to changes when applicable
-        return changeConsolidator.consolidate(individualChanges)
+            // Matching removals/additions to changes when applicable
+            return changeConsolidator.consolidate(individualChanges)
+        }
     }
 
     private static func recursiveCompare(
@@ -54,6 +56,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             changes += independentChanges(from: lhs, and: rhs, oldFirst: oldFirst)
         }
 
+        let exactMatches = Set(rhs.children.map { $0.recursiveDescription() })
         changes += lhs.children.flatMap { lhsElement in
 
             // Trying to find a matching element
@@ -63,7 +66,7 @@ struct SwiftInterfaceAnalyzer: SwiftInterfaceAnalyzing {
             //
             // This is especially important for extensions where the description might
             // be the same for a lot of different extensions but the body might be completely different
-            if rhs.children.first(where: { $0.recursiveDescription() == lhsElement.recursiveDescription() }) != nil {
+            if exactMatches.contains(lhsElement.recursiveDescription()) {
                 return [IndependentSwiftInterfaceChange]()
             }
 

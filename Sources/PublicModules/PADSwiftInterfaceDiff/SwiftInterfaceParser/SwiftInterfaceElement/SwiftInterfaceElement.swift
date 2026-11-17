@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Adyen N.V.
+// Copyright (c) 2026 Adyen N.V.
 //
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
@@ -141,16 +141,24 @@ private struct RecursiveDescriptionCacheKey: Hashable {
     let tokens: Set<SwiftInterfaceElementDescriptionToken>
 }
 
-/// A process-wide memoization cache for `recursiveDescription`.
-///
-/// The diffing algorithm requests the recursive description of the same elements many times.
-/// Recomputing it (which rebuilds and re-sorts the entire subtree on every call) makes diffing
-/// large modules (e.g. `SwiftUI`, `Foundation`) effectively hang. Elements are reference types
-/// that are not mutated during analysis, so their description can safely be cached by identity.
-///
-/// - Note: Access is not synchronized. Analysis runs on a single thread.
-private enum RecursiveDescriptionCache {
-    static var storage: [RecursiveDescriptionCacheKey: String] = [:]
+/// Descriptions are cached only during a synchronous analysis on the current thread.
+final class RecursiveDescriptionCache {
+
+    private static let key = "PADSwiftInterfaceDiff.RecursiveDescriptionCache"
+
+    static var current: RecursiveDescriptionCache? {
+        Thread.current.threadDictionary[key] as? RecursiveDescriptionCache
+    }
+
+    static func withCache<Result>(_ body: () -> Result) -> Result {
+        let dictionary = Thread.current.threadDictionary
+        let previous = dictionary[key]
+        dictionary[key] = RecursiveDescriptionCache()
+        defer { dictionary[key] = previous }
+        return body()
+    }
+
+    fileprivate var storage: [RecursiveDescriptionCacheKey: String] = [:]
 }
 
 extension SwiftInterfaceElement {
@@ -174,7 +182,8 @@ extension SwiftInterfaceElement {
         incl tokens: Set<SwiftInterfaceElementDescriptionToken>
     ) -> String {
         let cacheKey = RecursiveDescriptionCacheKey(id: ObjectIdentifier(self), tokens: tokens)
-        if let cached = RecursiveDescriptionCache.storage[cacheKey] { return cached }
+        let cache = RecursiveDescriptionCache.current
+        if let cached = cache?.storage[cacheKey] { return cached }
 
         var recursiveDescription = description(incl: tokens)
         if !self.children.isEmpty {
@@ -185,7 +194,7 @@ extension SwiftInterfaceElement {
             recursiveDescription.append("\n}")
         }
 
-        RecursiveDescriptionCache.storage[cacheKey] = recursiveDescription
+        cache?.storage[cacheKey] = recursiveDescription
         return recursiveDescription
     }
     

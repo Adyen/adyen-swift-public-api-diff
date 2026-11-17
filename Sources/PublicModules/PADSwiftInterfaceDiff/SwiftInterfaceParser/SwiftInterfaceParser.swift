@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Adyen N.V.
+// Copyright (c) 2026 Adyen N.V.
 //
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
@@ -25,7 +25,8 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
 
     func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
         let visitor = Self()
-        visitor.walk(Parser.parse(source: source))
+        let syntax = Parser.parse(source: source)
+        visitor.walk(ModuleSelectorNormalizer.normalize(syntax, moduleName: moduleName))
         return Root(
             moduleName: moduleName,
             elements: visitor.scope.elements
