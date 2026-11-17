@@ -14,7 +14,7 @@ struct MockSwiftInterfaceParser: SwiftInterfaceParsing {
         return SwiftInterfaceParser.Root(moduleName: "Module Name", elements: [])
     }
 
-    func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
+    func parse(source: String, moduleName: String, apiScope _: APIScope) -> any SwiftInterfaceElement {
         handleParseSource(source, moduleName)
     }
 }
