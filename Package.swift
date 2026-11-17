@@ -41,7 +41,7 @@ let package = Package(
         .package(url: "https://github.com/swiftlang/swift-syntax", .upToNextMajor(from: "604.0.0")),
         .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.62.1"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.5.0"),
-        .package(url: "https://github.com/apple/swift-testing", exact: "6.4.1")
+        .package(url: "https://github.com/apple/swift-testing", exact: "6.4.2")
     ],
     targets: [
 
