@@ -605,7 +605,7 @@ public init(id: Swift.String)
 
 /**
 Changes:
-- Added attribute `@available(*, deprecated, message: "Use default initializer")`
+- Deprecated: all platforms ("Use default initializer")
 */
 ```
 ### `TypeConstraintTester`

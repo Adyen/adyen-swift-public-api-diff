@@ -187,12 +187,20 @@ extension SwiftInterfaceElement {
         if let cached = cache?.storage[cacheKey] { return cached }
 
         var recursiveDescription = description(incl: tokens)
+        // Conformance extensions (see `conformanceExtensionsDescription`) follow the type's body
+        let conformanceExtensions = (self as? any SwiftInterfaceExtendableElement)?.conformanceExtensionsDescription(incl: tokens)
+        if let conformanceExtensions, recursiveDescription.hasSuffix(conformanceExtensions) {
+            recursiveDescription.removeLast(conformanceExtensions.count)
+        }
         if !self.children.isEmpty {
             recursiveDescription.append(" {")
             for child in self.children.sorted(by: { $0.description(incl: tokens) < $1.description(incl: tokens) }) {
                 recursiveDescription.append("\n\(child.canonicalRecursiveDescription(incl: tokens).indented(by: 1))")
             }
             recursiveDescription.append("\n}")
+        }
+        if let conformanceExtensions {
+            recursiveDescription.append(conformanceExtensions)
         }
 
         cache?.storage[cacheKey] = recursiveDescription
