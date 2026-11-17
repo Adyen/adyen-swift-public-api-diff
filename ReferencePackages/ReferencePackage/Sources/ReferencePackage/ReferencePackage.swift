@@ -232,3 +232,12 @@ public struct TypeConstraintTester<T> {
         _ = value
     }
 }
+
+// MARK: - Macros
+// The implementation modules don't exist, which is fine as long as the macros aren't expanded
+
+@freestanding(expression)
+public macro stringify<T>(_ value: T) -> (T, String) = #externalMacro(module: "ReferenceMacros", type: "StringifyMacro")
+
+@attached(peer)
+public macro RemovedMacro() = #externalMacro(module: "ReferenceMacros", type: "RemovedMacro")

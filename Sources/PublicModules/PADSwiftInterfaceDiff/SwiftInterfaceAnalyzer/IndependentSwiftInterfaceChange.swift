@@ -29,6 +29,12 @@ struct IndependentSwiftInterfaceChange: Equatable {
     let element: any SwiftInterfaceElement
 
     let oldFirst: Bool
+
+    /// The element `element` was compared with, if the change comes from comparing two elements
+    ///
+    /// Used to consolidate the removal and addition of a compared pair with each other
+    var counterpart: ObjectIdentifier?
+
     var parentPath: String? { element.parentPath }
 
     static func == (lhs: IndependentSwiftInterfaceChange, rhs: IndependentSwiftInterfaceChange) -> Bool {
