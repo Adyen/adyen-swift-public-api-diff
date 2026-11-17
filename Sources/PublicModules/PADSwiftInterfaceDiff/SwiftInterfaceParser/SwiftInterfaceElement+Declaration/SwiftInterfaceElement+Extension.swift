@@ -6,7 +6,7 @@
 
 import Foundation
 
-class SwiftInterfaceExtension: SwiftInterfaceElement {
+class SwiftInterfaceExtension: SwiftInterfaceConformingElement {
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
     var attributes: [String]
@@ -37,6 +37,10 @@ class SwiftInterfaceExtension: SwiftInterfaceElement {
 
     var consolidatableName: String { extendedType }
 
+    var conformingTypeName: String { extendedType }
+
+    var conformanceGenericWhereClause: String? { genericWhereClauseDescription }
+
     func description(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
         compileDescription(incl: tokens)
     }
@@ -65,7 +69,7 @@ extension SwiftInterfaceExtension {
         guard let other = otherElement as? Self else { return [] }
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
-        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance)
+        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance, oldTypeAttributes: other.attributes, newTypeAttributes: attributes)
         changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
         return changes.compactMap { $0 }
     }
@@ -84,8 +88,9 @@ private extension SwiftInterfaceExtension {
         if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
         description.append("extension", with: modifiers.isEmpty ? "" : " ")
         description.append(extendedType, with: " ")
-        description.append(inheritance?.sorted().joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(inheritanceClauseDescription, with: "") { ": \($0)" }
         description.append(genericWhereClauseDescription, with: " ")
+        description.append(conformanceExtensionsDescription(incl: tokens), with: "")
         return description
     }
 }

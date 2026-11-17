@@ -10,8 +10,9 @@ import Testing
 
 struct ExtensionPairingTests {
 
-    /// Mirrors `FoundationModels` (iOS 27.2 → 27.3): extensions of a type outside the module stay standalone.
-    /// When their availability changes, each must be compared with the extension declaring the same conformance.
+    /// Mirrors `FoundationModels` (iOS 27.2 → 27.3): extensions of a type outside the module stay standalone
+    /// and are combined into one extension. When their availability changes, each conformance must be
+    /// compared with the same conformance.
     @Test func standaloneExtensionsWithChangedHeaderArePairedByConformance() {
         let changes = compare(
             """
@@ -34,9 +35,13 @@ struct ExtensionPairingTests {
             extension Swift.Never: Example.Generable {}
             """
         )
-        #expect(changes.count == 3)
+        #expect(changes.count == 1)
         #expect(changes.allSatisfy { $0.changeType.isModification })
-        #expect(changes.flatMap(\.listOfChanges).allSatisfy { !$0.contains("inheritance") })
+        #expect(changes.flatMap(\.listOfChanges).sorted() == [
+            "Conformance `Example.DynamicInstructions`: Availability added: tvOS 27.0",
+            "Conformance `Example.DynamicProfile`: Availability added: tvOS 27.0",
+            "Conformance `Example.Generable`: Availability added: tvOS 27.0"
+        ])
     }
 
     /// Extensions with members and the same conformance prefer the candidate with the most matching members
