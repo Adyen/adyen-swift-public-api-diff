@@ -16,8 +16,8 @@ It makes use of `.swiftinterface` files that get produced during the archiving o
 We strongly encourage you to contribute to our repository. Find out more in our [contribution guidelines](https://github.com/Adyen/.github/blob/master/CONTRIBUTING.md)
 
 ## Requirements
-- **Xcode** >= 26.2 (incl. Xcode command line tools)
-- **Swift** >= 5.9
+- **Xcode** >= 26.6 (incl. Xcode command line tools)
+- **Swift** >= 6.2
 - **macOS** >= 13.0
 
 ## Installation
