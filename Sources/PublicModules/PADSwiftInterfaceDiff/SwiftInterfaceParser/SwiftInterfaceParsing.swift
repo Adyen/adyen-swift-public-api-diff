@@ -13,7 +13,8 @@ protocol SwiftInterfaceParsing {
 
 extension SwiftInterfaceParsing {
 
-    func parse(source: String, moduleName: String, apiScope: APIScope) -> any SwiftInterfaceElement {
+    /// Default for parsers that don't filter by ``APIScope``
+    func parse(source: String, moduleName: String, apiScope _: APIScope) -> any SwiftInterfaceElement {
         parse(source: source, moduleName: moduleName)
     }
 }
