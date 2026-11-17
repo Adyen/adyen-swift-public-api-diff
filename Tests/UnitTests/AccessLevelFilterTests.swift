@@ -195,7 +195,8 @@ struct AccessLevelFilterTests {
             apiScope: .all
         )
 
-        #expect(changes.count == 1)
+        // Both the internal property and the package function are reported
+        #expect(changes.count == 2)
     }
 
     @Test func defaultParsingDoesNotFilter() {
