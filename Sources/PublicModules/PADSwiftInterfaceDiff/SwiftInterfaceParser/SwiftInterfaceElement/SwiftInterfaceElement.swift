@@ -22,6 +22,7 @@ protocol SwiftInterfaceExtendableElement: SwiftInterfaceElement {
 enum SwiftInterfaceElementDescriptionToken: CaseIterable {
     case attributes
     case modifiers
+    case internalParameterNames
     // Add more tokens when needed
 }
 

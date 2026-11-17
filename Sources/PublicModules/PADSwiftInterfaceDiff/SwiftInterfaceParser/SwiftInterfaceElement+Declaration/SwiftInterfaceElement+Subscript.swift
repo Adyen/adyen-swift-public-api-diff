@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Adyen N.V.
+// Copyright (c) 2026 Adyen N.V.
 //
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
@@ -81,8 +81,8 @@ extension SwiftInterfaceSubscript {
 
 private extension SwiftInterfaceSubscript {
 
-    var parameterDescription: String {
-        formattedParameterDescription(for: parameters.map(\.description))
+    func parameterDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
+        formattedParameterDescription(for: parameters.map { $0.description(includingInternalName: tokens.contains(.internalParameterNames)) })
     }
     
     func compileDescription(incl tokens: Set<SwiftInterfaceElementDescriptionToken>) -> String {
@@ -96,7 +96,7 @@ private extension SwiftInterfaceSubscript {
         if modifiers.isEmpty && !attributes.isEmpty { description.append("\n") }
         description.append("subscript", with: modifiers.isEmpty ? "" : " ")
         description.append(genericParameterDescription, with: "")
-        description.append("(\(parameterDescription))", with: "")
+        description.append("(\(parameterDescription(incl: tokens)))", with: "")
         description.append(returnType, with: " ") { "-> \($0)" }
         description.append(genericWhereClauseDescription, with: " ")
         description.append(accessors, with: " ") { "{ \($0) }" }

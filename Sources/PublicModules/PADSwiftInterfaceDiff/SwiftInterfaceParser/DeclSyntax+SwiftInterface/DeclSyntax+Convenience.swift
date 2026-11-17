@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Adyen N.V.
+// Copyright (c) 2026 Adyen N.V.
 //
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
@@ -31,14 +31,45 @@ extension AttributeListSyntax {
 
     /// Produces a description where all elements in the list are mapped to their `trimmedDescription`
     var sanitizedList: [String] {
-        self.compactMap {
-            var description = $0.trimmedDescription
-            if let translation = translationTable[description] {
-                description = translation
+        var descriptions: [String] = []
+        var availabilityIndices: [Int] = []
+        for element in self {
+            var description = element.trimmedDescription
+            if case let .attribute(attribute) = element, attribute.attributeName.trimmedDescription == "available" {
+                availabilityIndices.append(descriptions.count)
+                description = normalizedAvailability(attribute).trimmedDescription
             }
-            if excludedAttributes.contains(description) { return nil }
-            return description
+            description = translationTable[description] ?? description
+            if !excludedAttributes.contains(description) {
+                descriptions.append(description)
+            }
         }
+        for (index, description) in zip(availabilityIndices, availabilityIndices.map { descriptions[$0] }.sorted()) {
+            descriptions[index] = description
+        }
+        return descriptions
+    }
+
+    private func normalizedAvailability(_ attribute: AttributeSyntax) -> AttributeSyntax {
+        guard case let .availability(arguments) = attribute.arguments,
+              arguments.count > 2,
+              let wildcard = arguments.last,
+              case let .token(token) = wildcard.argument,
+              token.text == "*" else {
+            return attribute
+        }
+        let platforms = arguments.dropLast()
+        // Only the shorthand platform list is order-independent. Keep the wildcard last.
+        guard platforms.allSatisfy({
+            if case .availabilityVersionRestriction = $0.argument { return true }
+            return false
+        }) else { return attribute }
+
+        let ordered = platforms.sorted { $0.argument.trimmedDescription < $1.argument.trimmedDescription }
+        let normalized = ordered.map { argument in
+            argument.trimmed.with(\.trailingComma, .commaToken(trailingTrivia: .space))
+        } + [wildcard.trimmed]
+        return attribute.with(\.arguments, .availability(AvailabilityArgumentListSyntax(normalized)))
     }
 }
 

@@ -64,6 +64,23 @@ struct ModuleSelectorTests {
         #expect(changes.count > 0)
     }
 
+    @Test func overlayRecognizesTransitivelyImportedModules() {
+        let changes = compare(
+            old: "@_exported import Example\npublic func convert(_ value: Input.Value) -> Output.Value?",
+            new: "@_exported import Example\npublic func convert(_ value: Input::Value) -> Output::Value?"
+        )
+        #expect(changes.isEmpty)
+    }
+
+    @Test func overlayStillReportsChangesBetweenTransitiveModules() {
+        let changes = compare(
+            old: "@_exported import Example\npublic func convert() -> First.Value",
+            new: "@_exported import Example\npublic func convert() -> Second::Value"
+        )
+        #expect(changes.count == 1)
+        #expect(changes.first?.changeType.isModification == true)
+    }
+
     @Test func differentModulesStillReported() {
         let changes = compare(
             old: "import First\npublic func widget() -> First.Widget",
