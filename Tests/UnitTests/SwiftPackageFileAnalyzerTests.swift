@@ -241,6 +241,49 @@ struct SwiftPackageFileAnalyzerTests {
         #expect(changes.changes == expectedChanges)
     }
 
+    @Test func resourcePathsAreRelativeToTheProjectDirectory() throws {
+
+        var fileHandler = MockFileHandler()
+        fileHandler.handleFileExists = { _ in true }
+
+        var shell = MockShell()
+        shell.handleExecute = { command in
+            let isNew = command.range(of: "NewPackage") != nil
+            let basePath = isNew ? "/tmp/NewPackage" : "/tmp/OldPackage"
+
+            let packageDescription = SwiftPackageDescription(
+                defaultLocalization: "en-us",
+                name: "Name",
+                targets: [
+                    .init(
+                        name: "Target",
+                        type: .library,
+                        path: "Sources/Target",
+                        moduleType: .swiftTarget,
+                        resources: [
+                            .init(path: "\(basePath)/Resources/unchanged", rule: .copy),
+                            .init(path: "\(basePath)/Resources/\(isNew ? "added" : "removed")", rule: .copy)
+                        ]
+                    )
+                ],
+                toolsVersion: "1.0"
+            )
+            return String(data: try! JSONEncoder().encode(packageDescription), encoding: .utf8)!
+        }
+
+        let projectAnalyzer = SwiftPackageFileAnalyzer(fileHandler: fileHandler, shell: shell, logger: nil)
+
+        let changes = try projectAnalyzer.analyze(
+            oldProjectUrl: URL(filePath: "/tmp/OldPackage"),
+            newProjectUrl: URL(filePath: "/tmp/NewPackage")
+        )
+
+        let listOfChanges = changes.changes.flatMap(\.listOfChanges)
+        #expect(listOfChanges.contains("Added resource .copy(\"Resources/added\")"))
+        #expect(listOfChanges.contains("Removed resource .copy(\"Resources/removed\")"))
+        #expect(!listOfChanges.contains { $0.contains("unchanged") })
+    }
+
     @Test func projectCausesNoChanges() throws {
 
         var fileHandler = MockFileHandler()

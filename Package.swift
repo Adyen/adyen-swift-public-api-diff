@@ -165,7 +165,8 @@ let package = Package(
                 // Use to retain directory structure.
                 // Will be at top level in bundle.
                 .copy("Resources/expected-reference-changes-swift-interface-private.md"),
-                .copy("Resources/expected-reference-changes-swift-interface-public.md")
+                .copy("Resources/expected-reference-changes-swift-interface-public.md"),
+                .copy("Resources/NonPublicDeclarations")
             ],
             swiftSettings: [
                 .enableExperimentalFeature("TestingMacros")

@@ -19,16 +19,21 @@ public struct SwiftInterfaceDiff {
     let swiftInterfaceParser: any SwiftInterfaceParsing
     let swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing
     let logger: (any Logging)?
+    let apiScope: APIScope
 
     /// Creates a new instance of ``SwiftInterfaceDiff``
-    /// - Parameter logger: The (optional) logger
+    /// - Parameters:
+    ///   - apiScope: Which declarations to consider part of the API (default: ``APIScope/all``)
+    ///   - logger: The (optional) logger
     public init(
+        apiScope: APIScope = .all,
         logger: (any Logging)? = nil
     ) {
         self.init(
             fileHandler: FileManager.default,
             swiftInterfaceParser: SwiftInterfaceParser(),
             swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
+            apiScope: apiScope,
             logger: logger
         )
     }
@@ -37,8 +42,10 @@ public struct SwiftInterfaceDiff {
         fileHandler: FileHandling = FileManager.default,
         swiftInterfaceParser: any SwiftInterfaceParsing = SwiftInterfaceParser(),
         swiftInterfaceAnalyzer: any SwiftInterfaceAnalyzing = SwiftInterfaceAnalyzer(),
+        apiScope: APIScope = .all,
         logger: (any Logging)? = nil
     ) {
+        self.apiScope = apiScope
         self.fileHandler = fileHandler
         self.swiftInterfaceParser = swiftInterfaceParser
         self.swiftInterfaceAnalyzer = swiftInterfaceAnalyzer
@@ -56,8 +63,8 @@ public struct SwiftInterfaceDiff {
             logger?.log("🧑‍🔬 Analyzing \(file.name)", from: String(describing: Self.self))
             let newContent = try fileHandler.loadString(from: file.newFilePath)
             let oldContent = try fileHandler.loadString(from: file.oldFilePath)
-            let newParsed = swiftInterfaceParser.parse(source: newContent, moduleName: file.name)
-            let oldParsed = swiftInterfaceParser.parse(source: oldContent, moduleName: file.name)
+            let newParsed = swiftInterfaceParser.parse(source: newContent, moduleName: file.name, apiScope: apiScope)
+            let oldParsed = swiftInterfaceParser.parse(source: oldContent, moduleName: file.name, apiScope: apiScope)
 
             let moduleChanges = try swiftInterfaceAnalyzer.analyze(
                 old: oldParsed,
