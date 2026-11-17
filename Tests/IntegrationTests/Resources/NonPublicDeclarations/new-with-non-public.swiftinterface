@@ -13,6 +13,7 @@ public struct Account {
   private var addedSecret: Swift.Int
   fileprivate var cache: Swift.Int
   internal func recalculate(force: Swift.Bool)
+  package func sync(force: Swift.Bool)
   public func close()
   public func reopen()
   internal struct Cache {

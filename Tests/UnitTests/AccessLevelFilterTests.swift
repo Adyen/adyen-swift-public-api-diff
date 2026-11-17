@@ -103,11 +103,64 @@ struct AccessLevelFilterTests {
         #expect(changes.count == 1)
     }
 
-    private func compare(old: String, new: String) -> [PADCore.Change] {
+    // MARK: - API scope
+
+    @Test func packageScopeKeepsPackageDeclarations() {
+        let changes = compare(
+            old: "public struct Example {}",
+            new: "public struct Example { package func shared() }",
+            apiScope: .package
+        )
+
+        #expect(changes.count == 1)
+    }
+
+    @Test func publicScopeDropsPackageDeclarations() {
+        let changes = compare(
+            old: "public struct Example {}",
+            new: "public struct Example { package func shared()\n package var value: Int }\npackage struct Other {}",
+            apiScope: .public
+        )
+
+        #expect(changes.isEmpty)
+    }
+
+    @Test func publicScopeKeepsPublicDeclarations() {
+        let changes = compare(
+            old: "public struct Example {}",
+            new: "public struct Example { public func visible()\n package func shared() }",
+            apiScope: .public
+        )
+
+        #expect(changes.count == 1)
+    }
+
+    @Test func allScopeKeepsEverything() {
+        let changes = compare(
+            old: "public struct Example {}",
+            new: "public struct Example { internal let hidden: Int\n package func shared() }",
+            apiScope: .all
+        )
+
+        #expect(changes.count == 1)
+    }
+
+    @Test func defaultParsingDoesNotFilter() {
+        let parser = SwiftInterfaceParser()
+        let source = "public struct Example { internal let hidden: Int }"
+
+        let tokens = Set(SwiftInterfaceElementDescriptionToken.allCases)
+        let defaultDescription = parser.parse(source: source, moduleName: "Example").description(incl: tokens)
+
+        #expect(defaultDescription.contains("hidden"))
+        #expect(defaultDescription == parser.parse(source: source, moduleName: "Example", apiScope: .all).description(incl: tokens))
+    }
+
+    private func compare(old: String, new: String, apiScope: APIScope = .package) -> [PADCore.Change] {
         let parser = SwiftInterfaceParser()
         return SwiftInterfaceAnalyzer().analyze(
-            old: parser.parse(source: old, moduleName: "Example"),
-            new: parser.parse(source: new, moduleName: "Example")
+            old: parser.parse(source: old, moduleName: "Example", apiScope: apiScope),
+            new: parser.parse(source: new, moduleName: "Example", apiScope: apiScope)
         )
     }
 }

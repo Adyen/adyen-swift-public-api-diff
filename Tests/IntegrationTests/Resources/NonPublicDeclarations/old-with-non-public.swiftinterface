@@ -11,6 +11,7 @@ public struct Account {
   private let secret: Swift.Int
   fileprivate var cache: Swift.Int
   internal func recalculate()
+  package func sync()
   public func close()
   internal struct Cache {
     public var entries: [Swift.String : Swift.Int]

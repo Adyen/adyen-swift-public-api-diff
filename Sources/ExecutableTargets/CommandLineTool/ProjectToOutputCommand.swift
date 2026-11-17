@@ -51,6 +51,9 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
     @Option(help: "[Optional] Where to output the logs (File path)")
     public var logOutput: String?
 
+    @Option(help: "[Optional] Which declarations to consider part of the API (public/package/all). `public` drops package, internal and private declarations, `package` drops internal and private declarations, `all` keeps everything")
+    public var apiScope: APIScope = .all
+
     @Option(help: "[Optional] The log level to use during execution")
     public var logLevel: LogLevel = .default
 
@@ -189,9 +192,10 @@ private extension ProjectToOutputCommand {
 
     static func analyzeSwiftInterfaceFiles(
         swiftInterfaceFiles: [SwiftInterfaceFile],
+        apiScope: APIScope,
         logger: any Logging
     ) async throws -> [String: [Change]] {
-        let swiftInterfaceDiff = SwiftInterfaceDiff(logger: logger)
+        let swiftInterfaceDiff = SwiftInterfaceDiff(apiScope: apiScope, logger: logger)
 
         return try await swiftInterfaceDiff.run(
             with: swiftInterfaceFiles

@@ -8,4 +8,12 @@ import Foundation
 
 protocol SwiftInterfaceParsing {
     func parse(source: String, moduleName: String) -> any SwiftInterfaceElement
+    func parse(source: String, moduleName: String, apiScope: APIScope) -> any SwiftInterfaceElement
+}
+
+extension SwiftInterfaceParsing {
+
+    func parse(source: String, moduleName: String, apiScope: APIScope) -> any SwiftInterfaceElement {
+        parse(source: source, moduleName: moduleName)
+    }
 }

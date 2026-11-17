@@ -24,9 +24,14 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     private var scope: Scope = .root(elements: [])
 
     func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
+        parse(source: source, moduleName: moduleName, apiScope: .all)
+    }
+
+    func parse(source: String, moduleName: String, apiScope: APIScope) -> any SwiftInterfaceElement {
         let visitor = Self()
         let syntax = Parser.parse(source: source)
-        visitor.walk(ModuleSelectorNormalizer.normalize(AccessLevelFilter.filter(syntax), moduleName: moduleName))
+        let filtered = AccessLevelFilter.filter(syntax, apiScope: apiScope)
+        visitor.walk(ModuleSelectorNormalizer.normalize(filtered, moduleName: moduleName))
         return Root(
             moduleName: moduleName,
             elements: visitor.scope.elements
