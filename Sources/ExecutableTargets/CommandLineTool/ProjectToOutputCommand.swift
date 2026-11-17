@@ -91,6 +91,7 @@ struct ProjectToOutputCommand: AsyncParsableCommand {
 
             let swiftInterfaceChanges = try await Self.analyzeSwiftInterfaceFiles(
                 swiftInterfaceFiles: projectBuilderResult.swiftInterfaceFiles,
+                apiScope: apiScope,
                 logger: logger
             )
 
