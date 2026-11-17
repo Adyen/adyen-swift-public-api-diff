@@ -1,10 +1,14 @@
-# ⚠️ 58 public changes detected ⚠️
+# ⚠️ 61 public changes detected ⚠️
 _Comparing `new_public` to `old_public`_
-<table><tr><td>❇️</td><td><b>31 Additions</b></td></tr><tr><td>🔀</td><td><b>23 Modifications</b></td></tr><tr><td>❌</td><td><b>4 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>32 Additions</b></td></tr><tr><td>🔀</td><td><b>24 Modifications</b></td></tr><tr><td>❌</td><td><b>5 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
 #### ❇️ Added
+```swift
+@attached(member, names: arbitrary)
+public macro AddedMacro() = #externalMacro(module: "ReferenceMacros", type: "AddedMacro")
+```
 ```swift
 @available(macOS 14, *)
 public enum NewEnumAvailableInVersion17: Swift.Codable, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {
@@ -47,6 +51,23 @@ public protocol ProtocolWithDefaultImplementation {
 public protocol SimpleProtocol
 ```
 #### 🔀 Modified
+```swift
+// From
+@freestanding(expression)
+public macro stringify<T>(_ value: T) -> (T, Swift.String) = #externalMacro(module: "ReferenceMacros", type: "StringifyMacro")
+
+// To
+@freestanding(expression)
+public macro stringify<T>(
+  _ value: T,
+  label: Swift.String
+) -> (T, Swift.String) = #externalMacro(module: "ReferenceMacros", type: "StringifyMacro")
+
+/**
+Changes:
+- Added parameter `label: Swift.String`
+*/
+```
 ```swift
 // From
 public actor CustomActor
@@ -101,6 +122,10 @@ Changes:
 */
 ```
 #### ❌ Removed
+```swift
+@attached(peer)
+public macro RemovedMacro() = #externalMacro(module: "ReferenceMacros", type: "RemovedMacro")
+```
 ```swift
 public struct PublicStructThatIsOnlyAvailableInTheReferencePackage {
   public func bar() -> Swift.Void

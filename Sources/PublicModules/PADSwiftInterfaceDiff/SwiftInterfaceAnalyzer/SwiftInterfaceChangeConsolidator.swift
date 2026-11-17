@@ -92,7 +92,14 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
         for change: IndependentSwiftInterfaceChange,
         in independentChanges: [IndependentSwiftInterfaceChange]
     ) -> Int? {
-        
+
+        // A removal and addition that come from comparing two elements belong together
+        if let counterpart = change.counterpart, let counterpartMatchIndex = independentChanges.firstIndex(where: {
+            ObjectIdentifier($0.element) == counterpart && $0.changeType.name != change.changeType.name
+        }) {
+            return counterpartMatchIndex
+        }
+
         if let signatureMatchIndex = independentChanges.firstIndex(where: { $0.element.isDiffable(with: change.element) && $0.changeType.name != change.changeType.name }) {
             return signatureMatchIndex
         }
@@ -125,11 +132,17 @@ extension IndependentSwiftInterfaceChange {
     }
 
     /// Helper method to construct an IndependentChange from the changeType & element
-    static func from(changeType: ChangeType, element: some SwiftInterfaceElement, oldFirst: Bool) -> Self {
+    static func from(
+        changeType: ChangeType,
+        element: some SwiftInterfaceElement,
+        oldFirst: Bool,
+        counterpart: (any SwiftInterfaceElement)? = nil
+    ) -> Self {
         .init(
             changeType: changeType,
             element: element,
-            oldFirst: oldFirst
+            oldFirst: oldFirst,
+            counterpart: counterpart.map { ObjectIdentifier($0) }
         )
     }
 

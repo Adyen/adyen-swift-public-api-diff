@@ -172,6 +172,16 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
         endScopeAndAddSymbol { [node.toInterfaceElement(children: $0)] }
     }
 
+    // MARK: - Macro
+
+    override open func visit(_ node: MacroDeclSyntax) -> SyntaxVisitorContinueKind {
+        startScope()
+    }
+
+    override open func visitPost(_ node: MacroDeclSyntax) {
+        endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
+    }
+
     // MARK: - Subscript
 
     override open func visit(_ node: SubscriptDeclSyntax) -> SyntaxVisitorContinueKind {
