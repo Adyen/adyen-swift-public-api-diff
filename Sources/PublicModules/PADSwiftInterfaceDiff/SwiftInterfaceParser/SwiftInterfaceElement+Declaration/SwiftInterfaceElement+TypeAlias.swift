@@ -9,7 +9,7 @@ import Foundation
 class SwiftInterfaceTypeAlias: SwiftInterfaceElement {
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let attributes: [String]
+    var attributes: [String]
 
     let name: String
 

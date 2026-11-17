@@ -52,8 +52,10 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
             }
 
             let match = independentChanges.remove(at: matchIndex)
-            let oldDescription = change.oldFirst ? change.element.description : match.element.description
-            let newDescription = change.oldFirst ? match.element.description : change.element.description
+            let oldElement = change.oldFirst ? change.element : match.element
+            let newElement = change.oldFirst ? match.element : change.element
+            let oldDescription = ConditionalCompilation.renderedDescription(of: oldElement, recursive: false)
+            let newDescription = ConditionalCompilation.renderedDescription(of: newElement, recursive: false)
             let listOfChanges = listOfChanges(between: change, and: match)
 
             if listOfChanges.isEmpty {
@@ -69,7 +71,9 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
                         newDescription: newDescription
                     ),
                     parentPath: match.parentPath,
-                    listOfChanges: listOfChanges
+                    listOfChanges: listOfChanges,
+                    conditions: (change.oldFirst ? change.element.allConditions + match.element.allConditions : match.element.allConditions + change.element.allConditions)
+                        .reduce(into: [String]()) { if !$0.contains($1) { $0.append($1) } }
                 )
             )
         }
@@ -115,11 +119,14 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
 extension IndependentSwiftInterfaceChange {
 
     var toConsolidatedChange: Change {
+        // Rendering the conditions as `#if … #endif` blocks (see `ConditionalCompilation`)
+        let isRecursive = self.changeType.description != element.description
+        let description = ConditionalCompilation.renderedDescription(of: element, recursive: isRecursive)
         let changeType: Change.ChangeType = {
             switch self.changeType {
-            case let .addition(description):
+            case .addition:
                 .addition(description: description)
-            case let .removal(description):
+            case .removal:
                 .removal(description: description)
             }
         }()
@@ -127,7 +134,8 @@ extension IndependentSwiftInterfaceChange {
         return .init(
             changeType: changeType,
             parentPath: parentPath,
-            listOfChanges: []
+            listOfChanges: [],
+            conditions: element.allConditions
         )
     }
 

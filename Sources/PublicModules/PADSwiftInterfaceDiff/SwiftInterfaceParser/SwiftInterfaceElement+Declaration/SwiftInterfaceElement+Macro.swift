@@ -15,7 +15,7 @@ import Foundation
 class SwiftInterfaceMacro: SwiftInterfaceElement {
 
     /// e.g. @attached(peer, names: prefixed(`$`)), @freestanding(expression), @available(...)
-    let attributes: [String]
+    var attributes: [String]
 
     let name: String
 

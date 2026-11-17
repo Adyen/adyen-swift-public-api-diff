@@ -9,7 +9,7 @@ import Foundation
 class SwiftInterfaceInitializer: SwiftInterfaceElement {
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let attributes: [String]
+    var attributes: [String]
 
     let optionalMark: String?
 

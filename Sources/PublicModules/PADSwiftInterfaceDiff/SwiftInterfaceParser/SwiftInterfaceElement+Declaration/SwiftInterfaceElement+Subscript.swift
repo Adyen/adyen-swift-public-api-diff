@@ -11,7 +11,7 @@ class SwiftInterfaceSubscript: SwiftInterfaceElement {
     let name: String = "subscript"
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let attributes: [String]
+    var attributes: [String]
 
     /// e.g. public, private, package, open, internal
     let modifiers: [String]

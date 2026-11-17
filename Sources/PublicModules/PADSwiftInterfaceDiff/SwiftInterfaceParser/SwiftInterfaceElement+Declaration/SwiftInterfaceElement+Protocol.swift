@@ -9,7 +9,7 @@ import Foundation
 class SwiftInterfaceProtocol: SwiftInterfaceExtendableElement {
 
     /// e.g. @discardableResult, @MainActor, @objc, @_spi(...), ...
-    let attributes: [String]
+    var attributes: [String]
 
     let name: String
 
@@ -67,7 +67,7 @@ extension SwiftInterfaceProtocol {
         changes += diffDescription(propertyType: "attribute", oldValues: other.attributes, newValues: attributes)
         changes += diffDescription(propertyType: "modifier", oldValues: other.modifiers, newValues: modifiers)
         changes += diffDescription(propertyType: "primary associated type", oldValues: other.primaryAssociatedTypes, newValues: primaryAssociatedTypes)
-        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance)
+        changes += diffDescription(propertyType: "inheritance", oldValues: other.inheritance, newValues: inheritance, oldTypeAttributes: other.attributes, newTypeAttributes: attributes)
         changes += diffDescription(propertyType: "generic where clause", oldValue: other.genericWhereClauseDescription, newValue: genericWhereClauseDescription)
         return changes.compactMap { $0 }
     }
@@ -87,8 +87,9 @@ private extension SwiftInterfaceProtocol {
         description.append("protocol", with: modifiers.isEmpty ? "" : " ")
         description.append(name, with: " ")
         description.append(primaryAssociatedTypes.map { "<\($0.joined(separator: ", "))>" }, with: "")
-        description.append(inheritance?.sorted().joined(separator: ", "), with: "") { ": \($0)" }
+        description.append(inheritanceClauseDescription, with: "") { ": \($0)" }
         description.append(genericWhereClauseDescription, with: " ")
+        description.append(conformanceExtensionsDescription(incl: tokens), with: "")
         return description
     }
 }

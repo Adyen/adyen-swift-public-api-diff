@@ -30,10 +30,22 @@ extension AttributeListSyntax {
     }
 
     /// Produces a description where all elements in the list are mapped to their `trimmedDescription`
+    ///
+    /// Attributes inside an `#if` are kept per clause together with the clause's condition
+    /// (e.g. `#if $NonexhaustiveAttribute @nonexhaustive #endif`, see ``ConditionalCompilation``)
     var sanitizedList: [String] {
         var descriptions: [String] = []
         var availabilityIndices: [Int] = []
         for element in self {
+            if case let .ifConfigDecl(ifConfig) = element {
+                descriptions += ConditionalCompilation.clauses(of: ifConfig).flatMap { clause, condition -> [String] in
+                    guard case let .attributes(attributes) = clause.elements else { return [] }
+                    return attributes.sanitizedList.map {
+                        ConditionalCompilation.conditionalAttribute($0.sanitizingNewlinesAndSpaces, condition: condition)
+                    }
+                }
+                continue
+            }
             var description = element.trimmedDescription
             if case let .attribute(attribute) = element, attribute.attributeName.trimmedDescription == "available" {
                 availabilityIndices.append(descriptions.count)
