@@ -9,12 +9,12 @@ import XCTest
 
 struct MockSwiftInterfaceParser: SwiftInterfaceParsing {
 
-    var handleParseSource: (String, String) -> any SwiftInterfaceElement = { _, _ in
+    var handleParseSource: (String, String, APIScope) -> any SwiftInterfaceElement = { _, _, _ in
         XCTFail("Unexpectedly called `\(#function)`")
         return SwiftInterfaceParser.Root(moduleName: "Module Name", elements: [])
     }
 
-    func parse(source: String, moduleName: String, apiScope _: APIScope) -> any SwiftInterfaceElement {
-        handleParseSource(source, moduleName)
+    func parse(source: String, moduleName: String, apiScope: APIScope) -> any SwiftInterfaceElement {
+        handleParseSource(source, moduleName, apiScope)
     }
 }

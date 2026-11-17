@@ -9,6 +9,18 @@
 import Testing
 
 @Test func pipeline() async throws {
+    try await runPipeline(apiScope: nil, expectedApiScope: .all)
+}
+
+@Test(arguments: [APIScope.all, .package, .public])
+func pipelinePassesAPIScopeToParser(apiScope: APIScope) async throws {
+    try await runPipeline(apiScope: apiScope, expectedApiScope: apiScope)
+}
+
+/// - Parameters:
+///   - apiScope: The scope passed to the pipeline. `nil` uses the pipeline's default
+///   - expectedApiScope: The scope the parser is expected to receive
+private func runPipeline(apiScope: APIScope?, expectedApiScope: APIScope) async throws {
 
         let swiftInterfaceFile = SwiftInterfaceFile(
             name: "MODULE_NAME",
@@ -18,9 +30,9 @@ import Testing
 
         let expectedChanges: [Change] = [.init(changeType: .addition(description: "addition"))]
         var expectedHandleLoadDataCalls = ["new_file_path", "old_file_path"]
-        var expectedHandleParseSourceCalls: [(source: String, moduleName: String)] = [
-            ("content_for_new_file_path", "MODULE_NAME"),
-            ("content_for_old_file_path", "MODULE_NAME")
+        var expectedHandleParseSourceCalls: [(source: String, moduleName: String, apiScope: APIScope)] = [
+            ("content_for_new_file_path", "MODULE_NAME", expectedApiScope),
+            ("content_for_old_file_path", "MODULE_NAME", expectedApiScope)
         ]
         var expectedHandleAnalyzeCalls: [(old: SwiftInterfaceParser.Root, new: SwiftInterfaceParser.Root)] = [
             (.init(moduleName: "MODULE_NAME", elements: []), .init(moduleName: "MODULE_NAME", elements: []))
@@ -40,10 +52,11 @@ import Testing
         }
 
         var swiftInterfaceParser = MockSwiftInterfaceParser()
-        swiftInterfaceParser.handleParseSource = { source, moduleName in
+        swiftInterfaceParser.handleParseSource = { source, moduleName, apiScope in
             let expectedInput = expectedHandleParseSourceCalls.removeFirst()
             #expect(expectedInput.source == source)
             #expect(expectedInput.moduleName == moduleName)
+            #expect(expectedInput.apiScope == apiScope)
             return SwiftInterfaceParser.Root(moduleName: moduleName, elements: [])
         }
 
@@ -64,12 +77,22 @@ import Testing
 
         // Pipeline run
 
-        let pipeline = SwiftInterfaceDiff(
-            fileHandler: fileHandler,
-            swiftInterfaceParser: swiftInterfaceParser,
-            swiftInterfaceAnalyzer: swiftInterfaceAnalyzer,
-            logger: logger
-        )
+        let pipeline = if let apiScope {
+            SwiftInterfaceDiff(
+                fileHandler: fileHandler,
+                swiftInterfaceParser: swiftInterfaceParser,
+                swiftInterfaceAnalyzer: swiftInterfaceAnalyzer,
+                apiScope: apiScope,
+                logger: logger
+            )
+        } else {
+            SwiftInterfaceDiff(
+                fileHandler: fileHandler,
+                swiftInterfaceParser: swiftInterfaceParser,
+                swiftInterfaceAnalyzer: swiftInterfaceAnalyzer,
+                logger: logger
+            )
+        }
 
         let pipelineOutput = try await pipeline.run(with: [swiftInterfaceFile])
 
