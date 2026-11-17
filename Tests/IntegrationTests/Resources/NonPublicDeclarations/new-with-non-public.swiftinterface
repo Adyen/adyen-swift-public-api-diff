@@ -1,0 +1,41 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2 effective-5.10
+// swift-module-flags: -target arm64-apple-macos13.0 -enable-objc-interop -swift-version 6 -module-name Example
+import Foundation
+import Swift
+public struct Account {
+  public let id: Swift.String
+  public private(set) var balance: Swift.Int
+  internal let reportedName: Swift.String
+  internal let addedHidden: Swift.Int
+  @_hasInitialValue final private var validationChallenge: Foundation.Data
+  private let secret: Swift.Int
+  private var addedSecret: Swift.Int
+  fileprivate var cache: Swift.Int
+  internal func recalculate(force: Swift.Bool)
+  public func close()
+  public func reopen()
+  internal struct Cache {
+    public var entries: [Swift.String : Swift.Int]
+    public var count: Swift.Int
+  }
+}
+public enum Status {
+  case active
+  case closed
+  case suspended
+}
+public protocol Notifier {
+  func notify()
+  func mute()
+}
+internal class Helper {
+  public func help()
+  public func assist()
+}
+private func utility()
+private func anotherUtility()
+extension Example.Account {
+  internal func audit(verbose: Swift.Bool)
+  public func summary() -> Swift.String
+}
