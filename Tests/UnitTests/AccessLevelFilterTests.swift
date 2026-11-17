@@ -103,6 +103,59 @@ struct AccessLevelFilterTests {
         #expect(changes.count == 1)
     }
 
+    // MARK: - Edge cases
+
+    @Test func extensionWithOnlyHiddenMembersOfExternalTypeIsIgnored() {
+        let changes = compare(
+            old: "",
+            new: """
+            extension Foundation.Data {
+                internal func helper()
+                private var other: Int { get }
+            }
+            """
+        )
+
+        #expect(changes.isEmpty)
+    }
+
+    @Test func extensionWithOnlyHiddenMembersOfLocalTypeIsIgnored() {
+        let changes = compare(
+            old: "public struct Account {}\nextension Example.Account { public func summary() -> Swift.String }",
+            new: "public struct Account {}\nextension Example.Account {\n public func summary() -> Swift.String\n}\nextension Example.Account { private func other() }"
+        )
+
+        #expect(changes.isEmpty)
+    }
+
+    @Test func extensionAddingConformanceIsKeptEvenIfAllMembersAreHidden() {
+        let changes = compare(
+            old: "",
+            new: "extension Foundation.Data: Swift.Equatable { internal func helper() }"
+        )
+
+        #expect(changes.count == 1)
+    }
+
+    @Test func hiddenDeclarationsInsideConditionalCompilationAreIgnored() {
+        let changes = compare(
+            old: "public struct Example {}",
+            new: """
+            #if compiler(>=5.3)
+            internal struct Helper {}
+            #endif
+            public struct Example {
+                #if compiler(>=5.3)
+                internal let hidden: Int
+                private func secret()
+                #endif
+            }
+            """
+        )
+
+        #expect(changes.isEmpty)
+    }
+
     // MARK: - API scope
 
     @Test func packageScopeKeepsPackageDeclarations() {

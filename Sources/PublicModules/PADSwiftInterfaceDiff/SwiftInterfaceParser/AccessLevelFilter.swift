@@ -14,6 +14,7 @@ import SwiftSyntax
 /// - `public private(set) var` stays, as only the setter is restricted.
 /// - `@usableFromInline` declarations stay, as they are ABI relevant.
 /// - Members of a removed declaration are removed with it.
+/// - An extension whose members are all removed is removed as well, unless it adds a conformance.
 final class AccessLevelFilter: SyntaxRewriter {
 
     private let apiScope: APIScope
@@ -29,8 +30,8 @@ final class AccessLevelFilter: SyntaxRewriter {
     }
 
     override func visit(_ node: CodeBlockItemListSyntax) -> CodeBlockItemListSyntax {
-        // Only the top level is filtered here, bodies of functions are left untouched
-        guard node.parent?.is(SourceFileSyntax.self) == true else {
+        // Only the top level (including `#if` blocks) is filtered here, bodies of functions are left untouched
+        guard node.parent?.is(SourceFileSyntax.self) == true || node.parent?.is(IfConfigClauseSyntax.self) == true else {
             return super.visit(node)
         }
         let filtered = CodeBlockItemListSyntax(node.filter { item in
@@ -49,7 +50,17 @@ final class AccessLevelFilter: SyntaxRewriter {
 private extension DeclSyntax {
 
     /// `true` if the declaration has an explicit access modifier outside of the API scope
-    func isHidden(below apiScope: APIScope) -> Bool {
+    func isHidden(outside apiScope: APIScope) -> Bool {
+        // An extension that only contained hidden members would otherwise remain as an empty extension
+        // (e.g. `extension Foundation.Data {}`) and be reported as an addition.
+        // Extensions that add a conformance are kept as the conformance is part of the API.
+        if let extensionDecl = self.as(ExtensionDeclSyntax.self),
+           extensionDecl.inheritanceClause == nil,
+           !extensionDecl.memberBlock.members.isEmpty,
+           extensionDecl.memberBlock.members.allSatisfy({ $0.decl.isHidden(outside: apiScope) }) {
+            return true
+        }
+
         guard let modifiable = asProtocol((any WithModifiersSyntax).self) else { return false }
 
         let hasHidingModifier = modifiable.modifiers.contains { modifier in
