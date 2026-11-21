@@ -39,7 +39,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.8.2"),
         .package(url: "https://github.com/swiftlang/swift-syntax", .upToNextMajor(from: "604.0.0")),
-        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.64.4"),
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.64.5"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.5.0"),
         .package(url: "https://github.com/apple/swift-testing", exact: "6.4.2")
     ],
