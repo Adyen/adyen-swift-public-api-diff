@@ -1,0 +1,23 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2 effective-5.10
+// swift-module-flags: -target arm64-apple-macos13.0 -enable-objc-interop -swift-version 6 -module-name Example
+import Foundation
+import Swift
+public struct Account {
+  public let id: Swift.String
+  public private(set) var balance: Swift.Int
+  public func close()
+  public func reopen()
+}
+public enum Status {
+  case active
+  case closed
+  case suspended
+}
+public protocol Notifier {
+  func notify()
+  func mute()
+}
+extension Example.Account {
+  public func summary() -> Swift.String
+}

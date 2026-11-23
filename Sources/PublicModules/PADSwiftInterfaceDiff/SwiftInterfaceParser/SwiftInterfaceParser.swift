@@ -29,9 +29,14 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     private var extensionNodes = [ObjectIdentifier: ExtensionDeclSyntax]()
 
     func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
+        parse(source: source, moduleName: moduleName, apiScope: .all)
+    }
+
+    func parse(source: String, moduleName: String, apiScope: APIScope) -> any SwiftInterfaceElement {
         let visitor = Self()
         let syntax = Parser.parse(source: source)
-        visitor.walk(ModuleSelectorNormalizer.normalize(syntax, moduleName: moduleName))
+        let filtered = AccessLevelFilter.filter(syntax, apiScope: apiScope)
+        visitor.walk(ModuleSelectorNormalizer.normalize(filtered, moduleName: moduleName))
         let extensionNodes = visitor.extensionNodes
         return Root(
             moduleName: moduleName,

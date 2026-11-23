@@ -9,6 +9,7 @@ import ArgumentParser
 import PADLogging
 import PADSwiftInterfaceFileLocator
 import PADProjectBuilder
+import PADSwiftInterfaceDiff
 
 extension SwiftInterfaceType: ExpressibleByArgument {
     public init?(argument: String) {
@@ -18,6 +19,22 @@ extension SwiftInterfaceType: ExpressibleByArgument {
             "package": .package
         ]
         
+        if let match = mapping.value(forArgument: argument) {
+            self = match
+        } else {
+            return nil
+        }
+    }
+}
+
+extension APIScope: ExpressibleByArgument {
+    public init?(argument: String) {
+        let mapping: [String: Self] = [
+            "public": .public,
+            "package": .package,
+            "all": .all
+        ]
+
         if let match = mapping.value(forArgument: argument) {
             self = match
         } else {
