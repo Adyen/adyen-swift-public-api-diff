@@ -61,7 +61,7 @@ Add the package to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Adyen/adyen-swift-public-api-diff", from: "0.12.0")
+    .package(url: "https://github.com/Adyen/adyen-swift-public-api-diff", from: "0.13.0")
 ]
 ```
 
@@ -359,7 +359,7 @@ The GitHub Action adds the report to the step summary and posts a comment on sam
 
 ```yaml
 - name: 🔍 Detect Changes
-  uses: Adyen/adyen-swift-public-api-diff@0.12.0
+  uses: Adyen/adyen-swift-public-api-diff@0.13.0
   with:
     platform: "iOS"
     new: "develop~https://github.com/Adyen/adyen-ios.git"
