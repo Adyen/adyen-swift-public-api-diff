@@ -35,9 +35,17 @@ jobs:
       run: |
         xcodebuild test -scheme public-api-diff-Package -destination "platform=macOS" -skipPackagePluginValidation | xcpretty --utf --color && exit ${PIPESTATUS[0]}
 
+    - name: Set up Python for schema validation
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+
     - name: 🧾 Validate JSON reference files against the schema
       run: |
-        pip3 install --break-system-packages check-jsonschema
-        check-jsonschema --schemafile docs/public-api-diff.schema.v1.json \
+        python -m venv "$RUNNER_TEMP/json-schema-validation"
+        "$RUNNER_TEMP/json-schema-validation/bin/python" -m pip install \
+          --only-binary=:all: --require-hashes \
+          --requirement .github/requirements-json-schema.txt
+        "$RUNNER_TEMP/json-schema-validation/bin/check-jsonschema" --schemafile docs/public-api-diff.schema.v1.json \
           Tests/IntegrationTests/Resources/expected-reference-changes-swift-interface-public.json \
           Tests/IntegrationTests/Resources/expected-reference-changes-swift-interface-private.json
