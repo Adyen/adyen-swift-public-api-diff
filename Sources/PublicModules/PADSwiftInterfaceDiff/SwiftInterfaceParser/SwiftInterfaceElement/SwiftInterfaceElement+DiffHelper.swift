@@ -77,7 +77,7 @@ extension SwiftInterfaceElement {
         let removed = old.subtracting(new)
         let added = new.subtracting(old)
 
-        // A conformance whose only difference is its availability is a changed availability,
+        // A conformance whose only difference is its availability or conditions is a modification,
         // not a removal + addition (see `AvailabilityInheritance.conformance`)
         let removedByConformance = Dictionary(grouping: removed, by: Self.conformanceName)
         let addedByConformance = Dictionary(grouping: added, by: Self.conformanceName)
@@ -90,9 +90,14 @@ extension SwiftInterfaceElement {
                   let newValue = addedByConformance[conformance]?.first else { return nil }
             let oldAvailability = Self.conformanceAvailability(oldValue, typeAttributes: oldTypeAttributes)
             let newAvailability = Self.conformanceAvailability(newValue, typeAttributes: newTypeAttributes)
-            guard let descriptions = AvailabilityChange.describe(old: oldAvailability, new: newAvailability) else {
+            guard var descriptions = AvailabilityChange.describe(old: oldAvailability, new: newAvailability) else {
                 return "Changed availability of conformance `\(conformance)` from `\(oldAvailability.joined(separator: " "))` to `\(newAvailability.joined(separator: " "))`"
             }
+            descriptions += Self.listDiffDescription(
+                propertyType: "attribute",
+                old: oldAvailability.filter { ConditionalCompilation.condition(of: $0) != nil },
+                new: newAvailability.filter { ConditionalCompilation.condition(of: $0) != nil }
+            ).sorted()
             guard !descriptions.isEmpty else { return nil }
             return "Conformance `\(conformance)`: \(descriptions.joined(separator: "; "))"
         }

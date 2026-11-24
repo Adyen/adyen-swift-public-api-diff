@@ -48,6 +48,8 @@ swift run public-api-diff swift-interface \
     --output api-comparison.md
 ```
 
+For [JSON output](#json-output), add `--format json` and change the output path to `api-comparison.json`.
+
 Need to build the compared projects first? Use the [`project` command](#from-project-to-output) instead.
 
 ## Installation
@@ -292,6 +294,62 @@ public func deprecatedFunction()
 </details>
 
 The output can be written to a file using the `--output` flag or printed to stdout.
+
+### JSON output
+Use `--format json` on `project`, `swift-interface`, or `framework` for a machine-readable report. The default is `markdown`.
+
+<details>
+<summary>JSON examples, schema, and versioning</summary>
+
+```bash
+swift run public-api-diff swift-interface \
+    --old old.swiftinterface \
+    --new new.swiftinterface \
+    --target-name MyModule \
+    --format json
+
+swift run public-api-diff project \
+    --old "5.12.0~https://github.com/Adyen/adyen-ios.git" \
+    --new "develop~https://github.com/Adyen/adyen-ios.git" \
+    --platform iOS \
+    --format json \
+    --output report.json
+```
+
+- Without `--output`, stdout contains only the JSON document, so it can be piped (`… --format json | jq`). With `--output`, the report is written to that file instead.
+- In JSON mode the tool exits with a non-zero status on errors (and writes no output). The `markdown` mode keeps exiting with `0`.
+- Within the same tool version, the same inputs produce byte-identical output.
+- The structure is described by the [JSON Schema](docs/public-api-diff.schema.v1.json).
+
+**Versioning:** The document contains a `formatVersion` (currently `1`). It only changes for breaking changes (a field is removed, renamed or changes its meaning, or a new value is added to an enumeration like `kind`).
+New optional fields can be added without changing it, so consumers must ignore unknown fields. `tool.version` is informational (the version of `public-api-diff`) - rely on `formatVersion` for compatibility checks.
+
+```json
+{
+  "formatVersion": 1,
+  "tool": { "name": "public-api-diff", "version": "0.12.0" },
+  "oldVersionName": "v1.0",
+  "newVersionName": "v2.0",
+  "platform": null,
+  "analyzedTargets": ["MyModule"],
+  "warnings": [],
+  "summary": { "added": 1, "modified": 0, "removed": 0, "total": 1 },
+  "targets": {
+    "MyModule": [
+      {
+        "kind": "added",
+        "parentPath": "MyType",
+        "before": null,
+        "after": "public func reload(animated: Swift.Bool) -> Swift.Void",
+        "details": [],
+        "conditions": []
+      }
+    ]
+  }
+}
+```
+
+</details>
 
 ## GitHub Action
 The GitHub Action adds the report to the step summary and posts a comment on same-repository pull requests. Pull requests from forks receive the step summary only.

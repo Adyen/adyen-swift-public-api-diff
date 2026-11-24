@@ -1,0 +1,770 @@
+{
+  "analyzedTargets" : [
+    "ReferencePackage"
+  ],
+  "formatVersion" : 1,
+  "newVersionName" : "new_public",
+  "oldVersionName" : "old_public",
+  "platform" : null,
+  "summary" : {
+    "added" : 32,
+    "modified" : 24,
+    "removed" : 5,
+    "total" : 61
+  },
+  "targets" : {
+    "ReferencePackage" : [
+      {
+        "after" : "@attached(member, names: arbitrary)\npublic macro AddedMacro() = #externalMacro(module: \"ReferenceMacros\", type: \"AddedMacro\")",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : null
+      },
+      {
+        "after" : "@available(macOS 14, *)\npublic enum NewEnumAvailableInVersion17: Swift.Codable, Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {\n  @available(macOS 14, *)\n  public typealias RawValue = Swift.String\n  @available(macOS 15, *)\n  public func laterAvailableFunction() -> Swift.Void\n  case case1\n  public init?(rawValue: Swift.String)\n  public var rawValue: Swift.String { get }\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : null
+      },
+      {
+        "after" : "@resultBuilder\npublic struct SomeResultBuilder {\n  public static func buildBlock(_ components: Swift.String) -> Swift.String\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : null
+      },
+      {
+        "after" : "public enum RawValueEnum: Swift.Equatable, Swift.Hashable, Swift.RawRepresentable, Swift.String {\n  case one\n  case two\n  public init?(rawValue: Swift.String)\n  public typealias RawValue = Swift.String\n  public var rawValue: Swift.String { get }\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : null
+      },
+      {
+        "after" : "public protocol ParentProtocol<ParentType> {\n  associatedtype Iterator: Swift.Collection\n  associatedtype ParentType: Swift.Equatable where Self.ParentType == Self.Iterator.Element\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : null
+      },
+      {
+        "after" : "public protocol ProtocolWithDefaultImplementation {\n  func function() -> Swift.String\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : null
+      },
+      {
+        "after" : "public protocol SimpleProtocol",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : null
+      },
+      {
+        "after" : "@freestanding(expression)\npublic macro stringify<T>(\n  _ value: T,\n  label: Swift.String\n) -> (T, Swift.String) = #externalMacro(module: \"ReferenceMacros\", type: \"StringifyMacro\")",
+        "before" : "@freestanding(expression)\npublic macro stringify<T>(_ value: T) -> (T, Swift.String) = #externalMacro(module: \"ReferenceMacros\", type: \"StringifyMacro\")",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added parameter `label: Swift.String`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
+        "after" : "public actor CustomActor: ReferencePackage.SimpleProtocol",
+        "before" : "public actor CustomActor",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added inheritance `ReferencePackage.SimpleProtocol`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
+        "after" : "public enum CustomEnum<T>: ReferencePackage.SimpleProtocol",
+        "before" : "public enum CustomEnum",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added generic parameter description `<T>`",
+          "Added inheritance `ReferencePackage.SimpleProtocol`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
+        "after" : "public protocol CustomProtocol<CustomAssociatedType, AnotherAssociatedType>: ReferencePackage.ParentProtocol where Self.ParentType == Swift.Double",
+        "before" : "public protocol CustomProtocol",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added generic where clause `where Self.ParentType == Swift.Double`",
+          "Added inheritance `ReferencePackage.ParentProtocol`",
+          "Added primary associated type `AnotherAssociatedType`",
+          "Added primary associated type `CustomAssociatedType`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
+        "after" : "public struct CustomStruct<T>: ReferencePackage.CustomProtocol where T : Swift.Strideable",
+        "before" : "public struct CustomStruct: ReferencePackage.CustomProtocol",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added generic parameter description `<T>`",
+          "Added generic where clause `where T : Swift.Strideable`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
+        "after" : null,
+        "before" : "@attached(peer)\npublic macro RemovedMacro() = #externalMacro(module: \"ReferenceMacros\", type: \"RemovedMacro\")",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : null
+      },
+      {
+        "after" : null,
+        "before" : "public struct PublicStructThatIsOnlyAvailableInTheReferencePackage {\n  public func bar() -> Swift.Void\n  public var foo: Swift.String\n}",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : null
+      },
+      {
+        "after" : "extension Swift.Array {\n  public subscript(safe index: Swift.Int) -> Element? { get }\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "Array"
+      },
+      {
+        "after" : "final public let a: Swift.Int { get }",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "final public let b: Swift.Int { get }",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "final public let c: Swift.Int { get }",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "final public let d: Swift.Double { get }",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "public subscript(index: Swift.Int) -> T? { get set }",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "public var lazyVar: Swift.String { get set }",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "@_Concurrency.MainActor\npublic func asyncThrowingFunc<Element>(_ element: Element) async throws -> Swift.Void where Element : Swift.Strideable",
+        "before" : "@_Concurrency.MainActor\npublic func asyncThrowingFunc() async throws -> Swift.Void",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added generic parameter description `<Element>`",
+          "Added generic where clause `where Element : Swift.Strideable`",
+          "Added parameter `_ element: Element`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "convenience public init!(value: T)",
+        "before" : "convenience public init(value: T)",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added optional mark `!`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "public init(\n  weakObject: ReferencePackage.CustomClass<T>? = nil,\n  optionalVar: T? = nil,\n  @ReferencePackage.SomeResultBuilder content: () -> Swift.String\n)",
+        "before" : "public init(\n  weakObject: ReferencePackage.CustomClass<T>? = nil,\n  optionalVar: T? = nil\n)",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added parameter `@ReferencePackage.SomeResultBuilder content: () -> Swift.String`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "public init?()",
+        "before" : "public init()",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added optional mark `?`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomClass"
+      },
+      {
+        "after" : "case a",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "case b",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "case c",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "case caseWithNamedString(title: T)",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "case d",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "case e(ReferencePackage.CustomEnum<T>.NestedStructInExtension)",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "extension ReferencePackage.CustomEnum where T == Swift.String {\n  public var titleOfCaseWithNamedString: Swift.String? { get }\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "public struct NestedStructInExtension: Swift.CustomStringConvertible {\n  public init(string: Swift.String = \"Hello\")\n  public let string: Swift.String { get }\n  public var description: Swift.String { get }\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "case caseWithTuple(\n  _: Swift.String,\n  bar: Swift.Int\n)",
+        "before" : "case caseWithTuple(\n  Swift.String,\n  Swift.Int\n)",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added parameter `_: Swift.String`",
+          "Added parameter `bar: Swift.Int`",
+          "Removed parameter `Swift.Int`",
+          "Removed parameter `Swift.String`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "indirect case recursive(ReferencePackage.CustomEnum<T>)",
+        "before" : "indirect case recursive(ReferencePackage.CustomEnum)",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified 1st parameter: Changed type from `ReferencePackage.CustomEnum` to `ReferencePackage.CustomEnum<T>`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : null,
+        "before" : "case caseWithString(Swift.String)",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : null,
+        "before" : "public enum PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage: Swift.Equatable, Swift.Hashable {\n  case alpha\n  case beta\n  public func hash(into hasher: inout Swift.Hasher) -> Swift.Void\n  public static func ==(\n    a: ReferencePackage.CustomEnum.PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage,\n    b: ReferencePackage.CustomEnum.PublicEnumInExtensionOfCustomEnumThatIsOnlyAvailableInTheReferencePackage\n  ) -> Swift.Bool\n  public var hashValue: Swift.Int { get }\n}",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : "CustomEnum"
+      },
+      {
+        "after" : "associatedtype AnotherAssociatedType: Swift.Strideable",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomProtocol"
+      },
+      {
+        "after" : "associatedtype CustomAssociatedType: Swift.Equatable",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomProtocol"
+      },
+      {
+        "after" : "func function() -> Self.CustomAssociatedType",
+        "before" : "func function() -> any Swift.Equatable",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified return type from `any Swift.Equatable` to `Self.CustomAssociatedType`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomProtocol"
+      },
+      {
+        "after" : "var getSetVar: Self.AnotherAssociatedType { get set }",
+        "before" : "var getSetVar: any Swift.Equatable { get set }",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified type from `any Swift.Equatable` to `Self.AnotherAssociatedType`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomProtocol"
+      },
+      {
+        "after" : "var getVar: Self.CustomAssociatedType { get }",
+        "before" : "var getVar: any Swift.Equatable { get }",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified type from `any Swift.Equatable` to `Self.CustomAssociatedType`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomProtocol"
+      },
+      {
+        "after" : null,
+        "before" : "typealias CustomAssociatedType = Swift.Equatable",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : "CustomProtocol"
+      },
+      {
+        "after" : "@available(macOS, unavailable, message: \"Unavailable on macOS\")\npublic struct NestedStruct {\n  @available(*, deprecated, renamed: \"nestedVar\")\n  public let nestedLet: Swift.String { get }\n  @available(swift 5.9)\n  public let nestedVar: Swift.String { get }\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomStruct"
+      },
+      {
+        "after" : "public typealias AnotherAssociatedType = Swift.Double",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomStruct"
+      },
+      {
+        "after" : "public typealias CustomAssociatedType = Swift.Int",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomStruct"
+      },
+      {
+        "after" : "public typealias Iterator = [ReferencePackage.CustomStruct<T>.AnotherAssociatedType]",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomStruct"
+      },
+      {
+        "after" : "public typealias ParentType = Swift.Double",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "CustomStruct"
+      },
+      {
+        "after" : "@discardableResult\npublic func function() -> Swift.Int",
+        "before" : "@discardableResult\npublic func function() -> any Swift.Equatable",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified return type from `any Swift.Equatable` to `Swift.Int`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomStruct"
+      },
+      {
+        "after" : "public var getSetVar: Swift.Double",
+        "before" : "public var getSetVar: any Swift.Equatable",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified type from `any Swift.Equatable` to `Swift.Double`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomStruct"
+      },
+      {
+        "after" : "public var getVar: Swift.Int",
+        "before" : "public var getVar: any Swift.Equatable",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified type from `any Swift.Equatable` to `Swift.Int`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "CustomStruct"
+      },
+      {
+        "after" : "public func newConsumingFunction(_ param: consuming Swift.String) -> Swift.Void",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "OwnershipTester"
+      },
+      {
+        "after" : "public func newMutatingFunction(_ param: inout Swift.String) -> Swift.Void",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "OwnershipTester"
+      },
+      {
+        "after" : "public func consumingFunction(_ param: Swift.String) -> Swift.Void",
+        "before" : "public func consumingFunction(_ param: consuming Swift.String) -> Swift.Void",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified parameter `param`: Changed type from `consuming Swift.String` to `Swift.String`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "OwnershipTester"
+      },
+      {
+        "after" : "public func mutatingFunction(_ param: Swift.String) -> Swift.Void",
+        "before" : "public func mutatingFunction(_ param: inout Swift.String) -> Swift.Void",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified parameter `param`: Changed type from `inout Swift.String` to `Swift.String`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "OwnershipTester"
+      },
+      {
+        "after" : "public func processingFunction(_ param: sending Swift.String) -> Swift.Void",
+        "before" : "public func processingFunction(_ param: Swift.String) -> Swift.Void",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified parameter `param`: Changed type from `Swift.String` to `sending Swift.String`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "OwnershipTester"
+      },
+      {
+        "after" : "public func regularFunction(_ param: borrowing Swift.String) -> Swift.Void",
+        "before" : "public func regularFunction(_ param: Swift.String) -> Swift.Void",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified parameter `param`: Changed type from `Swift.String` to `borrowing Swift.String`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "OwnershipTester"
+      },
+      {
+        "after" : "public var someValue: Swift.String",
+        "before" : "public let someValue: Swift.String { get }",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified from `let` to `var`",
+          "Removed accessors `get`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "TestExtensionMatching.Data"
+      },
+      {
+        "after" : "@available(*, deprecated, message: \"Use default initializer\")\npublic init(id: Swift.String)",
+        "before" : "public init(id: Swift.String)",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Deprecated: all platforms (\"Use default initializer\")"
+        ],
+        "kind" : "modified",
+        "parentPath" : "TestExtensionMatching.DataModel"
+      },
+      {
+        "after" : "public func processEscapable<U>(_ value: borrowing U) -> Swift.Void where U : ~Escapable",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "TypeConstraintTester"
+      },
+      {
+        "after" : "public func processValue<U>(_ value: consuming U) -> Swift.Void where U : ~Copyable",
+        "before" : "public func processValue<U>(_ value: U) -> Swift.Void",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added generic where clause `where U : ~Copyable`",
+          "Modified parameter `value`: Changed type from `U` to `consuming U`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "TypeConstraintTester"
+      }
+    ]
+  },
+  "tool" : {
+    "name" : "public-api-diff",
+    "version" : null
+  },
+  "warnings" : [
+
+  ]
+}

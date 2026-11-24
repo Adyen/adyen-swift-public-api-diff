@@ -166,6 +166,8 @@ let package = Package(
                 // Will be at top level in bundle.
                 .copy("Resources/expected-reference-changes-swift-interface-private.md"),
                 .copy("Resources/expected-reference-changes-swift-interface-public.md"),
+                .copy("Resources/expected-reference-changes-swift-interface-public.json"),
+                .copy("Resources/expected-reference-changes-swift-interface-private.json"),
                 .copy("Resources/NonPublicDeclarations")
             ],
             swiftSettings: [

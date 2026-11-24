@@ -74,6 +74,21 @@ extension ProjectPlatform: ExpressibleByArgument {
     }
 }
 
+extension OutputFormat: ExpressibleByArgument {
+    init?(argument: String) {
+        let mapping: [String: Self] = [
+            "markdown": .markdown,
+            "json": .json
+        ]
+
+        if let match = mapping.value(forArgument: argument) {
+            self = match
+        } else {
+            return nil
+        }
+    }
+}
+
 // MARK: - Convenience
 
 fileprivate extension Dictionary where Key == String {
