@@ -28,7 +28,9 @@ public struct SwiftInterfaceDiff {
         self.init(
             fileHandler: FileManager.default,
             swiftInterfaceParser: SwiftInterfaceParser(),
-            swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(),
+            swiftInterfaceAnalyzer: SwiftInterfaceAnalyzer(
+                changeConsolidator: SwiftInterfaceChangeConsolidator(logger: logger)
+            ),
             logger: logger
         )
     }

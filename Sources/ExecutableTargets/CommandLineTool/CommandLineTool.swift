@@ -20,6 +20,7 @@ struct PublicApiDiff: AsyncParsableCommand {
 
     static var configuration: CommandConfiguration = .init(
         commandName: "public-api-diff",
+        version: ToolVersion.current,
         subcommands: [
             ProjectToOutputCommand.self,
             SwiftInterfaceToOutputCommand.self,

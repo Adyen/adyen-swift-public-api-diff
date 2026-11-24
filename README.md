@@ -236,6 +236,47 @@ public func deprecatedFunction()
 
 The output can be written to a file using the `--output` flag or printed to stdout.
 
+### JSON output
+Use `--format json` (default: `markdown`) on `project`, `swift-interface` and `framework` to get a machine readable report instead:
+
+```bash
+public-api-diff swift-interface --old old.swiftinterface --new new.swiftinterface --target-name MyModule --format json
+public-api-diff project --old main --new develop --platform iOS --format json --output report.json
+```
+
+- With `--format json` stdout only contains the JSON document, so it can be piped (`… --format json | jq`).
+- In JSON mode the tool exits with a non-zero status on errors (and writes no output). The `markdown` mode keeps exiting with `0`.
+- The output is deterministic: the same input always results in byte-identical output.
+- The structure is described by the [JSON Schema](docs/public-api-diff.schema.v1.json).
+
+**Versioning:** The document contains a `formatVersion` (currently `1`). It only changes for breaking changes (a field is removed, renamed or changes its meaning, or a new value is added to an enumeration like `kind`).
+New optional fields can be added without changing it, so consumers must ignore unknown fields. `tool.version` is informational (the version of `public-api-diff`) - rely on `formatVersion` for compatibility checks.
+
+```json
+{
+  "formatVersion": 1,
+  "tool": { "name": "public-api-diff", "version": "0.12.0" },
+  "oldVersionName": "v1.0",
+  "newVersionName": "v2.0",
+  "platform": null,
+  "analyzedTargets": ["MyModule"],
+  "warnings": [],
+  "summary": { "added": 1, "modified": 0, "removed": 0, "total": 1 },
+  "targets": {
+    "MyModule": [
+      {
+        "kind": "added",
+        "parentPath": "MyType",
+        "before": null,
+        "after": "public func reload(animated: Swift.Bool)",
+        "details": [],
+        "conditions": []
+      }
+    ]
+  }
+}
+```
+
 ## Github Action
 The public-api-diff can be used easily via the provided github action, which creates a comment on a PR (if applicable) and also adds it to the Github step summary.
 ```bash

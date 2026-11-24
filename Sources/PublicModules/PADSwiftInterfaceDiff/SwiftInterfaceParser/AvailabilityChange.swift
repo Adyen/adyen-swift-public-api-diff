@@ -18,6 +18,7 @@ enum AvailabilityChange {
     struct Platform: Equatable {
         var introduced: String?
         var isUnavailable = false
+        var isNoAsync = false
         var isDeprecated = false
         var deprecated: String?
         var obsoleted: String?
@@ -34,6 +35,7 @@ enum AvailabilityChange {
         var undeclared = [String](), deprecated = [String: [String]](), undeprecated = [String]()
         var deprecationChanged = [String](), messageChanged = [String]()
         var obsoleted = [String](), unobsoleted = [String](), obsoletionChanged = [String]()
+        var noasync = [String](), asyncAvailable = [String](), asyncMessageChanged = [String]()
 
         for platform in sortedPlatforms(Set(old.keys).union(new.keys)) {
             let before = old[platform] ?? Platform()
@@ -50,6 +52,12 @@ enum AvailabilityChange {
 
             if !before.isUnavailable && after.isUnavailable { unavailable.append(name) }
             if before.isUnavailable && !after.isUnavailable && after.introduced == nil { noLongerUnavailable.append(name) }
+
+            if !before.isNoAsync && after.isNoAsync { noasync.append(name) }
+            if before.isNoAsync && !after.isNoAsync { asyncAvailable.append(name) }
+            if before.isNoAsync && after.isNoAsync && before.message != after.message {
+                asyncMessageChanged.append("\(name): \(before.message ?? "(none)") → \(after.message ?? "(none)")")
+            }
 
             switch (before.isDeprecated, after.isDeprecated) {
             case (false, true):
@@ -93,6 +101,9 @@ enum AvailabilityChange {
         add("Obsoleted", obsoleted)
         add("Obsoletion changed", obsoletionChanged)
         add("No longer obsoleted", unobsoleted)
+        add("Marked unavailable from async contexts", noasync)
+        add("No longer unavailable from async contexts", asyncAvailable)
+        add("Async unavailability message changed", asyncMessageChanged)
         return descriptions
     }
 
@@ -104,9 +115,11 @@ enum AvailabilityChange {
         let available = sorted.compactMap { platform in platforms[platform]?.introduced.map { "\(displayName(platform)) \($0)" } }
         let unavailable = sorted.filter { platforms[$0]?.isUnavailable == true }.map(displayName)
         let deprecated = sorted.filter { platforms[$0]?.isDeprecated == true }.map(displayName)
+        let noasync = sorted.filter { platforms[$0]?.isNoAsync == true }.map(displayName)
         if !available.isEmpty { parts.append("available on \(available.joined(separator: ", "))") }
         if !unavailable.isEmpty { parts.append("unavailable on \(unavailable.joined(separator: ", "))") }
         if !deprecated.isEmpty { parts.append("deprecated on \(deprecated.joined(separator: ", "))") }
+        if !noasync.isEmpty { parts.append("unavailable from async contexts on \(noasync.joined(separator: ", "))") }
         return parts.isEmpty ? nil : parts.joined(separator: "; ")
     }
 
@@ -143,7 +156,7 @@ enum AvailabilityChange {
                 case let ("obsoleted", version?): state.obsoleted = version
                 case let ("message", message?): state.message = message
                 case let ("renamed", renamed?): state.renamed = renamed
-                case ("noasync", nil): break
+                case ("noasync", nil): state.isNoAsync = true
                 default: return nil
                 }
             }

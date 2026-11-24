@@ -97,6 +97,49 @@ struct AvailabilityChangeTests {
         #expect(Set(change.listOfChanges) == ["Availability changed: iOS 27.0 → 27.2", "Added attribute `@discardableResult`"])
     }
 
+    @Test func noasyncAdditionAndRemovalAreReported() throws {
+        let unrestricted = "public func example()"
+        let restricted = "@available(*, noasync)\npublic func example()"
+
+        let addition = try #require(compare(unrestricted, restricted).first)
+        #expect(addition.changeType.isModification)
+        #expect(addition.listOfChanges == ["Marked unavailable from async contexts: all platforms"])
+
+        let removal = try #require(compare(restricted, unrestricted).first)
+        #expect(removal.changeType.isModification)
+        #expect(removal.listOfChanges == ["No longer unavailable from async contexts: all platforms"])
+    }
+
+    @Test func noasyncMessageChangeIsReported() throws {
+        let changes = compare(
+            "@available(*, noasync, message: \"Use first()\")\npublic func example()",
+            "@available(*, noasync, message: \"Use second()\")\npublic func example()"
+        )
+
+        let change = try #require(changes.first)
+        #expect(change.listOfChanges == [
+            "Async unavailability message changed: all platforms: \"Use first()\" → \"Use second()\""
+        ])
+    }
+
+    @Test func noasyncAndOtherAvailabilityChangesAreBothReported() throws {
+        let changes = compare(
+            "@available(iOS 16.0, *)\npublic func example()",
+            "@available(iOS 17.0, *)\n@available(*, noasync)\npublic func example()"
+        )
+
+        let change = try #require(changes.first)
+        #expect(Set(change.listOfChanges) == [
+            "Availability changed: iOS 16.0 → 17.0",
+            "Marked unavailable from async contexts: all platforms"
+        ])
+    }
+
+    @Test func unchangedNoasyncIsNotReported() {
+        let source = "@available(*, noasync, message: \"Use replacement()\")\npublic func example()"
+        #expect(compare(source, source).isEmpty)
+    }
+
     private func compare(_ old: String, _ new: String) -> [PADCore.Change] {
         let parser = SwiftInterfaceParser()
         return SwiftInterfaceAnalyzer().analyze(

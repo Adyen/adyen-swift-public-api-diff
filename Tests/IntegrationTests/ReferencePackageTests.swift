@@ -114,9 +114,51 @@ struct ReferencePackageTests {
             }
         }
     }
+
+    @Test func swiftInterfacePublicJSON() async throws {
+        try await setUp()
+        defer { tearDown() }
+        try await verifyJSON(for: .public, oldVersionName: "old_public", newVersionName: "new_public")
+    }
+
+    @Test func swiftInterfacePrivateJSON() async throws {
+        try await setUp()
+        defer { tearDown() }
+        try await verifyJSON(for: .private, oldVersionName: "old_private", newVersionName: "new_private")
+    }
 }
 
 private extension ReferencePackageTests {
+
+    /// Compares the JSON output byte for byte with the reference file.
+    ///
+    /// To (re-)record the reference files run the tests with the environment variable `RECORD_JSON_REFERENCES=1`
+    func verifyJSON(for interfaceType: InterfaceType, oldVersionName: String, newVersionName: String) async throws {
+        let pipelineOutput = try await runPipeline(for: interfaceType)
+
+        let jsonOutput = try JSONOutputGenerator(toolVersion: nil).generate(
+            from: pipelineOutput,
+            allTargets: ["ReferencePackage"],
+            oldVersionName: oldVersionName,
+            newVersionName: newVersionName,
+            platform: nil,
+            warnings: []
+        )
+
+        if ProcessInfo.processInfo.environment["RECORD_JSON_REFERENCES"] == "1" {
+            let resourcesDirectory = try Self.referencePackagesPath()
+                .deletingLastPathComponent()
+                .appending(path: "Tests/IntegrationTests/Resources")
+            let file = resourcesDirectory.appending(path: "\(interfaceType.expectedOutputFileName).json")
+            try jsonOutput.write(to: file, atomically: true, encoding: .utf8)
+            return
+        }
+
+        let path = try #require(Bundle.module.path(forResource: interfaceType.expectedOutputFileName, ofType: "json"))
+        let expected = try String(contentsOfFile: path, encoding: .utf8)
+
+        #expect(jsonOutput == expected)
+    }
 
     static func referencePackagesPath() throws -> URL {
         // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root

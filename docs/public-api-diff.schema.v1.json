@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Adyen/adyen-swift-public-api-diff/blob/main/docs/public-api-diff.schema.v1.json",
+  "title": "public-api-diff report (format version 1)",
+  "description": "Output of `public-api-diff --format json`. Additive changes (new optional fields) do not change the format version, so unknown properties must be ignored by consumers. Removing/renaming a field, changing its meaning or adding a value to an enumeration is a breaking change and bumps `formatVersion`.",
+  "type": "object",
+  "required": ["formatVersion", "tool", "oldVersionName", "newVersionName", "platform", "analyzedTargets", "warnings", "summary", "targets"],
+  "properties": {
+    "formatVersion": { "const": 1 },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": ["string", "null"] }
+      }
+    },
+    "oldVersionName": { "type": ["string", "null"] },
+    "newVersionName": { "type": ["string", "null"] },
+    "platform": { "type": ["string", "null"] },
+    "analyzedTargets": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "description": "Sorted. null when not provided. Empty means targets were expected but none were found."
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "summary": {
+      "type": "object",
+      "required": ["added", "modified", "removed", "total"],
+      "properties": {
+        "added": { "type": "integer", "minimum": 0 },
+        "modified": { "type": "integer", "minimum": 0 },
+        "removed": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "targets": {
+      "type": "object",
+      "description": "Changes per target/module. Targets without changes are omitted. The key can be an empty string. For `project` a `Package.swift` key may be present.",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "$ref": "#/$defs/change" }
+      }
+    }
+  },
+  "$defs": {
+    "change": {
+      "type": "object",
+      "required": ["kind", "parentPath", "before", "after", "details", "conditions"],
+      "properties": {
+        "kind": { "enum": ["added", "modified", "removed"] },
+        "parentPath": { "type": ["string", "null"], "minLength": 1 },
+        "before": { "type": ["string", "null"] },
+        "after": { "type": ["string", "null"] },
+        "details": { "type": "array", "items": { "type": "string" } },
+        "conditions": { "type": "array", "items": { "type": "string" } }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "added" } } }, "then": { "properties": { "before": { "type": "null" }, "after": { "type": "string" } } } },
+        { "if": { "properties": { "kind": { "const": "removed" } } }, "then": { "properties": { "before": { "type": "string" }, "after": { "type": "null" } } } },
+        { "if": { "properties": { "kind": { "const": "modified" } } }, "then": { "properties": { "before": { "type": "string" }, "after": { "type": "string" } } } }
+      ]
+    }
+  }
+}

@@ -23,6 +23,24 @@ let markdownOutput: String = try outputGenerator.generate(
 )
 ```
 
+### JSON output
+
+``PADOutputGenerator/JSONOutputGenerator`` produces a deterministic, versioned JSON document that other tools can process.
+The model (``PADOutputGenerator/JSONReport``) is `Codable`, so it can be decoded again.
+Consumers should check `formatVersion` (see ``PADOutputGenerator/JSONReport/currentFormatVersion``) - not the tool version.
+
+```swift
+let outputGenerator = JSONOutputGenerator(toolVersion: "1.0.0")
+let json: String = try outputGenerator.generate(
+    from: changes,
+    allTargets: allTargets,
+    oldVersionName: oldVersionName,
+    newVersionName: newVersionName,
+    platform: nil,
+    warnings: warnings
+)
+```
+
 ---
 
 Example output for ``PADOutputGenerator/MarkdownOutputGenerator``

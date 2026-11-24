@@ -6,6 +6,7 @@
 
 import Foundation
 import PADCore
+import PADLogging
 
 /// A helper to consolidate a `removal` and `addition` to `change`
 protocol SwiftInterfaceChangeConsolidating {
@@ -18,6 +19,12 @@ protocol SwiftInterfaceChangeConsolidating {
 }
 
 struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
+
+    let logger: (any Logging)?
+
+    init(logger: (any Logging)? = nil) {
+        self.logger = logger
+    }
 
     /// Tries to match a `removal` and `addition` to a `change`
     ///
@@ -59,7 +66,8 @@ struct SwiftInterfaceChangeConsolidator: SwiftInterfaceChangeConsolidating {
             let listOfChanges = listOfChanges(between: change, and: match)
 
             if listOfChanges.isEmpty {
-                print("⚠ We should not end up here - investigate how this happened")
+                // Not using `print` as it would pollute stdout (e.g. when producing JSON output)
+                logger?.log("⚠ We should not end up here - investigate how this happened", from: String(describing: Self.self))
                 // Continue processing remaining changes (don't break the loop)
                 continue
             }
