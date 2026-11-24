@@ -179,6 +179,33 @@ OPTIONS:
 ```
 </details>
 
+## API Scope
+
+Interfaces that were generated without library evolution (e.g. `BUILD_LIBRARY_FOR_DISTRIBUTION = NO`) still contain `private`, `fileprivate` and `internal` declarations.
+Use `--api-scope` to define which declarations are considered part of the API:
+
+| Value | Keeps | Drops |
+|-------|-------|-------|
+| `all` (default) | everything | nothing |
+| `package` | `public`, `open`, `package` | `internal`, `fileprivate`, `private` |
+| `public` | `public`, `open` | `package`, `internal`, `fileprivate`, `private` |
+
+`--api-scope` decides which *declarations* to keep. `--swift-interface-type` decides which *file* to read.
+
+<details><summary><b>How declarations are filtered / known limitations</b></summary>
+
+- Only an **explicit** access modifier hides a declaration. Declarations without one (enum cases, protocol requirements, members of an extension without access modifier) are kept.
+- `public private(set) var` is kept, only the setter is restricted.
+- `@usableFromInline` declarations are kept, as they are part of the ABI.
+- Members of a removed type are removed with it.
+- An extension whose members are all removed is removed as well, unless it adds a conformance (`extension T: P`). The conformance is part of the API.
+- Declarations in `#if` blocks are filtered like any other declaration.
+- Declarations are **not** removed because they are only *reachable* through hidden ones. A `public func make() -> HiddenType` stays in the report.
+- A `public` type whose members are all removed stays in the report, as the type itself is still API.
+- Filtering is syntactic. Access control inherited from an enclosing extension modifier (e.g. `internal extension T { func f() }`) is handled by removing the whole extension, but access levels that are only implied by the context are not inferred.
+
+</details>
+
 ## Release Build
 ### Create
 ```bash

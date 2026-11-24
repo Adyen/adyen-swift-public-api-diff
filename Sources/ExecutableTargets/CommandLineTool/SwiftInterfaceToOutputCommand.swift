@@ -49,6 +49,9 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
     @Option(help: "[Optional] Where to output the logs (File path)")
     public var logOutput: String?
 
+    @Option(help: "[Optional] Which declarations to consider part of the API (public/package/all). `public` drops package, internal and private declarations, `package` drops internal and private declarations, `all` keeps everything")
+    public var apiScope: APIScope = .all
+
     @Option(help: "[Optional] The log level to use during execution")
     public var logLevel: LogLevel = .default
 
@@ -65,6 +68,7 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
 
             let swiftInterfaceChanges = try await Self.analyzeSwiftInterfaceFiles(
                 swiftInterfaceFiles: [.init(name: targetName ?? "", oldFilePath: old, newFilePath: new)],
+                apiScope: apiScope,
                 logger: logger
             )
 
@@ -95,9 +99,10 @@ private extension SwiftInterfaceToOutputCommand {
 
     static func analyzeSwiftInterfaceFiles(
         swiftInterfaceFiles: [SwiftInterfaceFile],
+        apiScope: APIScope,
         logger: any Logging
     ) async throws -> [String: [Change]] {
-        let swiftInterfaceDiff = SwiftInterfaceDiff(logger: logger)
+        let swiftInterfaceDiff = SwiftInterfaceDiff(apiScope: apiScope, logger: logger)
 
         return try await swiftInterfaceDiff.run(
             with: swiftInterfaceFiles

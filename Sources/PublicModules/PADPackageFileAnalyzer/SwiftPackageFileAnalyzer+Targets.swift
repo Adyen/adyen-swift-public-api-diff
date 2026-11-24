@@ -146,13 +146,13 @@ private extension SwiftPackageFileAnalyzer {
         
         let oldResources = old.map { resource in
             var updated = resource
-            updated.path = updated.path.trimmingPrefix(oldProjectBasePath)
+            updated.path = updated.path.relativePath(to: oldProjectBasePath)
             return updated
         }
         
         let newResources = new.map { resource in
             var updated = resource
-            updated.path = updated.path.trimmingPrefix(newProjectBasePath)
+            updated.path = updated.path.relativePath(to: newProjectBasePath)
             return updated
         }
         
@@ -166,7 +166,7 @@ private extension SwiftPackageFileAnalyzer {
         var listOfChanges = [String]()
         
         listOfChanges += addedResourcePaths.compactMap { path in
-            guard let resource = newResources.first(where: { $0.path.trimmingPrefix(newProjectBasePath) == path }) else { return nil }
+            guard let resource = newResources.first(where: { $0.path == path }) else { return nil }
             return "Added resource \(resource.description)"
         }
         
@@ -192,9 +192,17 @@ private extension SwiftPackageFileAnalyzer {
 // MARK: - Convenience Extension
 
 private extension String {
-    func trimmingPrefix(_ prefix: String) -> String {
+
+    /// Removes the project base path (and the separator that follows it)
+    ///
+    /// e.g. `/path/to/project/Resources/file.json` with base path `/path/to/project` -> `Resources/file.json`
+    func relativePath(to basePath: String) -> String {
+        guard !basePath.isEmpty, hasPrefix(basePath) else { return self }
         var trimmed = self
-        trimmed.trimPrefix(prefix)
+        trimmed.removeFirst(basePath.count)
+        if trimmed.hasPrefix("/") {
+            trimmed.removeFirst()
+        }
         return trimmed
     }
 }
