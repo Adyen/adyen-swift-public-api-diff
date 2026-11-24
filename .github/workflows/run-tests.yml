@@ -36,7 +36,7 @@ jobs:
         xcodebuild test -scheme public-api-diff-Package -destination "platform=macOS" -skipPackagePluginValidation | xcpretty --utf --color && exit ${PIPESTATUS[0]}
 
     - name: Set up Python for schema validation
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: '3.13'
 
