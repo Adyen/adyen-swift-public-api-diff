@@ -12,5 +12,5 @@
 /// Used for `--version` and for `tool.version` in the JSON output.
 /// Note: Consumers of the JSON output should rely on `formatVersion`, not on this value.
 enum ToolVersion {
-    static let current = "0.12.0"
+    static let current = "0.13.0"
 }
