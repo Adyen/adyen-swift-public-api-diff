@@ -1,28 +1,59 @@
 [![🧪 Run Tests](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Adyen/adyen-swift-public-api-diff/actions/workflows/run-tests.yml)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAdyen%2Fadyen-swift-public-api-diff%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/Adyen/adyen-swift-public-api-diff)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FAdyen%2Fadyen-swift-public-api-diff%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/Adyen/adyen-swift-public-api-diff)
-[![Mint](https://img.shields.io/badge/Mint-adyen%E2%80%93swift%E2%80%93public%E2%80%93api%E2%80%93diff-40c8a7?logo=leaf&logoColor=white)](#install-via-mint)
+[![Mint](https://img.shields.io/badge/Mint-adyen%E2%80%93swift%E2%80%93public%E2%80%93api%E2%80%93diff-40c8a7?logo=leaf&logoColor=white)](#installation)
 
 ![github-header](https://github.com/user-attachments/assets/08ec7d60-eb0f-4937-b44a-afff02eff72c)
 
 
 # Swift Public API diff
 
-This tool allows comparing 2 versions of a swift (sdk) project and lists all changes in a human readable way.
+Compare two versions of a Swift SDK or project and generate a human-readable report of API changes.
 
-It makes use of `.swiftinterface` files that get produced during the archiving of a swift project and parses them using [`swift-syntax`](https://github.com/swiftlang/swift-syntax).  
+The tool parses `.swiftinterface` files using [`SwiftSyntax`](https://github.com/swiftlang/swift-syntax). It can build projects for you, compare existing interface files, or locate interfaces inside built frameworks.
 
-## Contributing
-We strongly encourage you to contribute to our repository. Find out more in our [contribution guidelines](https://github.com/Adyen/.github/blob/master/CONTRIBUTING.md)
+[Quick start](#quick-start) · [Installation](#installation) · [Usage](#usage) · [Output](#output-format) · [GitHub Action](#github-action)
 
 ## Requirements
-- **Xcode** >= 26.6 (incl. Xcode command line tools)
-- **Swift** >= 6.2
-- **macOS** >= 13.0
+- **Xcode** >= 26.6, including the command line tools
+- **Swift** >= 6.3
+- **macOS** >= 13.0 for the tool and library products; your Xcode installation may require a newer macOS version
+
+<details>
+<summary>Check or select your Swift toolchain</summary>
+
+The pinned `swift-testing` dependency requires Swift 6.3, even though this package's manifest declares Swift tools version 5.9. Check the selected toolchain before building:
+
+```bash
+xcodebuild -version
+xcrun swift --version
+```
+
+If multiple Xcode versions are installed, select a compatible one using `DEVELOPER_DIR` or `xcode-select`.
+
+</details>
+
+## Quick start
+
+With two existing `.swiftinterface` files, build the tool from source and save a Markdown report. Replace `old.swiftinterface` and `new.swiftinterface` with your file paths:
+
+```bash
+git clone https://github.com/Adyen/adyen-swift-public-api-diff.git
+cd adyen-swift-public-api-diff
+swift run public-api-diff swift-interface \
+    --old old.swiftinterface \
+    --new new.swiftinterface \
+    --target-name MyModule \
+    --api-scope public \
+    --output api-comparison.md
+```
+
+Need to build the compared projects first? Use the [`project` command](#from-project-to-output) instead.
 
 ## Installation
 
-### Swift Package Manager (as a dependency)
+<details>
+<summary>Use as a Swift Package Manager dependency</summary>
 
 Add the package to your `Package.swift`:
 
@@ -36,12 +67,21 @@ Available library products:
 - **SwiftInterfaceDiff** - Core diffing functionality for `.swiftinterface` files
 - **PublicApiDiff** - Full API including project building, package analysis, and output generation
 
-### Install via [Mint](https://github.com/yonaskolb/mint)
-```
+</details>
+
+<details>
+<summary>Install the CLI with Mint</summary>
+
+With [Mint](https://github.com/yonaskolb/mint) installed:
+
+```bash
 mint install Adyen/adyen-swift-public-api-diff
 ```
 
-### Build from Source
+</details>
+
+<details>
+<summary>Build the CLI from source</summary>
 
 ```bash
 git clone https://github.com/Adyen/adyen-swift-public-api-diff.git
@@ -51,11 +91,30 @@ swift build --configuration release
 
 The binary will be available at `.build/release/public-api-diff`.
 
+</details>
+
 ## Usage
+
+Choose the command that matches your inputs:
+
+| Command | Inputs | Builds the project? |
+|---------|--------|---------------------|
+| [`project`](#from-project-to-output) | Local project directories or Git references | Yes |
+| [`swift-interface`](#from-swiftinterface-to-output) | Two `.swiftinterface` files | No |
+| [`framework`](#from-framework-to-output) | Two built `.framework` directories containing interfaces | No |
+
+This README describes the current branch. For a released version, use the README at the corresponding Git tag.
  
 ### From Project to Output
 
-- Build using the iOS sdk (Requires an iOS Simulator to be installed)
+<details>
+<summary>Build and compare Swift packages or Xcode projects</summary>
+
+`--old` and `--new` accept an existing local directory or a Git source in the form `branch-or-tag~repository-url`. A bare branch name is not a project source.
+
+Swift packages are built by default. Add `--scheme "YourScheme"` when comparing Xcode projects.
+
+- Build using the iOS SDK (requires an iOS Simulator SDK to be installed)
 ```bash
 swift run public-api-diff \
     project \
@@ -63,7 +122,7 @@ swift run public-api-diff \
     --new "develop~https://github.com/Adyen/adyen-ios.git" \
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
 ```
-- Build using the macOS sdk
+- Build using the macOS SDK
 ```bash
 swift run public-api-diff \
     project \
@@ -72,38 +131,26 @@ swift run public-api-diff \
     --old "0.4.0~https://github.com/Adyen/adyen-swift-public-api-diff"
 ```
 
-<details><summary><b>--help:</b></summary>
+For all available options and their defaults:
 
+```bash
+swift run public-api-diff project --help
 ```
-USAGE: public-api-diff project --new <new> --old <old> --platform <platform> [--scheme <scheme>] [--swift-interface-type <swift-interface-type>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
 
-OPTIONS:
-  --new <new>             Specify the updated version to compare to
-  --old <old>             Specify the old version to compare to
-  --platform <platform>   The platform to build the project for (iOS/macOS)
-  --scheme <scheme>       [Optional] Which scheme to build (Needed when
-                          comparing 2 xcode projects)
-  --swift-interface-type <swift-interface-type>
-                          [Optional] Specify the type of .swiftinterface you
-                          want to compare (public/private) (default: public)
-  --output <output>       [Optional] Where to output the result (File path)
-  --log-output <log-output>
-                          [Optional] Where to output the logs (File path)
-  --log-level <log-level> [Optional] The log level to use during execution
-                          (default: default)
-  -h, --help              Show help information.
- ```
 </details>
  
 ### From `.swiftinterface` to Output
 
+<details>
+<summary>Generate and compare interface files</summary>
+
 **1.** Build 2 versions of your project with `BUILD_LIBRARY_FOR_DISTRIBUTION=YES`
 ```bash
 xcodebuild clean build \
-    -scheme "YOUR_TARGET_NAME" \
+    -scheme "YOUR_SCHEME" \
     -derivedDataPath .build \
     -sdk "$(xcrun --sdk iphonesimulator --show-sdk-path)" \
-    -destination "generic/platform=iOS" \
+    -destination "generic/platform=iOS Simulator" \
     BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 ```
 
@@ -115,33 +162,18 @@ swift run public-api-diff \
     --old "old/path/to/project.swiftinterface"
 ```
  
-<details><summary><b>--help:</b></summary>
- 
-```
-USAGE: public-api-diff swift-interface --new <new> --old <old> [--target-name <target-name>] [--old-version-name <old-version-name>] [--new-version-name <new-version-name>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
+For all available options and their defaults:
 
-OPTIONS:
-  --new <new>             Specify the updated .swiftinterface file to compare to
-  --old <old>             Specify the old .swiftinterface file to compare to
-  --target-name <target-name>
-                          [Optional] The name of your target/module to show in
-                          the output
-  --old-version-name <old-version-name>
-                          [Optional] The name of your old version (e.g. v1.0 /
-                          main) to show in the output
-  --new-version-name <new-version-name>
-                          [Optional] The name of your new version (e.g. v2.0 /
-                          develop) to show in the output
-  --output <output>       [Optional] Where to output the result (File path)
-  --log-output <log-output>
-                          [Optional] Where to output the logs (File path)
-  --log-level <log-level> [Optional] The log level to use during execution
-                          (default: default)
-  -h, --help              Show help information.
+```bash
+swift run public-api-diff swift-interface --help
 ```
+
 </details>
 
 ### From `.framework` to Output
+
+<details>
+<summary>Compare interfaces inside built frameworks</summary>
 
 ```bash
 swift run public-api-diff \
@@ -151,38 +183,23 @@ swift run public-api-diff \
     --old "old/path/to/project.framework"
 ```
 
-<details><summary><b>--help:</b></summary>
+For all available options and their defaults:
 
+```bash
+swift run public-api-diff framework --help
 ```
-USAGE: public-api-diff framework --new <new> --old <old> --target-name <target-name> [--swift-interface-type <swift-interface-type>] [--old-version-name <old-version-name>] [--new-version-name <new-version-name>] [--output <output>] [--log-output <log-output>] [--log-level <log-level>]
 
-OPTIONS:
-  --new <new>             Specify the updated .framework to compare to
-  --old <old>             Specify the old .framework to compare to
-  --target-name <target-name>
-                          The name of your target/module to show in the output
-  --swift-interface-type <swift-interface-type>
-                          [Optional] Specify the type of .swiftinterface you
-                          want to compare (public/private) (default: public)
-  --old-version-name <old-version-name>
-                          [Optional] The name of your old version (e.g. v1.0 /
-                          main) to show in the output
-  --new-version-name <new-version-name>
-                          [Optional] The name of your new version (e.g. v2.0 /
-                          develop) to show in the output
-  --output <output>       [Optional] Where to output the result (File path)
-  --log-output <log-output>
-                          [Optional] Where to output the logs (File path)
-  --log-level <log-level> [Optional] The log level to use during execution
-                          (default: default)
-  -h, --help              Show help information.
-```
 </details>
 
 ## API Scope
 
+The default scope is `all`. Choose `public` or `package` to filter explicitly non-public declarations.
+
+<details>
+<summary>Scope values, interface types, and filtering limitations</summary>
+
 Interfaces that were generated without library evolution (e.g. `BUILD_LIBRARY_FOR_DISTRIBUTION = NO`) still contain `private`, `fileprivate` and `internal` declarations.
-Use `--api-scope` to define which declarations are considered part of the API:
+Use `--api-scope` on any of the three commands to define which declarations are considered part of the API:
 
 | Value | Keeps | Drops |
 |-------|-------|-------|
@@ -191,8 +208,9 @@ Use `--api-scope` to define which declarations are considered part of the API:
 | `public` | `public`, `open` | `package`, `internal`, `fileprivate`, `private` |
 
 `--api-scope` decides which *declarations* to keep. `--swift-interface-type` decides which *file* to read.
+The `public` interface file is the default for `project` and `framework`; choosing it does not enable `--api-scope public`.
 
-<details><summary><b>How declarations are filtered / known limitations</b></summary>
+### Filtering limitations
 
 - Only an **explicit** access modifier hides a declaration. Declarations without one (enum cases, protocol requirements, members of an extension without access modifier) are kept.
 - `public private(set) var` is kept, only the setter is restricted.
@@ -207,6 +225,10 @@ Use `--api-scope` to define which declarations are considered part of the API:
 </details>
 
 ## Release Build
+
+<details>
+<summary>Build and run the optimized CLI</summary>
+
 ### Create
 ```bash
 swift build --configuration release
@@ -214,58 +236,70 @@ swift build --configuration release
 
 ### Run
 ```bash
-./public-api-diff \
+.build/release/public-api-diff \
     project \
-    --new "develop~https://github.com/Adyen/adyen-ios.git" \ 
+    --platform iOS \
+    --new "develop~https://github.com/Adyen/adyen-ios.git" \
     --old "5.12.0~https://github.com/Adyen/adyen-ios.git"
 ```
 ```bash
-./public-api-diff \
+.build/release/public-api-diff \
     swift-interface \
     --new "new/path/to/project.swiftinterface" \
     --old "old/path/to/project.swiftinterface"
 ```
 ```bash
-./public-api-diff \
+.build/release/public-api-diff \
     framework \
     --target-name "TargetName" \
     --new "new/path/to/project.framework" \
     --old "old/path/to/project.framework"
 ```
 
+</details>
+
 ## Output Format
 
-The tool generates a Markdown report showing all public API changes, organized by module/target:
+The tool generates a Markdown report of API changes, organized by module/target. Use [`--api-scope`](#api-scope) to control which declarations are included.
 
-```markdown
+<details>
+<summary>Example Markdown report</summary>
+
+````markdown
 # 👀 3 public changes detected
 _Comparing `develop` to `5.12.0`_
 
 ---
 ## `ModuleName`
 #### ❇️ Added
-\`\`\`swift
+```swift
 public func newFunction()
-\`\`\`
+```
 #### 🔀 Changed
-\`\`\`swift
+```swift
 // From
 public func existingFunction(param: String)
 
 // To
 public func existingFunction(param: String, newParam: Int)
-\`\`\`
-#### 😶‍🌫️ Removed
-\`\`\`swift
-public func deprecatedFunction()
-\`\`\`
 ```
+#### 😶‍🌫️ Removed
+```swift
+public func deprecatedFunction()
+```
+````
+
+</details>
 
 The output can be written to a file using the `--output` flag or printed to stdout.
 
-## Github Action
-The public-api-diff can be used easily via the provided github action, which creates a comment on a PR (if applicable) and also adds it to the Github step summary.
-```bash
+## GitHub Action
+The GitHub Action adds the report to the step summary and posts a comment on same-repository pull requests. Pull requests from forks receive the step summary only.
+
+<details>
+<summary>Action configuration example</summary>
+
+```yaml
 - name: 🔍 Detect Changes
   uses: Adyen/adyen-swift-public-api-diff@0.12.0
   with:
@@ -273,22 +307,32 @@ The public-api-diff can be used easily via the provided github action, which cre
     new: "develop~https://github.com/Adyen/adyen-ios.git"
     old: "5.12.0~https://github.com/Adyen/adyen-ios.git"
 ```
-See: [example workflow](https://github.com/Adyen/adyen-swift-public-api-diff/blob/main/Examples/github-workflow.yml)
 
-## Alternatives
+</details>
+
+See the [example workflow](Examples/github-workflow.yml) for checkout and Xcode setup.
+
+## More Resources
+
+<details>
+<summary>Related tools, projects, and inspiration</summary>
+
+### Alternatives
 - **swift-api-digester**
   - `xcrun swift-api-digester -dump-sdk`
   - `xcrun swift-api-digester -diagnose-sdk`
 
-## Projects using `public-api-diff`
+### Projects using `public-api-diff`
 - [Adyen iOS Checkout](https://github.com/Adyen/adyen-ios)
 
-## Inspiration
- - https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift
-   - For parsing swift files using [swift-syntax](https://github.com/swiftlang/swift-syntax)'s [`SyntaxVisitor`](https://github.com/swiftlang/swift-syntax/blob/main/Sources/SwiftSyntax/generated/SyntaxVisitor.swift)
+### Inspiration
+- [Hatch's symbol parser](https://github.com/sdidla/Hatch/blob/main/Sources/Hatch/SymbolParser.swift), which uses SwiftSyntax's [`SyntaxVisitor`](https://github.com/swiftlang/swift-syntax/blob/main/Sources/SwiftSyntax/generated/SyntaxVisitor.swift) to parse Swift files.
 
-## Support
-If you have a feature request, or spotted a bug or a technical problem, create a GitHub issue.
+</details>
+
+## Contributing and Support
+
+Contributions are welcome. See our [contribution guidelines](https://github.com/Adyen/.github/blob/master/CONTRIBUTING.md), or [open an issue](https://github.com/Adyen/adyen-swift-public-api-diff/issues) for bugs and feature requests.
 
 ## License    
-MIT license. For more information, see the LICENSE file.
+MIT license. See [LICENSE.txt](LICENSE.txt).
