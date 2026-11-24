@@ -5,6 +5,8 @@
 //
 
 import Foundation
+import SwiftParser
+import SwiftSyntax
 
 /// An element whose attributes can be adjusted after parsing (e.g. when merging extensions)
 protocol SwiftInterfaceAttributedElement: SwiftInterfaceElement {
@@ -45,10 +47,13 @@ enum AvailabilityInheritance {
 
             if isShorthand(arguments) {
                 // `@available(iOS 26.0, macOS 26.0, *)` - keep only platforms the member doesn't specify
-                let remaining = arguments.dropLast().filter { !covered.contains(platformName($0)) }
+                let remaining = arguments.dropLast().filter {
+                    guard let platform = platformName($0) else { return false }
+                    return !covered.contains(platform)
+                }
                 guard !remaining.isEmpty else { continue }
-                inherited.append("@available(\((remaining + ["*"]).joined(separator: ", ")))")
-            } else if let platform = arguments.first, !covered.contains(platformName(platform)) {
+                inherited.append("@available(\((remaining.map { $0.argument.trimmedDescription } + ["*"]).joined(separator: ", ")))")
+            } else if let first = arguments.first, let platform = platformName(first), !covered.contains(platform) {
                 // `@available(tvOS, unavailable)`, `@available(*, deprecated, ...)`, ...
                 inherited.append(attribute)
             }
@@ -98,44 +103,36 @@ enum AvailabilityInheritance {
     /// The platforms an attribute makes a statement about (empty for non-availability attributes)
     private static func platforms(of attribute: String) -> [String] {
         guard let arguments = availabilityArguments(attribute) else { return [] }
-        if isShorthand(arguments) { return arguments.dropLast().map(platformName) }
-        return arguments.first.map { [platformName($0)] } ?? []
+        if isShorthand(arguments) { return arguments.dropLast().compactMap(platformName) }
+        return arguments.first.flatMap(platformName).map { [$0] } ?? []
     }
 
-    /// The top level, comma separated arguments of an `@available(...)` attribute
-    static func availabilityArguments(_ attribute: String) -> [String]? {
-        guard attribute.hasPrefix("@available("), attribute.hasSuffix(")") else { return nil }
-        let body = attribute.dropFirst("@available(".count).dropLast()
-
-        var arguments = [String]()
-        var current = ""
-        var inString = false
-        var previous: Character?
-        for character in body {
-            if character == "\"" && previous != "\\" { inString.toggle() }
-            if character == "," && !inString {
-                arguments.append(current.trimmingCharacters(in: .whitespaces))
-                current = ""
-            } else {
-                current.append(character)
-            }
-            previous = character
-        }
-        arguments.append(current.trimmingCharacters(in: .whitespaces))
+    /// Parses the stored attribute spelling into SwiftSyntax's typed availability arguments
+    static func availabilityArguments(_ attribute: String) -> AvailabilityArgumentListSyntax? {
+        var parser = Parser(attribute)
+        let syntax = AttributeSyntax.parse(from: &parser)
+        guard !syntax.hasError,
+              syntax.attributeName.trimmedDescription == "available",
+              case let .availability(arguments) = syntax.arguments else { return nil }
         return arguments
     }
 
     /// `@available(iOS 26.0, macOS 26.0, *)` (as opposed to `@available(iOS, introduced: 26.0)`)
-    static func isShorthand(_ arguments: [String]) -> Bool {
-        guard arguments.count >= 2, arguments.last == "*" else { return false }
+    static func isShorthand(_ arguments: AvailabilityArgumentListSyntax) -> Bool {
+        guard arguments.count >= 2, let last = arguments.last,
+              case let .token(token) = last.argument, token.tokenKind == .binaryOperator("*") else { return false }
         return arguments.dropLast().allSatisfy { argument in
-            let parts = argument.split(separator: " ")
-            return parts.count == 2 && parts[1].first?.isNumber == true
+            guard case let .availabilityVersionRestriction(platform) = argument.argument else { return false }
+            return platform.version != nil
         }
     }
 
-    static func platformName(_ argument: String) -> String {
-        String(argument.split(separator: " ").first ?? "")
+    static func platformName(_ argument: AvailabilityArgumentSyntax) -> String? {
+        switch argument.argument {
+        case let .token(token): return token.text
+        case let .availabilityVersionRestriction(platform): return platform.platform.text
+        case .availabilityLabeledArgument: return nil
+        }
     }
 
     /// Mirrors the parser normalization: `@available` attributes are sorted within their positions
