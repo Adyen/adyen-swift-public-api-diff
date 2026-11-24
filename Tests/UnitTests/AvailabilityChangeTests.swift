@@ -140,6 +140,40 @@ struct AvailabilityChangeTests {
         #expect(compare(source, source).isEmpty)
     }
 
+    @Test func nativeAvailabilityParsingPreservesPlatformValues() throws {
+        let platforms = try #require(AvailabilityChange.platforms([
+            "@available(iOS 16.1, macOS 13.2, CustomOS 2.3, *)",
+            "@available(iOS, deprecated: 17.0, obsoleted: 18.0, message: \"a, b: c\", renamed: \"replacement(_:)\")",
+            "@available(swift 5.9)",
+            "@available(*, noasync)"
+        ]))
+
+        #expect(platforms["iOS"]?.introduced == "16.1")
+        #expect(platforms["iOS"]?.deprecated == "17.0")
+        #expect(platforms["iOS"]?.isDeprecated == true)
+        #expect(platforms["iOS"]?.obsoleted == "18.0")
+        #expect(platforms["iOS"]?.message == "\"a, b: c\"")
+        #expect(platforms["iOS"]?.renamed == "\"replacement(_:)\"")
+        #expect(platforms["macOS"]?.introduced == "13.2")
+        #expect(platforms["CustomOS"]?.introduced == "2.3")
+        #expect(platforms["swift"]?.introduced == "5.9")
+        #expect(platforms["*"]?.isNoAsync == true)
+    }
+
+    @Test func escapedStringsKeepTheirSourceSpelling() throws {
+        let platforms = try #require(AvailabilityChange.platforms([
+            #"@available(*, deprecated, message: "C:\\", renamed: "replacement()")"#
+        ]))
+
+        #expect(platforms["*"]?.message == "\"C:\\\\\"")
+        #expect(platforms["*"]?.renamed == "\"replacement()\"")
+    }
+
+    @Test func malformedAvailabilityFallsBackInsteadOfInventingValues() {
+        #expect(AvailabilityChange.platforms(["@available(iOS, introduced: )"]) == nil)
+        #expect(AvailabilityChange.platforms(["@available(iOS, introduced: 16.0) extra"]) == nil)
+    }
+
     private func compare(_ old: String, _ new: String) -> [PADCore.Change] {
         let parser = SwiftInterfaceParser()
         return SwiftInterfaceAnalyzer().analyze(

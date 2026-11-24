@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import SwiftSyntax
 
 /// Describes the difference between two sets of `@available` attributes per platform,
 /// instead of as added/removed attribute strings.
@@ -129,35 +130,46 @@ enum AvailabilityChange {
     static func platforms(_ attributes: [String]) -> [String: Platform]? {
         var result = [String: Platform]()
         for attribute in attributes where attribute.hasPrefix("@available(") {
-            guard let arguments = AvailabilityInheritance.availabilityArguments(attribute), let first = arguments.first else { return nil }
+            guard let arguments = AvailabilityInheritance.availabilityArguments(attribute),
+                  let first = arguments.first,
+                  let platform = AvailabilityInheritance.platformName(first) else { return nil }
 
             if AvailabilityInheritance.isShorthand(arguments) {
                 // @available(iOS 16.1, macOS 27.3, *)
                 for argument in arguments.dropLast() {
-                    let parts = argument.split(separator: " ", maxSplits: 1)
-                    result[String(parts[0]), default: Platform()].introduced = String(parts[1])
+                    guard case let .availabilityVersionRestriction(platform) = argument.argument else { return nil }
+                    result[platform.platform.text, default: Platform()].introduced = platform.version?.trimmedDescription
                 }
                 continue
             }
 
             // @available(iOS, introduced: 13.0, deprecated: 16.0, message: "...") / @available(*, unavailable) / @available(swift 5.9)
-            let firstParts = first.split(separator: " ", maxSplits: 1)
-            let platform = String(firstParts[0])
             var state = result[platform] ?? Platform()
-            if firstParts.count == 2 { state.introduced = String(firstParts[1]) }
+            if case let .availabilityVersionRestriction(platform) = first.argument {
+                state.introduced = platform.version?.trimmedDescription
+            }
 
             for argument in arguments.dropFirst() {
-                let pair = argument.split(separator: ":", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
-                switch (pair[0], pair.count == 2 ? pair[1] : nil) {
-                case ("unavailable", nil): state.isUnavailable = true
-                case ("deprecated", nil): state.isDeprecated = true
-                case let ("deprecated", version?): state.isDeprecated = true; state.deprecated = version
-                case let ("introduced", version?): state.introduced = version
-                case let ("obsoleted", version?): state.obsoleted = version
-                case let ("message", message?): state.message = message
-                case let ("renamed", renamed?): state.renamed = renamed
-                case ("noasync", nil): state.isNoAsync = true
-                default: return nil
+                switch argument.argument {
+                case let .token(token):
+                    switch token.tokenKind {
+                    case .keyword(.unavailable): state.isUnavailable = true
+                    case .keyword(.deprecated): state.isDeprecated = true
+                    case .keyword(.noasync): state.isNoAsync = true
+                    default: return nil
+                    }
+                case let .availabilityLabeledArgument(argument):
+                    switch (argument.label.tokenKind, argument.value) {
+                    case let (.keyword(.deprecated), .version(version)):
+                        state.isDeprecated = true
+                        state.deprecated = version.trimmedDescription
+                    case let (.keyword(.introduced), .version(version)): state.introduced = version.trimmedDescription
+                    case let (.keyword(.obsoleted), .version(version)): state.obsoleted = version.trimmedDescription
+                    case let (.keyword(.message), .string(message)): state.message = message.trimmedDescription
+                    case let (.keyword(.renamed), .string(renamed)): state.renamed = renamed.trimmedDescription
+                    default: return nil
+                    }
+                case .availabilityVersionRestriction: return nil
                 }
             }
             result[platform] = state
