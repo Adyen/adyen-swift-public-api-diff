@@ -44,6 +44,7 @@ jobs:
     - name: 📝 Update version references
       run: |
         sed -i "s|uses: Adyen/adyen-swift-public-api-diff@[0-9]*\.[0-9]*\.[0-9]*|uses: Adyen/adyen-swift-public-api-diff@${VERSION}|g" Examples/github-workflow.yml README.md
+        sed -i "s|static let current = \"[0-9]*\\.[0-9]*\\.[0-9]*\"|static let current = \"${VERSION}\"|" Sources/ExecutableTargets/CommandLineTool/ToolVersion.swift
         sed -i "s|adyen-swift-public-api-diff\", from: \"[0-9]*\.[0-9]*\.[0-9]*\"|adyen-swift-public-api-diff\", from: \"${VERSION}\"|g" README.md
       env:
         VERSION: ${{ inputs.version }}
@@ -52,7 +53,7 @@ jobs:
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add Examples/github-workflow.yml README.md
+        git add Examples/github-workflow.yml README.md Sources/ExecutableTargets/CommandLineTool/ToolVersion.swift
         git diff --cached --quiet || git commit -m "Bump version to $VERSION"
         git push origin "release/$VERSION"
       env:

@@ -55,6 +55,9 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
     @Option(help: "[Optional] The log level to use during execution")
     public var logLevel: LogLevel = .default
 
+    @Option(help: "[Optional] The output format (markdown/json)")
+    public var format: OutputFormat = .markdown
+
     /// Entry point of the command line tool
     public func run() async throws {
 
@@ -74,6 +77,7 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
             let generatedOutput = try Self.generateOutput(
                 for: swiftInterfaceChanges,
                 warnings: [],
+                format: format,
                 allTargets: targetName.map { [$0] },
                 oldVersionName: oldVersionName,
                 newVersionName: newVersionName
@@ -81,16 +85,12 @@ struct SwiftInterfaceToOutputCommand: AsyncParsableCommand {
 
             // MARK: -
 
-            if let output {
-                try FileManager.default.write(generatedOutput, to: output)
-            } else {
-                // We're not using a logger here as we always want to have it printed if no output was specified
-                print(generatedOutput)
-            }
+            try PublicApiDiff.deliver(generatedOutput, to: output)
 
             logger.log("✅ Success", from: "Main")
         } catch {
-            logger.log("💥 \(error.localizedDescription)", from: "Main")
+            // `markdown` must keep exiting with status 0 on errors, `json` exits non-zero. See `PublicApiDiff.handle`
+            try PublicApiDiff.handle(error, format: format, logger: logger)
         }
     }
 }
@@ -112,11 +112,12 @@ private extension SwiftInterfaceToOutputCommand {
     static func generateOutput(
         for changes: [String: [Change]],
         warnings: [String],
+        format: OutputFormat,
         allTargets: [String]?,
         oldVersionName: String?,
         newVersionName: String?
     ) throws -> String {
-        let outputGenerator: any OutputGenerating<String> = MarkdownOutputGenerator()
+        let outputGenerator = format.generator()
 
         return try outputGenerator.generate(
             from: changes,

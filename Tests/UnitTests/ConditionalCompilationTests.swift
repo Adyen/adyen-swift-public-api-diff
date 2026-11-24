@@ -21,6 +21,76 @@ struct ConditionalCompilationTests {
         SwiftInterfaceAnalyzer().analyze(old: parse(old), new: parse(new))
     }
 
+    @Test func conformanceConditionChangesAreReported() throws {
+        let changes = changes(
+            from: """
+            public struct Shape {}
+            #if os(iOS)
+            extension Example.Shape: Swift.Sendable {}
+            #endif
+            """,
+            to: """
+            public struct Shape {}
+            #if os(macOS)
+            extension Example.Shape: Swift.Sendable {}
+            #endif
+            """
+        )
+
+        let change = try #require(changes.first)
+        #expect(changes.count == 1)
+        #expect(change.changeType.isModification)
+        #expect(change.listOfChanges == [
+            "Conformance `Swift.Sendable`: Added condition `#if os(macOS)`; Removed condition `#if os(iOS)`"
+        ])
+    }
+
+    @Test(arguments: [true, false])
+    func conformanceConditionAdditionAndRemovalAreReported(adding: Bool) throws {
+        let unconditional = "public struct Shape {}\nextension Example.Shape: Swift.Sendable {}"
+        let conditional = """
+        public struct Shape {}
+        #if os(iOS)
+        extension Example.Shape: Swift.Sendable {}
+        #endif
+        """
+        let changes = changes(
+            from: adding ? unconditional : conditional,
+            to: adding ? conditional : unconditional
+        )
+
+        let change = try #require(changes.first)
+        #expect(changes.count == 1)
+        #expect(change.listOfChanges == [
+            "Conformance `Swift.Sendable`: \(adding ? "Added" : "Removed") condition `#if os(iOS)`"
+        ])
+    }
+
+    @Test func conformanceConditionAndAvailabilityChangesAreBothReported() throws {
+        let changes = changes(
+            from: """
+            public struct Shape {}
+            #if os(iOS)
+            @available(iOS 16.0, *)
+            extension Example.Shape: Swift.Sendable {}
+            #endif
+            """,
+            to: """
+            public struct Shape {}
+            #if os(macOS)
+            @available(iOS 17.0, *)
+            extension Example.Shape: Swift.Sendable {}
+            #endif
+            """
+        )
+
+        let change = try #require(changes.first)
+        #expect(changes.count == 1)
+        #expect(change.listOfChanges == [
+            "Conformance `Swift.Sendable`: Availability changed: iOS 16.0 → 17.0; Added condition `#if os(macOS)`; Removed condition `#if os(iOS)`"
+        ])
+    }
+
     // MARK: - Parsing
 
     @Test func everyClauseIsTaggedWithItsCondition() throws {
