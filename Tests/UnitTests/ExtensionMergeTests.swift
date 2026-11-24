@@ -51,7 +51,7 @@ struct ExtensionMergeTests {
         )
         #expect(changes.isEmpty)
 
-        let root = SwiftInterfaceParser().parse(source: nestedTypeExtension + "\n" + nestedTypeDeclaration, moduleName: "Example")
+        let root = SwiftInterfaceParser().parseValid(source: nestedTypeExtension + "\n" + nestedTypeDeclaration, moduleName: "Example")
         #expect(!root.children.contains { $0 is SwiftInterfaceExtension })
     }
 
@@ -65,7 +65,7 @@ struct ExtensionMergeTests {
           public func apply()
         }
         """
-        let root = SwiftInterfaceParser().parse(source: source, moduleName: "Example")
+        let root = SwiftInterfaceParser().parseValid(source: source, moduleName: "Example")
         #expect(!root.children.contains { $0 is SwiftInterfaceExtension })
     }
 
@@ -177,7 +177,7 @@ struct ExtensionMergeTests {
     }
 
     @Test func conformanceWithTypeAvailabilityIsNotAnnotated() throws {
-        let root = SwiftInterfaceParser().parse(source: """
+        let root = SwiftInterfaceParser().parseValid(source: """
         @available(iOS 26.0, *)
         public enum E { case a }
         @available(iOS 26.0, *)
@@ -190,7 +190,7 @@ struct ExtensionMergeTests {
     }
 
     @Test func conformanceWithOwnAvailabilityIsRenderedAsExtension() throws {
-        let root = SwiftInterfaceParser().parse(source: """
+        let root = SwiftInterfaceParser().parseValid(source: """
         public struct Configuration {
           @available(iOS 16.1, *)
           public enum ActivityStyle { case standard }
@@ -256,8 +256,8 @@ struct ExtensionMergeTests {
     private func compare(_ old: String, _ new: String) -> [Change] {
         let parser = SwiftInterfaceParser()
         return SwiftInterfaceAnalyzer().analyze(
-            old: parser.parse(source: old, moduleName: "Example"),
-            new: parser.parse(source: new, moduleName: "Example")
+            old: parser.parseValid(source: old, moduleName: "Example"),
+            new: parser.parseValid(source: new, moduleName: "Example")
         )
     }
 }

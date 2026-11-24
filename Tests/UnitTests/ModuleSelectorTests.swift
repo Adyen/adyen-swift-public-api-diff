@@ -93,8 +93,8 @@ struct ModuleSelectorTests {
     private func compare(old: String, new: String) -> [PADCore.Change] {
         let parser = SwiftInterfaceParser()
         return SwiftInterfaceAnalyzer().analyze(
-            old: parser.parse(source: old, moduleName: "Example"),
-            new: parser.parse(source: new, moduleName: "Example")
+            old: parser.parseValid(source: old, moduleName: "Example"),
+            new: parser.parseValid(source: new, moduleName: "Example")
         )
     }
 }

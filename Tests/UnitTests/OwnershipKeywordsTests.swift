@@ -20,7 +20,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
@@ -41,7 +41,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
@@ -61,7 +61,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
@@ -88,8 +88,8 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
-        let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
+        let oldRoot = parser.parseValid(source: swiftCodeOld, moduleName: "TestModule")
+        let newRoot = parser.parseValid(source: swiftCodeNew, moduleName: "TestModule")
         
         let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
@@ -118,8 +118,8 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
-        let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
+        let oldRoot = parser.parseValid(source: swiftCodeOld, moduleName: "TestModule")
+        let newRoot = parser.parseValid(source: swiftCodeNew, moduleName: "TestModule")
         
         let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
@@ -145,7 +145,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
@@ -176,8 +176,8 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
-        let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
+        let oldRoot = parser.parseValid(source: swiftCodeOld, moduleName: "TestModule")
+        let newRoot = parser.parseValid(source: swiftCodeNew, moduleName: "TestModule")
         
         let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
@@ -203,8 +203,8 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
-        let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
+        let oldRoot = parser.parseValid(source: swiftCodeOld, moduleName: "TestModule")
+        let newRoot = parser.parseValid(source: swiftCodeNew, moduleName: "TestModule")
         
         let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
@@ -227,7 +227,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
@@ -251,8 +251,8 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
-        let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
+        let oldRoot = parser.parseValid(source: swiftCodeOld, moduleName: "TestModule")
+        let newRoot = parser.parseValid(source: swiftCodeNew, moduleName: "TestModule")
         
         let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
@@ -275,7 +275,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
@@ -297,7 +297,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
@@ -320,7 +320,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         
@@ -349,8 +349,8 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let oldRoot = parser.parse(source: swiftCodeOld, moduleName: "TestModule")
-        let newRoot = parser.parse(source: swiftCodeNew, moduleName: "TestModule")
+        let oldRoot = parser.parseValid(source: swiftCodeOld, moduleName: "TestModule")
+        let newRoot = parser.parseValid(source: swiftCodeNew, moduleName: "TestModule")
         
         let oldFunction = try #require(oldRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
         let newFunction = try #require(newRoot.children.first as? SwiftInterfaceFunction, "Expected function elements")
@@ -379,7 +379,7 @@ struct OwnershipKeywordsTests {
         """
         
         let parser = SwiftInterfaceParser()
-        let root = parser.parse(source: swiftCode, moduleName: "TestModule")
+        let root = parser.parseValid(source: swiftCode, moduleName: "TestModule")
         
         let function = try #require(root.children.first as? SwiftInterfaceFunction, "Expected a function element")
         

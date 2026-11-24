@@ -75,8 +75,8 @@ struct ExtensionPairingTests {
     private func compare(_ old: String, _ new: String) -> [Change] {
         let parser = SwiftInterfaceParser()
         return SwiftInterfaceAnalyzer().analyze(
-            old: parser.parse(source: old, moduleName: "Example"),
-            new: parser.parse(source: new, moduleName: "Example")
+            old: parser.parseValid(source: old, moduleName: "Example"),
+            new: parser.parseValid(source: new, moduleName: "Example")
         )
     }
 }

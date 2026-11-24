@@ -5,7 +5,9 @@
 //
 
 import Foundation
+import SwiftDiagnostics
 import SwiftParser
+import SwiftParserDiagnostics
 import SwiftSyntax
 
 /// Parses the source content of a swift file into intermediate objects for further processing
@@ -28,13 +30,14 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
     /// The syntax of every parsed extension, to produce new instances of it (see ``Root/init(moduleName:elements:copyExtension:)``)
     private var extensionNodes = [ObjectIdentifier: ExtensionDeclSyntax]()
 
-    func parse(source: String, moduleName: String) -> any SwiftInterfaceElement {
-        parse(source: source, moduleName: moduleName, apiScope: .all)
+    func parse(source: String, moduleName: String) throws -> any SwiftInterfaceElement {
+        try parse(source: source, moduleName: moduleName, apiScope: .all)
     }
 
-    func parse(source: String, moduleName: String, apiScope: APIScope) -> any SwiftInterfaceElement {
+    func parse(source: String, moduleName: String, apiScope: APIScope) throws -> any SwiftInterfaceElement {
         let visitor = Self()
         let syntax = Parser.parse(source: source)
+        try Self.validate(syntax)
         let filtered = AccessLevelFilter.filter(syntax, apiScope: apiScope)
         visitor.walk(ModuleSelectorNormalizer.normalize(filtered, moduleName: moduleName))
         let extensionNodes = visitor.extensionNodes
@@ -51,6 +54,24 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
                 return copy
             }
         )
+    }
+
+    /// SwiftParser recovers from syntax errors, which would silently drop or misinterpret declarations.
+    ///
+    /// Errors inside an attribute are tolerated: interfaces of newer compilers can contain attribute arguments
+    /// SwiftParser doesn't know yet (e.g. a new `@available` argument) and such attributes are compared as written.
+    private static func validate(_ syntax: SourceFileSyntax) throws {
+        guard syntax.hasError else { return }
+        let converter = SourceLocationConverter(fileName: "", tree: syntax)
+        let diagnostics = ParseDiagnosticsGenerator.diagnostics(for: syntax)
+            .filter { $0.diagMessage.severity == .error }
+            .filter { $0.node.ancestorOrSelf(mapping: { $0.as(AttributeSyntax.self) }) == nil }
+            .map { diagnostic in
+                let location = diagnostic.location(converter: converter)
+                return "\(location.line):\(location.column): \(diagnostic.message)"
+            }
+        guard !diagnostics.isEmpty else { return }
+        throw SwiftInterfaceParsingError(filePath: nil, diagnostics: diagnostics)
     }
 
     /// Designated initializer

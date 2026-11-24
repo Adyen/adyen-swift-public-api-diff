@@ -7,5 +7,6 @@
 import Foundation
 
 protocol SwiftInterfaceParsing {
-    func parse(source: String, moduleName: String, apiScope: APIScope) -> any SwiftInterfaceElement
+    /// - Throws: ``SwiftInterfaceParsingError`` if the source contains syntax errors
+    func parse(source: String, moduleName: String, apiScope: APIScope) throws -> any SwiftInterfaceElement
 }

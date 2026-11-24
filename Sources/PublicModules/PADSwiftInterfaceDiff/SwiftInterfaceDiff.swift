@@ -65,8 +65,8 @@ public struct SwiftInterfaceDiff {
             logger?.log("🧑‍🔬 Analyzing \(file.name)", from: String(describing: Self.self))
             let newContent = try fileHandler.loadString(from: file.newFilePath)
             let oldContent = try fileHandler.loadString(from: file.oldFilePath)
-            let newParsed = swiftInterfaceParser.parse(source: newContent, moduleName: file.name, apiScope: apiScope)
-            let oldParsed = swiftInterfaceParser.parse(source: oldContent, moduleName: file.name, apiScope: apiScope)
+            let newParsed = try parse(newContent, filePath: file.newFilePath, moduleName: file.name)
+            let oldParsed = try parse(oldContent, filePath: file.oldFilePath, moduleName: file.name)
 
             let moduleChanges = try swiftInterfaceAnalyzer.analyze(
                 old: oldParsed,
@@ -79,5 +79,14 @@ public struct SwiftInterfaceDiff {
         }
 
         return changes
+    }
+
+    private func parse(_ source: String, filePath: String, moduleName: String) throws -> any SwiftInterfaceElement {
+        do {
+            return try swiftInterfaceParser.parse(source: source, moduleName: moduleName, apiScope: apiScope)
+        } catch var error as SwiftInterfaceParsingError {
+            error.filePath = filePath
+            throw error
+        }
     }
 }

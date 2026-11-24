@@ -15,8 +15,8 @@ struct ExtensionCombiningTests {
     private func changes(from old: String, to new: String) -> [Change] {
         let parser = SwiftInterfaceParser()
         return SwiftInterfaceAnalyzer().analyze(
-            old: parser.parse(source: old, moduleName: "Example"),
-            new: parser.parse(source: new, moduleName: "Example")
+            old: parser.parseValid(source: old, moduleName: "Example"),
+            new: parser.parseValid(source: new, moduleName: "Example")
         )
     }
 
@@ -117,7 +117,7 @@ struct ExtensionCombiningTests {
     }
 
     @Test func extensionsWithDifferentWhereClausesAreNotCombined() throws {
-        let root = SwiftInterfaceParser().parse(
+        let root = SwiftInterfaceParser().parseValid(
             source: """
             extension Swift.Array where Element == Swift.Int {
               public func sum() -> Swift.Int
@@ -139,7 +139,7 @@ struct ExtensionCombiningTests {
     }
 
     @Test func conformanceAvailabilityIsKeptAndRenderedAsExtension() throws {
-        let root = SwiftInterfaceParser().parse(
+        let root = SwiftInterfaceParser().parseValid(
             source: """
             @available(iOS 17.0, *)
             extension Other.View: Other.Hoverable {
@@ -184,7 +184,7 @@ struct ExtensionCombiningTests {
     }
 
     @Test func extensionsWithOtherAttributesAreNotCombined() {
-        let root = SwiftInterfaceParser().parse(
+        let root = SwiftInterfaceParser().parseValid(
             source: """
             @_Concurrency.MainActor extension Other.View {
               public func first()

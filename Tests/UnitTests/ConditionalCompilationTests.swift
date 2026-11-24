@@ -14,7 +14,7 @@ struct ConditionalCompilationTests {
 
     private func parse(_ source: String) -> SwiftInterfaceParser.Root {
         // swiftlint:disable:next force_cast
-        SwiftInterfaceParser().parse(source: source, moduleName: "Example") as! SwiftInterfaceParser.Root
+        SwiftInterfaceParser().parseValid(source: source, moduleName: "Example") as! SwiftInterfaceParser.Root
     }
 
     private func changes(from old: String, to new: String) -> [Change] {

@@ -11,11 +11,11 @@ struct RepeatedParameterLabelTests {
 
     @Test func detectsChangeToSecondUnlabeledParameter() throws {
         let parser = SwiftInterfaceParser()
-        let before = parser.parse(
+        let before = parser.parseValid(
             source: "public func combine(_ first: Int, _ second: Int)",
             moduleName: "Example"
         )
-        let after = parser.parse(
+        let after = parser.parseValid(
             source: "public func combine(_ first: Int, _ second: String)",
             moduleName: "Example"
         )

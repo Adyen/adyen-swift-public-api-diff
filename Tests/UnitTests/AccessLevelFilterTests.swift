@@ -204,17 +204,17 @@ struct AccessLevelFilterTests {
         let source = "public struct Example { internal let hidden: Int }"
 
         let tokens = Set(SwiftInterfaceElementDescriptionToken.allCases)
-        let defaultDescription = parser.parse(source: source, moduleName: "Example").description(incl: tokens)
+        let defaultDescription = parser.parseValid(source: source, moduleName: "Example").description(incl: tokens)
 
         #expect(defaultDescription.contains("hidden"))
-        #expect(defaultDescription == parser.parse(source: source, moduleName: "Example", apiScope: .all).description(incl: tokens))
+        #expect(defaultDescription == parser.parseValid(source: source, moduleName: "Example", apiScope: .all).description(incl: tokens))
     }
 
     private func compare(old: String, new: String, apiScope: APIScope = .package) -> [PADCore.Change] {
         let parser = SwiftInterfaceParser()
         return SwiftInterfaceAnalyzer().analyze(
-            old: parser.parse(source: old, moduleName: "Example", apiScope: apiScope),
-            new: parser.parse(source: new, moduleName: "Example", apiScope: apiScope)
+            old: parser.parseValid(source: old, moduleName: "Example", apiScope: apiScope),
+            new: parser.parseValid(source: new, moduleName: "Example", apiScope: apiScope)
         )
     }
 }
