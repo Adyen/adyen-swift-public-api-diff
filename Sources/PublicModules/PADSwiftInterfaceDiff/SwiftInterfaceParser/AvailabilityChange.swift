@@ -149,6 +149,10 @@ enum AvailabilityChange {
                 state.introduced = platform.version?.trimmedDescription
             }
 
+            // When upgrading SwiftSyntax, check SwiftParser's AvailabilityArgumentKind and
+            // parseAvailabilityArgumentSpecList for new keywords or argument forms, and extend
+            // these switches and their tests. The defaults fall back to raw attribute diffs,
+            // so new availability keywords do not necessarily cause a compiler error here.
             for argument in arguments.dropFirst() {
                 switch argument.argument {
                 case let .token(token):
