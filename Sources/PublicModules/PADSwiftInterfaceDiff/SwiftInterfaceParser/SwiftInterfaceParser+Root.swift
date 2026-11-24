@@ -314,6 +314,10 @@ private extension SwiftInterfaceParser.Root {
 
         // We found the extended type
         if extendedElementPrefix == extensionElement.extendedType {
+            // Protocol requirements and extension implementations are distinct API.
+            // Merging them would hide removed defaults and changes in dispatch.
+            guard !(extendedElement is SwiftInterfaceProtocol) else { return false }
+
             // Conformances declared in an extension with its own availability keep it,
             // so e.g. a `Hashable` conformance arriving on a new platform stays visible.
             let conformances = (extensionElement.inheritance ?? []).map {

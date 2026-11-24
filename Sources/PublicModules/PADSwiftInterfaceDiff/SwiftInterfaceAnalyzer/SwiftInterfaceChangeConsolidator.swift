@@ -174,7 +174,15 @@ extension IndependentSwiftInterfaceChange {
     /// Here we already found the matching elements and thus are looking for combining a removal/addition to a change and thus we can loosen the filter to use the `name`.
     /// It could potentially still lead to false positives when having multiple functions with changes and the same name and parent but this is acceptable in this phase.
     func isConsolidatable(with otherChange: IndependentSwiftInterfaceChange) -> Bool {
-        element.consolidatableName == otherChange.element.consolidatableName &&
+        // A new designated initializer may replace inherited initializers, not modify them.
+        // Only loosen initializer matching when there is a shared parameter label.
+        if let initializer = element as? SwiftInterfaceInitializer,
+           let otherInitializer = otherChange.element as? SwiftInterfaceInitializer {
+            let labels = Set(initializer.parameters.compactMap(\.firstName))
+            let otherLabels = Set(otherInitializer.parameters.compactMap(\.firstName))
+            guard !labels.isDisjoint(with: otherLabels) else { return false }
+        }
+        return element.consolidatableName == otherChange.element.consolidatableName &&
             type(of: element) == type(of: otherChange.element) &&
             element.parentPath == otherChange.element.parentPath &&
             changeType.name != otherChange.changeType.name // We only want to match independent changes that are hava a different changeType

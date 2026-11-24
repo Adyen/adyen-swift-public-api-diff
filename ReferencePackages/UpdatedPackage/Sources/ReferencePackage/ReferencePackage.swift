@@ -4,6 +4,7 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
+// No longer re-exports Foundation (was `@_exported import Foundation`)
 import Foundation
 
 /**
@@ -183,12 +184,15 @@ postfix operator &&
 prefix operator &&
 
 infix operator &&: CustomPrecedence
+// Moved to another precedence group (was `AdditionPrecedence`), `prefix operator ~~>` was removed
+infix operator <~>: MultiplicationPrecedence
 
 precedencegroup CustomPrecedence {
     higherThan: AdditionPrecedence
     lowerThan: MultiplicationPrecedence
     assignment: false
-    associativity: left
+    // Changed from `left`: chaining `a && b && c` no longer compiles
+    associativity: none
 }
 
 // MARK: - Enums
@@ -336,6 +340,42 @@ public struct TypeConstraintTester<T> {
     }
 }
 
+
+// MARK: - Protocol Default Implementation Tests
+
+// Default implementation removed: conforming types now have to implement the requirement
+public protocol ProtocolWithRemovedDefaultImplementation {
+    func requirementWithDefaultImplementation() -> String
+}
+
+// MARK: - Parameter Tests
+
+public struct ParameterTester {
+    // Parameter changed to variadic
+    public func variadicFunction(_ values: Int...) {}
+}
+
+// MARK: - Extension Attribute Tests
+
+public struct ExtensionAttributeTester {}
+
+// Extension moved behind an SPI: its members are no longer public API
+@_spi(ExtensionSpi)
+extension ExtensionAttributeTester {
+    public func becomesSpi() {}
+}
+
+// MARK: - Initializer Inheritance Tests
+
+open class InitializerInheritanceBase {
+    public init() {}
+    public convenience init(value: Int) { self.init() }
+}
+
+// A new designated initializer stops the inheritance of `init()` and the convenience `init(value:)`
+open class InitializerInheritanceSubclass: InitializerInheritanceBase {
+    public init(other: Int) { super.init() }
+}
 
 // MARK: - Macros
 // The implementation modules don't exist, which is fine as long as the macros aren't expanded

@@ -60,61 +60,14 @@ struct ReferencePackageTests {
     @Test func swiftInterfacePublic() async throws {
         try await setUp()
         defer { tearDown() }
-
-        let interfaceType: InterfaceType = .public
-
-        let expectedOutput = try expectedOutput(for: interfaceType)
-        let pipelineOutput = try await runPipeline(for: interfaceType)
-
-        let markdownOutput = MarkdownOutputGenerator().generate(
-            from: pipelineOutput,
-            allTargets: ["ReferencePackage"],
-            oldVersionName: "old_public",
-            newVersionName: "new_public",
-            platform: nil,
-            warnings: []
-        )
-        
-        let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
-        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
-        
-        for i in 0..<expectedLines.count {
-            if expectedLines[i] != markdownOutputLines[i] {
-                #expect(expectedLines[i] == markdownOutputLines[i], "Issue in line \(i)")
-                return
-            }
-        }
+        try await verifyMarkdown(for: .public, oldVersionName: "old_public", newVersionName: "new_public")
     }
 
     @Test func swiftInterfacePrivate() async throws {
         try await setUp()
         defer { tearDown() }
-
-        let interfaceType: InterfaceType = .private
-
-        let expectedOutput = try expectedOutput(for: interfaceType)
-        let pipelineOutput = try await runPipeline(for: interfaceType)
-
-        let markdownOutput = MarkdownOutputGenerator().generate(
-            from: pipelineOutput,
-            allTargets: ["ReferencePackage"],
-            oldVersionName: "old_private",
-            newVersionName: "new_private",
-            platform: nil,
-            warnings: []
-        )
-
-        let expectedLines = sanitizeOutput(expectedOutput).components(separatedBy: "\n")
-        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
-
-        for i in 0..<expectedLines.count {
-            if expectedLines[i] != markdownOutputLines[i] {
-                #expect(expectedLines[i] == markdownOutputLines[i], "Issue in line \(i)")
-                return
-            }
-        }
+        try await verifyMarkdown(for: .private, oldVersionName: "old_private", newVersionName: "new_private")
     }
-
     @Test func swiftInterfacePublicJSON() async throws {
         try await setUp()
         defer { tearDown() }
@@ -130,9 +83,50 @@ struct ReferencePackageTests {
 
 private extension ReferencePackageTests {
 
-    /// Compares the JSON output byte for byte with the reference file.
+    /// Whether to (re-)record the reference files instead of comparing with them
     ///
-    /// To (re-)record the reference files run the tests with the environment variable `RECORD_JSON_REFERENCES=1`
+    /// To (re-)record the reference files run the tests with the environment variable `RECORD_REFERENCES=1`
+    var isRecording: Bool {
+        ProcessInfo.processInfo.environment["RECORD_REFERENCES"] == "1"
+    }
+
+    func record(_ output: String, for interfaceType: InterfaceType, fileExtension: String) throws {
+        let resourcesDirectory = try Self.referencePackagesPath()
+            .deletingLastPathComponent()
+            .appending(path: "Tests/IntegrationTests/Resources")
+        let file = resourcesDirectory.appending(path: "\(interfaceType.expectedOutputFileName).\(fileExtension)")
+        try output.write(to: file, atomically: true, encoding: .utf8)
+    }
+
+    /// Compares the Markdown output line by line with the reference file (ignoring the line with local paths)
+    func verifyMarkdown(for interfaceType: InterfaceType, oldVersionName: String, newVersionName: String) async throws {
+        let pipelineOutput = try await runPipeline(for: interfaceType)
+
+        let markdownOutput = MarkdownOutputGenerator().generate(
+            from: pipelineOutput,
+            allTargets: ["ReferencePackage"],
+            oldVersionName: oldVersionName,
+            newVersionName: newVersionName,
+            platform: nil,
+            warnings: []
+        )
+
+        if isRecording {
+            try record(markdownOutput + "\n", for: interfaceType, fileExtension: "md")
+            return
+        }
+
+        let expectedLines = sanitizeOutput(try expectedOutput(for: interfaceType)).components(separatedBy: "\n")
+        let markdownOutputLines = sanitizeOutput(markdownOutput).components(separatedBy: "\n")
+
+        for (index, (expectedLine, outputLine)) in zip(expectedLines, markdownOutputLines).enumerated() where expectedLine != outputLine {
+            #expect(expectedLine == outputLine, "Issue in line \(index)")
+            return
+        }
+        #expect(expectedLines.count == markdownOutputLines.count, "Unexpected number of lines")
+    }
+
+    /// Compares the JSON output byte for byte with the reference file.
     func verifyJSON(for interfaceType: InterfaceType, oldVersionName: String, newVersionName: String) async throws {
         let pipelineOutput = try await runPipeline(for: interfaceType)
 
@@ -145,12 +139,8 @@ private extension ReferencePackageTests {
             warnings: []
         )
 
-        if ProcessInfo.processInfo.environment["RECORD_JSON_REFERENCES"] == "1" {
-            let resourcesDirectory = try Self.referencePackagesPath()
-                .deletingLastPathComponent()
-                .appending(path: "Tests/IntegrationTests/Resources")
-            let file = resourcesDirectory.appending(path: "\(interfaceType.expectedOutputFileName).json")
-            try jsonOutput.write(to: file, atomically: true, encoding: .utf8)
+        if isRecording {
+            try record(jsonOutput, for: interfaceType, fileExtension: "json")
             return
         }
 
@@ -159,7 +149,6 @@ private extension ReferencePackageTests {
 
         #expect(jsonOutput == expected)
     }
-
     static func referencePackagesPath() throws -> URL {
         // Unfortunately we can't use packages as Test Resources, so we put it in a `ReferencePackages` directory on root
         guard let projectRoot = #file.replacingOccurrences(of: "relatve/path/to/file", with: "").split(separator: "/Tests/").first else {

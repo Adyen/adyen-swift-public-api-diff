@@ -4,7 +4,7 @@
 // This file is open source and available under the MIT license. See the LICENSE file for more info.
 //
 
-import Foundation
+@_exported import Foundation
 
 /**
  An attempt of using all swift language features to make sure that all types of different projects are supported.
@@ -122,6 +122,8 @@ postfix operator &&
 prefix operator &&
 
 infix operator &&: CustomPrecedence
+infix operator <~>: AdditionPrecedence
+prefix operator ~~>
 
 precedencegroup CustomPrecedence {
     higherThan: AdditionPrecedence
@@ -232,6 +234,39 @@ public struct TypeConstraintTester<T> {
         _ = value
     }
 }
+
+// MARK: - Protocol Default Implementation Tests
+
+public protocol ProtocolWithRemovedDefaultImplementation {
+    func requirementWithDefaultImplementation() -> String
+}
+
+extension ProtocolWithRemovedDefaultImplementation {
+    public func requirementWithDefaultImplementation() -> String { "default" }
+}
+
+// MARK: - Parameter Tests
+
+public struct ParameterTester {
+    public func variadicFunction(_ values: Int) {}
+}
+
+// MARK: - Extension Attribute Tests
+
+public struct ExtensionAttributeTester {}
+
+extension ExtensionAttributeTester {
+    public func becomesSpi() {}
+}
+
+// MARK: - Initializer Inheritance Tests
+
+open class InitializerInheritanceBase {
+    public init() {}
+    public convenience init(value: Int) { self.init() }
+}
+
+open class InitializerInheritanceSubclass: InitializerInheritanceBase {}
 
 // MARK: - Macros
 // The implementation modules don't exist, which is fine as long as the macros aren't expanded

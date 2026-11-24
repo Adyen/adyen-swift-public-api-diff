@@ -22,13 +22,6 @@ extension AttributeListSyntax {
         ]
     }
     
-    private var excludedAttributes: Set<String> {
-        [
-            "@_hasMissingDesignatedInitializers",
-            "@_inheritsConvenienceInitializers"
-        ]
-    }
-
     /// Produces a description where all elements in the list are mapped to their `trimmedDescription`
     ///
     /// Attributes inside an `#if` are kept per clause together with the clause's condition
@@ -52,9 +45,7 @@ extension AttributeListSyntax {
                 description = normalizedAvailability(attribute).trimmedDescription
             }
             description = translationTable[description] ?? description
-            if !excludedAttributes.contains(description) {
-                descriptions.append(description)
-            }
+            descriptions.append(description)
         }
         for (index, description) in zip(availabilityIndices, availabilityIndices.map { descriptions[$0] }.sorted()) {
             descriptions[index] = description

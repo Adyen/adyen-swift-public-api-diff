@@ -16,8 +16,6 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
 
     // TODO: Handle (Nice to have)
     // - DeinitializerDeclSyntax
-    // - PrecedenceGroupDeclSyntax
-    // - OperatorDeclSyntax
     // - ... (There are more but not important right now)
 
     private var scope: Scope = .root(elements: [])
@@ -88,6 +86,36 @@ class SwiftInterfaceParser: SyntaxVisitor, SwiftInterfaceParsing {
             conditionStack.removeLast()
         }
         return .skipChildren
+    }
+
+    // MARK: - Operator
+
+    override open func visit(_ node: OperatorDeclSyntax) -> SyntaxVisitorContinueKind {
+        startScope()
+    }
+
+    override open func visitPost(_ node: OperatorDeclSyntax) {
+        endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
+    }
+
+    // MARK: - Precedence group
+
+    override open func visit(_ node: PrecedenceGroupDeclSyntax) -> SyntaxVisitorContinueKind {
+        startScope()
+    }
+
+    override open func visitPost(_ node: PrecedenceGroupDeclSyntax) {
+        endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
+    }
+
+    // MARK: - Import
+
+    override open func visit(_ node: ImportDeclSyntax) -> SyntaxVisitorContinueKind {
+        startScope()
+    }
+
+    override open func visitPost(_ node: ImportDeclSyntax) {
+        endScopeAndAddSymbol { _ in [node.toInterfaceElement()] }
     }
 
     // MARK: - Class

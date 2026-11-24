@@ -1,6 +1,6 @@
-# ⚠️ 70 public changes detected ⚠️
+# ⚠️ 81 public changes detected ⚠️
 _Comparing `new_private` to `old_private`_
-<table><tr><td>❇️</td><td><b>35 Additions</b></td></tr><tr><td>🔀</td><td><b>30 Modifications</b></td></tr><tr><td>❌</td><td><b>5 Removals</b></td></tr></table>
+<table><tr><td>❇️</td><td><b>37 Additions</b></td></tr><tr><td>🔀</td><td><b>36 Modifications</b></td></tr><tr><td>❌</td><td><b>8 Removals</b></td></tr></table>
 
 ---
 ## `ReferencePackage`
@@ -53,6 +53,46 @@ public protocol SimpleProtocol
 #### 🔀 Modified
 ```swift
 // From
+@_exported
+import Foundation
+
+// To
+import Foundation
+
+/**
+Changes:
+- Removed attribute `@_exported`
+*/
+```
+```swift
+// From
+@_hasMissingDesignatedInitializers
+public actor CustomActor
+
+// To
+@_hasMissingDesignatedInitializers
+public actor CustomActor: ReferencePackage.SimpleProtocol
+
+/**
+Changes:
+- Added inheritance `ReferencePackage.SimpleProtocol`
+*/
+```
+```swift
+// From
+@_inheritsConvenienceInitializers
+open class InitializerInheritanceSubclass: ReferencePackage.InitializerInheritanceBase
+
+// To
+open class InitializerInheritanceSubclass: ReferencePackage.InitializerInheritanceBase
+
+/**
+Changes:
+- Removed attribute `@_inheritsConvenienceInitializers`
+*/
+```
+```swift
+// From
 @_spi(SystemProgrammingInterface)
 open class OpenSpiConformingClass: ReferencePackage.CustomProtocol
 
@@ -85,14 +125,36 @@ Changes:
 ```
 ```swift
 // From
-public actor CustomActor
+infix operator <~>: AdditionPrecedence
 
 // To
-public actor CustomActor: ReferencePackage.SimpleProtocol
+infix operator <~>: MultiplicationPrecedence
 
 /**
 Changes:
-- Added inheritance `ReferencePackage.SimpleProtocol`
+- Modified precedence group from `AdditionPrecedence` to `MultiplicationPrecedence`
+*/
+```
+```swift
+// From
+precedencegroup CustomPrecedence {
+  assignment: false
+  associativity: left
+  higherThan: AdditionPrecedence
+  lowerThan: MultiplicationPrecedence
+}
+
+// To
+precedencegroup CustomPrecedence {
+  assignment: false
+  associativity: none
+  higherThan: AdditionPrecedence
+  lowerThan: MultiplicationPrecedence
+}
+
+/**
+Changes:
+- Modified associativity from `left` to `none`
 */
 ```
 ```swift
@@ -140,6 +202,9 @@ Changes:
 ```swift
 @attached(peer)
 public macro RemovedMacro() = #externalMacro(module: "ReferenceMacros", type: "RemovedMacro")
+```
+```swift
+prefix operator ~~>
 ```
 ```swift
 public struct PublicStructThatIsOnlyAvailableInTheReferencePackage {
@@ -427,6 +492,30 @@ Changes:
 - Modified type from `any Swift.Equatable` to `Swift.Int`
 */
 ```
+### `ExtensionAttributeTester`
+#### 🔀 Modified
+```swift
+// From
+public func becomesSpi() -> Swift.Void
+
+// To
+@_spi(ExtensionSpi)
+public func becomesSpi() -> Swift.Void
+
+/**
+Changes:
+- Added attribute `@_spi(ExtensionSpi)`
+*/
+```
+### `InitializerInheritanceSubclass`
+#### ❇️ Added
+```swift
+public init(other: Swift.Int)
+```
+#### ❌ Removed
+```swift
+override public init()
+```
 ### `OpenSpiConformingClass`
 #### ❇️ Added
 ```swift
@@ -577,6 +666,34 @@ public func regularFunction(_ param: borrowing Swift.String) -> Swift.Void
 Changes:
 - Modified parameter `param`: Changed type from `Swift.String` to `borrowing Swift.String`
 */
+```
+### `ParameterTester`
+#### 🔀 Modified
+```swift
+// From
+public func variadicFunction(_ values: Swift.Int) -> Swift.Void
+
+// To
+public func variadicFunction(_ values: Swift.Int...) -> Swift.Void
+
+/**
+Changes:
+- Modified parameter `values`: Changed type from `Swift.Int` to `Swift.Int...`
+*/
+```
+### `ProtocolWithDefaultImplementation`
+#### ❇️ Added
+```swift
+extension ReferencePackage.ProtocolWithDefaultImplementation {
+  public func function() -> Swift.String
+}
+```
+### `ProtocolWithRemovedDefaultImplementation`
+#### ❌ Removed
+```swift
+extension ReferencePackage.ProtocolWithRemovedDefaultImplementation {
+  public func requirementWithDefaultImplementation() -> Swift.String
+}
 ```
 ### `TestExtensionMatching.Data`
 #### 🔀 Modified

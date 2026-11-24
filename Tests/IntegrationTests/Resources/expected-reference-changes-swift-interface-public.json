@@ -7,10 +7,10 @@
   "oldVersionName" : "old_public",
   "platform" : null,
   "summary" : {
-    "added" : 32,
-    "modified" : 24,
-    "removed" : 5,
-    "total" : 61
+    "added" : 34,
+    "modified" : 29,
+    "removed" : 9,
+    "total" : 72
   },
   "targets" : {
     "ReferencePackage" : [
@@ -99,6 +99,18 @@
         "parentPath" : null
       },
       {
+        "after" : "@_hasMissingDesignatedInitializers\npublic actor CustomActor: ReferencePackage.SimpleProtocol",
+        "before" : "@_hasMissingDesignatedInitializers\npublic actor CustomActor",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Added inheritance `ReferencePackage.SimpleProtocol`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
         "after" : "@freestanding(expression)\npublic macro stringify<T>(\n  _ value: T,\n  label: Swift.String\n) -> (T, Swift.String) = #externalMacro(module: \"ReferenceMacros\", type: \"StringifyMacro\")",
         "before" : "@freestanding(expression)\npublic macro stringify<T>(_ value: T) -> (T, Swift.String) = #externalMacro(module: \"ReferenceMacros\", type: \"StringifyMacro\")",
         "conditions" : [
@@ -111,13 +123,49 @@
         "parentPath" : null
       },
       {
-        "after" : "public actor CustomActor: ReferencePackage.SimpleProtocol",
-        "before" : "public actor CustomActor",
+        "after" : "import Foundation",
+        "before" : "@_exported\nimport Foundation",
         "conditions" : [
 
         ],
         "details" : [
-          "Added inheritance `ReferencePackage.SimpleProtocol`"
+          "Removed attribute `@_exported`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
+        "after" : "infix operator <~>: MultiplicationPrecedence",
+        "before" : "infix operator <~>: AdditionPrecedence",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified precedence group from `AdditionPrecedence` to `MultiplicationPrecedence`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
+        "after" : "open class InitializerInheritanceSubclass: ReferencePackage.InitializerInheritanceBase",
+        "before" : "@_inheritsConvenienceInitializers\nopen class InitializerInheritanceSubclass: ReferencePackage.InitializerInheritanceBase",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Removed attribute `@_inheritsConvenienceInitializers`"
+        ],
+        "kind" : "modified",
+        "parentPath" : null
+      },
+      {
+        "after" : "precedencegroup CustomPrecedence {\n  assignment: false\n  associativity: none\n  higherThan: AdditionPrecedence\n  lowerThan: MultiplicationPrecedence\n}",
+        "before" : "precedencegroup CustomPrecedence {\n  assignment: false\n  associativity: left\n  higherThan: AdditionPrecedence\n  lowerThan: MultiplicationPrecedence\n}",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified associativity from `left` to `none`"
         ],
         "kind" : "modified",
         "parentPath" : null
@@ -166,6 +214,18 @@
       {
         "after" : null,
         "before" : "@attached(peer)\npublic macro RemovedMacro() = #externalMacro(module: \"ReferenceMacros\", type: \"RemovedMacro\")",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : null
+      },
+      {
+        "after" : null,
+        "before" : "prefix operator ~~>",
         "conditions" : [
 
         ],
@@ -637,6 +697,42 @@
         "parentPath" : "CustomStruct"
       },
       {
+        "after" : null,
+        "before" : "public func becomesSpi() -> Swift.Void",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : "ExtensionAttributeTester"
+      },
+      {
+        "after" : "public init(other: Swift.Int)",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "InitializerInheritanceSubclass"
+      },
+      {
+        "after" : null,
+        "before" : "override public init()",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : "InitializerInheritanceSubclass"
+      },
+      {
         "after" : "public func newConsumingFunction(_ param: consuming Swift.String) -> Swift.Void",
         "before" : null,
         "conditions" : [
@@ -707,6 +803,42 @@
         ],
         "kind" : "modified",
         "parentPath" : "OwnershipTester"
+      },
+      {
+        "after" : "public func variadicFunction(_ values: Swift.Int...) -> Swift.Void",
+        "before" : "public func variadicFunction(_ values: Swift.Int) -> Swift.Void",
+        "conditions" : [
+
+        ],
+        "details" : [
+          "Modified parameter `values`: Changed type from `Swift.Int` to `Swift.Int...`"
+        ],
+        "kind" : "modified",
+        "parentPath" : "ParameterTester"
+      },
+      {
+        "after" : "extension ReferencePackage.ProtocolWithDefaultImplementation {\n  public func function() -> Swift.String\n}",
+        "before" : null,
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "added",
+        "parentPath" : "ProtocolWithDefaultImplementation"
+      },
+      {
+        "after" : null,
+        "before" : "extension ReferencePackage.ProtocolWithRemovedDefaultImplementation {\n  public func requirementWithDefaultImplementation() -> Swift.String\n}",
+        "conditions" : [
+
+        ],
+        "details" : [
+
+        ],
+        "kind" : "removed",
+        "parentPath" : "ProtocolWithRemovedDefaultImplementation"
       },
       {
         "after" : "public var someValue: Swift.String",

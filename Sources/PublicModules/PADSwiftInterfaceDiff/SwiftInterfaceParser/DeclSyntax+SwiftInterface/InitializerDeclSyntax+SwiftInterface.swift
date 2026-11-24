@@ -28,7 +28,7 @@ extension InitializerDeclSyntax {
                 attributes: $0.attributes.sanitizedList,
                 firstName: $0.firstName.trimmedDescription,
                 secondName: $0.secondName?.trimmedDescription,
-                type: $0.type.trimmedDescription,
+                type: $0.type.trimmedDescription + ($0.ellipsis?.trimmedDescription ?? ""),
                 defaultValue: $0.defaultValue?.value.trimmedDescription.sanitizingNewlinesAndSpaces
             )
         }
